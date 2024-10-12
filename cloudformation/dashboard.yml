@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SAM Template for the Earth Watcher Dashboard
 
@@ -8,17 +8,17 @@ Parameters:
     AllowedValues:
       - dev
       - prod
-    Description: 'The environment for the dashboard.'
+    Description: "The environment for the dashboard."
 
   DeploymentRoleARN:
     Type: String
-    Description: 'ARN of the IAM role for deployment.'
+    Description: "ARN of the IAM role for deployment."
 
 Resources:
   DashboardS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'earth-watcher-dashboard-${Environment}'
+      BucketName: !Sub "earth-watcher-dashboard-${Environment}"
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
@@ -37,21 +37,22 @@ Resources:
     Properties:
       Bucket: !Ref DashboardS3Bucket
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
               AWS:
                 - !Ref DeploymentRoleARN
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action:
               - s3:GetObject
               - s3:PutObject
+              - s3:DeleteObject
             Resource:
-              - !Sub '${DashboardS3Bucket.Arn}/*'
-              - !Sub '${DashboardS3Bucket.Arn}'
+              - !Sub "${DashboardS3Bucket.Arn}/*"
+              - !Sub "${DashboardS3Bucket.Arn}"
 
 Outputs:
   DashboardS3BucketName:
-    Description: 'Bucket name'
+    Description: "Bucket name"
     Value: !Ref DashboardS3Bucket
