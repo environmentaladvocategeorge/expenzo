@@ -19,9 +19,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "earth-watcher-dashboard-${Environment}"
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: index.html
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
