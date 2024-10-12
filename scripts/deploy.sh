@@ -5,7 +5,7 @@ set -e
 ASSUMED_ROLE_ARN=$1
 ACCOUNT_ID=$2
 ENVIRONMENT=$3
-STACK_NAME="earth-watcher-dashboard-${ENVIRONMENT}"
+STACK_NAME="earth-watcher-dashboard2-${ENVIRONMENT}"
 REGION="us-east-1"
 
 STACK_STATUS=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].StackStatus" --output text || echo "NOT_FOUND")
