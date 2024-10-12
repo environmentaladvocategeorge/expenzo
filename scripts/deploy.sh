@@ -30,6 +30,6 @@ sam deploy \
   --region $REGION
 
 echo "Syncing build files to S3 bucket: s3://${STACK_NAME}/..."
-aws s3 sync dist/apps/earth-watcher-dashboard s3://${STACK_NAME}/ --delete
+aws s3 sync .next s3://${STACK_NAME}/ --delete
 
 echo "Deployment complete."
