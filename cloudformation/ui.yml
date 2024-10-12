@@ -58,7 +58,6 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        CallerReference: !Sub "${AWS::StackName}-${Environment}-${AWS::Region}"
         Origins:
           - Id: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
             DomainName: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
@@ -66,7 +65,7 @@ Resources:
               OriginAccessIdentity: "origin-access-identity/cloudfront/E1CXPOQH50XLNI"
         DefaultRootObject: "index.html"
         DefaultCacheBehavior:
-          TargetOriginId: !Sub "${UIS3Bucket}-origin"
+          TargetOriginId: !Sub "earth-watcher-dashboard-${Environment}-origin"
           ViewerProtocolPolicy: "allow-all"
           AllowedMethods:
             - HEAD
@@ -78,7 +77,6 @@ Resources:
           CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
         Enabled: true
         HttpVersion: "http2"
-        IsIPV6Enabled: true
         PriceClass: "PriceClass_All"
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
