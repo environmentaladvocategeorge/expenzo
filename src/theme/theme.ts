@@ -23,14 +23,14 @@ const firaSans = Fira_Sans({
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#4CAF50",
-      light: "#C8E6C9",
-      dark: "#1B5E20",
+      main: "#455a64",
+      light: "#6a7b83",
+      dark: "#303e46",
     },
     secondary: {
-      main: "#43A047",
-      light: "#A5D6A7",
-      dark: "#2E7D32",
+      main: "#546e7a",
+      light: "#768b94",
+      dark: "#3a4d55",
     },
     neutral: {
       white: "#FFFFFF",
