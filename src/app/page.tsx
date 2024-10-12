@@ -7,7 +7,10 @@ const Home = () => {
   return (
     <Box>
       <Typography variant="h2" sx={{ color: theme.palette.primary.main }}>
-        Hello, Angie
+        Welcome, Angie
+      </Typography>
+      <Typography>
+        Welcome to Earth Watcher, the center for all climate disasters.
       </Typography>
     </Box>
   );

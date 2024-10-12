@@ -27,6 +27,11 @@ const theme = createTheme({
       light: "#C8E6C9",
       dark: "#1B5E20",
     },
+    secondary: {
+      main: "#43A047",
+      light: "#A5D6A7",
+      dark: "#2E7D32",
+    },
     neutral: {
       white: "#FFFFFF",
     },
@@ -40,6 +45,7 @@ const theme = createTheme({
       fontWeight: 700,
     },
     body1: {
+      fontSize: "18px",
       fontWeight: 400,
     },
   },
