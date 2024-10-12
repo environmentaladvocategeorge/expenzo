@@ -59,13 +59,13 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - Id: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
-            DomainName: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
+          - Id: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
             S3OriginConfig:
               OriginAccessIdentity: "origin-access-identity/cloudfront/E1CXPOQH50XLNI"
         DefaultRootObject: "index.html"
         DefaultCacheBehavior:
-          TargetOriginId: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
+          TargetOriginId: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
           ViewerProtocolPolicy: "allow-all"
           AllowedMethods:
             - HEAD
