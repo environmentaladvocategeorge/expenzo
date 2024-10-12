@@ -1,0 +1,58 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.18.0"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Verify pnpm installation
+        run: pnpm --version
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build the app using Next.js
+        run: pnpm build
+
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          output-credentials: true
+
+      - name: Package and Deploy SAM Application
+        run: |
+          ASSUMED_ROLE_ARN=$(aws sts get-caller-identity --query Arn --output text)
+          ROLE_ARN=${{ secrets.AWS_ROLE_ARN_DEV }}
+          ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID_DEV }}
+
+          chmod +x ./scripts/package.sh
+          chmod +x ./scripts/deploy.sh
+
+          ./scripts/package.sh $ROLE_ARN $ACCOUNT_ID dev
+          ./scripts/deploy.sh $ASSUMED_ROLE_ARN $ACCOUNT_ID dev

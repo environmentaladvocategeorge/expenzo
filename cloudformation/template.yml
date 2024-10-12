@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for the entire application
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Description: "Deployment environment. Allowed values are 'dev' or 'prod'."
+
+  DeploymentRoleARN:
+    Type: String
+    Description: 'ARN of the IAM role for deployment.'
+
+Resources:
+  Dashboard:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: dashboard.yml
+      Parameters:
+        Environment: !Ref Environment
+        DeploymentRoleARN: !Ref DeploymentRoleARN
