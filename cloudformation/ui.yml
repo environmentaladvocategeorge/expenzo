@@ -50,7 +50,7 @@ Resources:
               - !Sub "${UIS3Bucket.Arn}"
           - Effect: Allow
             Principal:
-              AWS: "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E1CXPOQH50XLNI"
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${UICloudFrontOAI.Id}"
             Action: s3:GetObject
             Resource: !Sub "${UIS3Bucket.Arn}/*"
 
@@ -62,7 +62,7 @@ Resources:
           - Id: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
             DomainName: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
             S3OriginConfig:
-              OriginAccessIdentity: "origin-access-identity/cloudfront/E1CXPOQH50XLNI"
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${UICloudFrontOAI.Id}"
         DefaultRootObject: "index.html"
         DefaultCacheBehavior:
           TargetOriginId: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
@@ -99,6 +99,12 @@ Resources:
             HeaderBehavior: none
           QueryStringsConfig:
             QueryStringBehavior: none
+
+  UICloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "OAI for Earth Watcher UI ${Environment}"
 
 Outputs:
   UIS3BucketName:
