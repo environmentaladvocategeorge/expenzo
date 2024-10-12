@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template for the Earth Watcher UI
+Description: CloudFormation Template for Earth Watcher CloudFront Distribution
 
 Parameters:
   Environment:
@@ -8,11 +8,7 @@ Parameters:
     AllowedValues:
       - dev
       - prod
-    Description: "The environment for the UI."
-
-  DeploymentRoleARN:
-    Type: String
-    Description: "ARN of the IAM role for deployment."
+    Description: "The environment for the CloudFront distribution."
 
 Resources:
   UIS3Bucket:
@@ -54,7 +50,42 @@ Resources:
             Action: s3:GetObject
             Resource: !Sub "${UIS3Bucket.Arn}/*"
 
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        CallerReference: !Sub "${AWS::StackName}-${Environment}-${AWS::Region}"
+        Origins:
+          - Id: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
+            S3OriginConfig:
+              OriginAccessIdentity: "origin-access-identity/cloudfront/E1CXPOQH50XLNI"
+        DefaultRootObject: "index.html"
+        DefaultCacheBehavior:
+          TargetOriginId: !Sub "${UIS3Bucket}-origin"
+          ViewerProtocolPolicy: "allow-all"
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          Compress: true
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+        Enabled: true
+        HttpVersion: "http2"
+        IsIPV6Enabled: true
+        PriceClass: "PriceClass_All"
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
 Outputs:
   UIS3BucketName:
-    Description: "Bucket name"
+    Description: "S3 Bucket name"
     Value: !Ref UIS3Bucket
+  CloudFrontDistributionId:
+    Description: "CloudFront Distribution ID"
+    Value: !Ref CloudFrontDistribution
+  CloudFrontDomainName:
+    Description: "CloudFront Domain Name"
+    Value: !GetAtt CloudFrontDistribution.DomainName
