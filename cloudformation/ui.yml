@@ -54,7 +54,7 @@ Resources:
             Action: s3:GetObject
             Resource: !Sub "${UIS3Bucket.Arn}/*"
 
-  CloudFrontDistribution:
+  UICloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
@@ -65,7 +65,7 @@ Resources:
               OriginAccessIdentity: "origin-access-identity/cloudfront/E1CXPOQH50XLNI"
         DefaultRootObject: "index.html"
         DefaultCacheBehavior:
-          TargetOriginId: !Sub "earth-watcher-dashboard-${Environment}-origin"
+          TargetOriginId: !Sub "earth-watcher-dashboard-${Environment}.s3.${AWS::Region}.amazonaws.com"
           ViewerProtocolPolicy: "allow-all"
           AllowedMethods:
             - HEAD
@@ -74,20 +74,39 @@ Resources:
             - HEAD
             - GET
           Compress: true
-          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+          CachePolicyId: !Ref UICachePolicy
         Enabled: true
         HttpVersion: "http2"
         PriceClass: "PriceClass_All"
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
 
+  UICachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub "earth-watcher-cache-policy-${Environment}"
+        Comment: "Cache policy for Earth Watcher application"
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
 Outputs:
   UIS3BucketName:
     Description: "S3 Bucket name"
     Value: !Ref UIS3Bucket
   CloudFrontDistributionId:
-    Description: "CloudFront Distribution ID"
-    Value: !Ref CloudFrontDistribution
+    Description: "UI CloudFront Distribution ID"
+    Value: !Ref UICloudFrontDistribution
   CloudFrontDomainName:
-    Description: "CloudFront Domain Name"
-    Value: !GetAtt CloudFrontDistribution.DomainName
+    Description: "UI CloudFront Domain Name"
+    Value: !GetAtt UICloudFrontDistribution.DomainName
