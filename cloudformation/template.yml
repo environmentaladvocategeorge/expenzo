@@ -15,10 +15,10 @@ Parameters:
     Description: "ARN of the IAM role for deployment."
 
 Resources:
-  Dashboard:
+  UI:
     Type: AWS::Serverless::Application
     Properties:
-      Location: dashboard.yml
+      Location: ui.yml
       Parameters:
         Environment: !Ref Environment
         DeploymentRoleARN: !Ref DeploymentRoleARN

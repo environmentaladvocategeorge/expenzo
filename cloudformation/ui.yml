@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template for the Earth Watcher Dashboard
+Description: SAM Template for the Earth Watcher UI
 
 Parameters:
   Environment:
@@ -8,17 +8,17 @@ Parameters:
     AllowedValues:
       - dev
       - prod
-    Description: "The environment for the dashboard."
+    Description: "The environment for the UI."
 
   DeploymentRoleARN:
     Type: String
     Description: "ARN of the IAM role for deployment."
 
 Resources:
-  DashboardS3Bucket:
+  UIS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "earth-watcher-dashboard-${Environment}"
+      BucketName: !Sub "earth-watcher-ui-${Environment}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
@@ -29,10 +29,10 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  DashboardS3BucketPolicy:
+  UIS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref DashboardS3Bucket
+      Bucket: !Ref UIS3Bucket
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -46,15 +46,15 @@ Resources:
               - s3:PutObject
               - s3:DeleteObject
             Resource:
-              - !Sub "${DashboardS3Bucket.Arn}/*"
-              - !Sub "${DashboardS3Bucket.Arn}"
+              - !Sub "${UIS3Bucket.Arn}/*"
+              - !Sub "${UIS3Bucket.Arn}"
           - Effect: Allow
             Principal:
               AWS: "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E1CXPOQH50XLNI"
             Action: s3:GetObject
-            Resource: !Sub "${DashboardS3Bucket.Arn}/*"
+            Resource: !Sub "${UIS3Bucket.Arn}/*"
 
 Outputs:
-  DashboardS3BucketName:
+  UIS3BucketName:
     Description: "Bucket name"
-    Value: !Ref DashboardS3Bucket
+    Value: !Ref UIS3Bucket
