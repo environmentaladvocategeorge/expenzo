@@ -1,11 +1,16 @@
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { Box, Typography, useTheme } from "@mui/material";
+
+const Home = () => {
+  const theme = useTheme();
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1>Earth Watcher</h1>
-      </main>
-    </div>
+    <Box>
+      <Typography variant="h2" sx={{ color: theme.palette.primary.main }}>
+        Hello, Angie
+      </Typography>
+    </Box>
   );
-}
+};
+
+export default Home;
