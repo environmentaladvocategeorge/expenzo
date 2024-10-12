@@ -10,6 +10,10 @@ Parameters:
       - prod
     Description: "The environment for the CloudFront distribution."
 
+  DeploymentRoleARN:
+    Type: String
+    Description: "ARN of the IAM role for deployment."
+
 Resources:
   UIS3Bucket:
     Type: AWS::S3::Bucket
