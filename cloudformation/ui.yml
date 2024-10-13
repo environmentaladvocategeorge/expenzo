@@ -87,8 +87,8 @@ Resources:
       CachePolicyConfig:
         Name: !Sub "earth-watcher-cache-policy-${Environment}"
         Comment: "Cache policy for Earth Watcher application"
-        DefaultTTL: 86400
-        MaxTTL: 31536000
+        DefaultTTL: 3600
+        MaxTTL: 86400
         MinTTL: 0
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
