@@ -20,7 +20,7 @@ export const Link = styled("span")(({ theme }) => ({
   alignItems: "center",
 
   "&:hover": {
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.secondary.dark,
   },
 }));
 

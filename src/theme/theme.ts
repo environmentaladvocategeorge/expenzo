@@ -13,6 +13,18 @@ declare module "@mui/material/styles" {
       white: string;
     };
   }
+
+  interface BreakpointOverrides {
+    xs: false;
+    sm: false;
+    md: false;
+    lg: false;
+    xl: false;
+    mobile: true;
+    tablet: true;
+    laptop: true;
+    desktop: true;
+  }
 }
 
 const firaSans = Fira_Sans({
@@ -50,6 +62,14 @@ const theme = createTheme({
     },
   },
   shadows: Array(25).fill("none") as any,
+  breakpoints: {
+    values: {
+      mobile: 0,
+      tablet: 600,
+      laptop: 1024,
+      desktop: 1440,
+    },
+  },
 });
 
 export default theme;
