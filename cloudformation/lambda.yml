@@ -9,9 +9,9 @@ Parameters:
       - dev
       - prod
     Description: "The environment for the CloudFront distribution."
-  KinesisStreamArn:
+  KinesisStreamName:
     Type: String
-    Description: "ARN of the Kinesis Data Stream"
+    Description: "The name of the Kinesis Data Stream"
   ResourceBaseIdentifier:
     Type: String
     Description: "Base identifier for resource naming."
@@ -30,7 +30,7 @@ Resources:
       Environment:
         Variables:
           ENV: !Ref Environment
-          KINESIS_STREAM_NAME: !Sub "${KinesisStreamArn}"
+          KINESIS_STREAM_NAME: !Sub "${KinesisStreamName}"
           BASE_IDENTIFIER: !Ref ResourceBaseIdentifier
 
   GetAllEarthquakesExecutionRole:

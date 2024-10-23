@@ -33,7 +33,7 @@ Resources:
       Location: lambda.yml
       Parameters:
         Environment: !Ref Environment
-        KinesisStreamArn: !GetAtt Kinesis.Outputs.KinesisStreamArn
+        KinesisStreamName: !GetAtt Kinesis.Outputs.KinesisStreamName
         ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
 
   # UI Nested Stack

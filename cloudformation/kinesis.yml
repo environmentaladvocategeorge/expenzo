@@ -20,8 +20,8 @@ Resources:
       ShardCount: 1
 
 Outputs:
-  KinesisStreamArn:
-    Description: "ARN of the Kinesis Data Stream"
-    Value: !GetAtt KinesisDataStream.Arn
+  KinesisStreamName:
+    Description: "Name of the Kinesis Data Stream"
+    Value: !Ref KinesisDataStream
     Export:
-      Name: !Sub "${ResourceBaseIdentifier}-KinesisStreamArn-${Environment}"
+      Name: !Sub "${ResourceBaseIdentifier}-KinesisStreamName-${Environment}"
