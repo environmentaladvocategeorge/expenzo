@@ -9,16 +9,18 @@ Parameters:
       - dev
       - prod
     Description: "The environment for the CloudFront distribution."
-
   DeploymentRoleARN:
     Type: String
     Description: "ARN of the IAM role for deployment."
+  ResourceBaseIdentifier:
+    Type: String
+    Description: "Base identifier for resource naming."
 
 Resources:
   UIS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "earth-watcher-ui-${Environment}"
+      BucketName: !Sub "${ResourceBaseIdentifier}-ui-${Environment}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
@@ -59,13 +61,13 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - Id: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
-            DomainName: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
+          - Id: !Sub "${ResourceBaseIdentifier}-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "${ResourceBaseIdentifier}-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${UICloudFrontOAI.Id}"
         DefaultRootObject: "index.html"
         DefaultCacheBehavior:
-          TargetOriginId: !Sub "earth-watcher-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
+          TargetOriginId: !Sub "${ResourceBaseIdentifier}-ui-${Environment}.s3.${AWS::Region}.amazonaws.com"
           ViewerProtocolPolicy: "allow-all"
           AllowedMethods:
             - HEAD
@@ -85,8 +87,8 @@ Resources:
     Type: AWS::CloudFront::CachePolicy
     Properties:
       CachePolicyConfig:
-        Name: !Sub "earth-watcher-cache-policy-${Environment}"
-        Comment: "Cache policy for Earth Watcher application"
+        Name: !Sub "${ResourceBaseIdentifier}-cache-policy-${Environment}"
+        Comment: !Sub "Cache policy for ${ResourceBaseIdentifier} application"
         DefaultTTL: 3600
         MaxTTL: 86400
         MinTTL: 0
@@ -104,7 +106,7 @@ Resources:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "OAI for Earth Watcher UI ${Environment}"
+        Comment: !Sub "OAI for ${ResourceBaseIdentifier} UI ${Environment}"
 
 Outputs:
   UIS3BucketName:

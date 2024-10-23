@@ -9,12 +9,37 @@ Parameters:
       - dev
       - prod
     Description: "Deployment environment. Allowed values are 'dev' or 'prod'."
-
+  ResourceBaseIdentifier:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Description: "Base identifier for resource naming."
   DeploymentRoleARN:
     Type: String
     Description: "ARN of the IAM role for deployment."
 
 Resources:
+  # Kinesis Nested Stack
+  Kinesis:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: kinesis.yml
+      Parameters:
+        Environment: !Ref Environment
+        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
+
+  # Lambda Nested Stack
+  Lambda:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: lambda.yml
+      Parameters:
+        Environment: !Ref Environment
+        KinesisStreamArn: !GetAtt Kinesis.Outputs.KinesisStreamArn
+        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
+
+  # UI Nested Stack
   UI:
     Type: AWS::Serverless::Application
     Properties:
@@ -22,3 +47,4 @@ Resources:
       Parameters:
         Environment: !Ref Environment
         DeploymentRoleARN: !Ref DeploymentRoleARN
+        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier

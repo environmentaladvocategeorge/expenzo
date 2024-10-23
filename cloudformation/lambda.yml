@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: CloudFormation Template for Earth Watcher CloudFront Distribution
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Description: "The environment for the CloudFront distribution."
+  KinesisStreamArn:
+    Type: String
+    Description: "ARN of the Kinesis Data Stream"
+  ResourceBaseIdentifier:
+    Type: String
+    Description: "Base identifier for resource naming."
+
+Resources:
+  GetAllEarthquakesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ResourceBaseIdentifier}-GetAllEarthquakes-${Environment}"
+      Handler: lambda/GetAllEarthquakes/handler.lambda_handler
+      Runtime: python3.8
+      Role: !GetAtt GetAllEarthquakesExecutionRole.Arn
+      CodeUri: lambda/GetAllEarthquakes/
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          ENV: !Ref Environment
+          KINESIS_STREAM_NAME: !Sub "${KinesisStreamArn}"
+          BASE_IDENTIFIER: !Ref ResourceBaseIdentifier
+
+  GetAllEarthquakesExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ResourceBaseIdentifier}-GetAllEarthquakesExecutionRole-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ResourceBaseIdentifier}KinesisWritePolicy-${Environment}"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:PutRecord
+                  - kinesis:PutRecords
+                Resource: !Ref KinesisStreamArn
