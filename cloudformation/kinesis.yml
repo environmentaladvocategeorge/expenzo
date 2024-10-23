@@ -23,8 +23,6 @@ Outputs:
   KinesisStreamName:
     Description: "Name of the Kinesis Data Stream"
     Value: !Ref KinesisDataStream
-    Export:
-      Name: !Sub "${ResourceBaseIdentifier}-EarthquakeDataStream-${Environment}"
   KinesisStreamArn:
     Description: "ARN of the Kinesis Data Stream"
     Value: !GetAtt KinesisDataStream.Arn
