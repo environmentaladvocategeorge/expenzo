@@ -34,6 +34,7 @@ Resources:
       Parameters:
         Environment: !Ref Environment
         KinesisStreamName: !GetAtt Kinesis.Outputs.KinesisStreamName
+        KinesisStreamArn: !GetAtt Kinesis.Outputs.KinesisStreamArn
         ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
 
   # UI Nested Stack
