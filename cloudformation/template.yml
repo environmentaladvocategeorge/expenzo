@@ -11,9 +11,6 @@ Parameters:
     Description: "Deployment environment. Allowed values are 'dev' or 'prod'."
   ResourceBaseIdentifier:
     Type: String
-    AllowedValues:
-      - dev
-      - prod
     Description: "Base identifier for resource naming."
   DeploymentRoleARN:
     Type: String
