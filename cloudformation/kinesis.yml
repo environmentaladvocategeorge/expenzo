@@ -8,7 +8,6 @@ Parameters:
       - dev
       - prod
     Description: "The environment for the Kinesis Data Stream."
-
   ResourceBaseIdentifier:
     Type: String
     Description: "Base identifier for resource naming."

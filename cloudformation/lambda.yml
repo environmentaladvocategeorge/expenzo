@@ -22,7 +22,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${ResourceBaseIdentifier}-GetAllEarthquakes-${Environment}"
       Handler: lambda/GetAllEarthquakes/handler.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.9
       Role: !GetAtt GetAllEarthquakesExecutionRole.Arn
       CodeUri: lambda/GetAllEarthquakes/
       MemorySize: 128

@@ -5,7 +5,8 @@ set -e
 ASSUMED_ROLE_ARN=$1
 ACCOUNT_ID=$2
 ENVIRONMENT=$3
-STACK_NAME="earth-watcher-ui-${ENVIRONMENT}"
+RESOURCE_BASE_IDENTIFIER="earth-watcher"
+STACK_NAME="${RESOURCE_BASE_IDENTIFIER}-ui-${ENVIRONMENT}"
 REGION="us-east-1"
 
 STACK_STATUS=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].StackStatus" --output text || echo "NOT_FOUND")
@@ -25,7 +26,7 @@ echo "Deploying SAM application..."
 sam deploy \
   --template-file packaged.yaml \
   --stack-name $STACK_NAME \
-  --parameter-overrides Environment=${ENVIRONMENT} DeploymentRoleARN=${ASSUMED_ROLE_ARN} \
+  --parameter-overrides Environment=${ENVIRONMENT} DeploymentRoleARN=${ASSUMED_ROLE_ARN} ResourceBaseIdentifier=${RESOURCE_BASE_IDENTIFIER} \
   --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
   --region $REGION
 
