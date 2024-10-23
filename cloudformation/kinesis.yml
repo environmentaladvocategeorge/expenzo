@@ -24,4 +24,4 @@ Outputs:
     Description: "Name of the Kinesis Data Stream"
     Value: !Ref KinesisDataStream
     Export:
-      Name: !Sub "${ResourceBaseIdentifier}-KinesisStreamName-${Environment}"
+      Name: !Sub "${ResourceBaseIdentifier}-EarthquakeDataStream-${Environment}"
