@@ -27,7 +27,7 @@ sam deploy \
   --template-file packaged.yaml \
   --stack-name $STACK_NAME \
   --parameter-overrides Environment=${ENVIRONMENT} DeploymentRoleARN=${ASSUMED_ROLE_ARN} ResourceBaseIdentifier=${RESOURCE_BASE_IDENTIFIER} \
-  --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
   --region $REGION
 
 echo "Syncing build files to S3 bucket: s3://${STACK_NAME}/..."
