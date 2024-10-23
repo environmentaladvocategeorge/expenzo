@@ -21,10 +21,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "${ResourceBaseIdentifier}-GetAllEarthquakes-${Environment}"
-      Handler: lambda/GetAllEarthquakes/handler.lambda_handler
+      Handler: handler.lambda_handler
       Runtime: python3.9
       Role: !GetAtt GetAllEarthquakesExecutionRole.Arn
-      CodeUri: lambda/GetAllEarthquakes/
+      CodeUri: ../lambda/GetAllEarthquakes/
       MemorySize: 128
       Timeout: 30
       Environment:
