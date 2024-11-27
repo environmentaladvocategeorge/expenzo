@@ -14,7 +14,7 @@ Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello-world/
+      CodeUri: ../api/
       Handler: app.app
       Runtime: python3.9
       Environment:
