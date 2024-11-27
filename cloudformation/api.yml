@@ -35,7 +35,5 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: URL of the API
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/hello"
-    Export:
-      Name: !Sub "${ResourceBaseIdentifier}-ApiUrl"
+    Description: "URL of the API"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/hello"

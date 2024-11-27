@@ -1,16 +1,21 @@
 import { createTheme } from "@mui/material/styles";
-import { Fira_Sans } from "next/font/google";
+import { DM_Sans } from "next/font/google";
+import { CssBaseline } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Palette {
     neutral: {
       white: string;
+      gray: string;
+      black: string;
     };
   }
 
   interface PaletteOptions {
     neutral: {
       white: string;
+      gray: string;
+      black: string;
     };
   }
 
@@ -27,7 +32,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-const firaSans = Fira_Sans({
+const dm_sans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "700"],
 });
@@ -35,21 +40,19 @@ const firaSans = Fira_Sans({
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#455a64",
-      light: "#6a7b83",
-      dark: "#303e46",
+      main: "#FF7F32",
     },
     secondary: {
-      main: "#546e7a",
-      light: "#768b94",
-      dark: "#3a4d55",
+      main: "#18b2f2",
     },
     neutral: {
       white: "#FFFFFF",
+      gray: "#a6a6a6",
+      black: "#191919",
     },
   },
   typography: {
-    fontFamily: firaSans.style.fontFamily,
+    fontFamily: dm_sans.style.fontFamily,
     h1: {
       fontWeight: 700,
     },
@@ -57,7 +60,7 @@ const theme = createTheme({
       fontWeight: 700,
     },
     body1: {
-      fontSize: "18px",
+      fontSize: "16px",
       fontWeight: 400,
     },
   },
@@ -68,6 +71,15 @@ const theme = createTheme({
       tablet: 600,
       laptop: 1024,
       desktop: 1440,
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        a: {
+          textDecoration: "none",
+        },
+      },
     },
   },
 });
