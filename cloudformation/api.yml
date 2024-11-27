@@ -20,11 +20,19 @@ Resources:
       Environment:
         Variables:
           ENV: !Ref Environment
+          SECRET_NAME: earth-watcher-dev-teller-secrets
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:earth-watcher-dev-teller-secrets-*
+
       Events:
         HelloWorldApi:
           Type: Api
           Properties:
-            Path: /hello
+            Path: /accounts
             Method: GET
             RestApiId: !Ref ApiGateway
 
@@ -36,4 +44,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "URL of the API"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/hello"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/accounts"

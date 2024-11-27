@@ -20,8 +20,8 @@ const useTellerConnect = (applicationId: string) => {
         onInit: () => {
           console.log("Teller Connect has initialized");
         },
-        onSuccess: (enrollment: { accessToken: string }) => {
-          console.log("User enrolled successfully", enrollment.accessToken);
+        onSuccess: (enrollment: any) => {
+          console.log("User enrolled successfully", enrollment);
         },
         onExit: () => {
           console.log("User closed Teller Connect");
