@@ -1,6 +1,5 @@
 import { createTheme } from "@mui/material/styles";
 import { DM_Sans } from "next/font/google";
-import { CssBaseline } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Palette {

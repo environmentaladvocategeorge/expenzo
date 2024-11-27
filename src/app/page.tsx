@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, useTheme, Button } from "@mui/material";
+import { Box, useTheme, Button } from "@mui/material";
 import useTellerConnect from "../hooks/useTellerConnect";
 
 const Home = () => {
