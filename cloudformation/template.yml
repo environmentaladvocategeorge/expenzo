@@ -46,3 +46,12 @@ Resources:
         Environment: !Ref Environment
         DeploymentRoleARN: !Ref DeploymentRoleARN
         ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
+
+  # API Nested Stack
+  API:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: api.yml
+      Parameters:
+        Environment: !Ref Environment
+        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier

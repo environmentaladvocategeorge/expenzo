@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for the API Service
+
+Parameters:
+  Environment:
+    Type: String
+    Description: "Deployment environment."
+  ResourceBaseIdentifier:
+    Type: String
+    Description: "Base identifier for resource naming."
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/
+      Handler: app.app
+      Runtime: python3.9
+      Environment:
+        Variables:
+          ENV: !Ref Environment
+      Events:
+        HelloWorldApi:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
+            RestApiId: !Ref ApiGateway
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+
+Outputs:
+  ApiUrl:
+    Description: URL of the API
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/hello"
+    Export:
+      Name: !Sub "${ResourceBaseIdentifier}-ApiUrl"
