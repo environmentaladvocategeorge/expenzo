@@ -9,7 +9,7 @@ import {
 } from "@/contexts/NavigationMenuContext";
 import theme from "@/theme/theme";
 import { NavigationBar } from "@/components";
-import PageContainer from "@/global.styles";
+import { PageContainer } from "@/global.styles";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (

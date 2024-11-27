@@ -1,10 +1,11 @@
 import { createTheme } from "@mui/material/styles";
-import { DM_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 
 declare module "@mui/material/styles" {
   interface Palette {
     neutral: {
       white: string;
+      lightGray: string;
       gray: string;
       black: string;
     };
@@ -13,6 +14,7 @@ declare module "@mui/material/styles" {
   interface PaletteOptions {
     neutral: {
       white: string;
+      lightGray: string;
       gray: string;
       black: string;
     };
@@ -31,7 +33,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-const dm_sans = DM_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "700"],
 });
@@ -46,16 +48,14 @@ const theme = createTheme({
     },
     neutral: {
       white: "#FFFFFF",
+      lightGray: "#f4f6f6",
       gray: "#a6a6a6",
       black: "#191919",
     },
   },
   typography: {
-    fontFamily: dm_sans.style.fontFamily,
-    h1: {
-      fontWeight: 700,
-    },
-    h2: {
+    fontFamily: poppins.style.fontFamily,
+    allVariants: {
       fontWeight: 700,
     },
     body1: {
@@ -77,6 +77,14 @@ const theme = createTheme({
       styleOverrides: {
         a: {
           textDecoration: "none",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "uppercase",
+          fontWeight: 700,
         },
       },
     },
