@@ -52,7 +52,7 @@ def get_secret(secret_name: str):
 
 def generate_certificates(cert: str, private_key: str):
     """
-    Generates temporary certificate and private key files.
+    Generates temporary certificate and private key files with .pem extension.
 
     Args:
         cert (str): Certificate string.
@@ -65,13 +65,15 @@ def generate_certificates(cert: str, private_key: str):
         HTTPException: If there is an error creating the temporary files.
     """
     try:
-        with tempfile.NamedTemporaryFile(delete=False) as cert_file, tempfile.NamedTemporaryFile(delete=False) as key_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pem") as cert_file, \
+             tempfile.NamedTemporaryFile(delete=False, suffix=".pem") as key_file:
             cert_file.write(cert.encode('utf-8'))
             key_file.write(private_key.encode('utf-8'))
             return cert_file.name, key_file.name
     except Exception as e:
         logger.error(f"Error generating certificate files: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate certificate files")
+
 
 @app.get("/accounts")
 async def get_accounts(
