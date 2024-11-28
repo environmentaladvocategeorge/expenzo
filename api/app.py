@@ -5,8 +5,7 @@ import logging
 from botocore.exceptions import ClientError
 import requests
 from mangum import Mangum
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Query
 
 app = FastAPI()
 
@@ -37,20 +36,17 @@ def get_secret(secret_name):
         logger.error(f"Secret parsing error: {e}")
         raise HTTPException(status_code=500, detail="Missing expected fields in secret")
 
-class AccountRequest(BaseModel):
-    accessToken: str
-
 @app.get("/accounts")
-async def get_accounts(request: AccountRequest):
+async def get_accounts(
+    accessToken: str = Query(..., description="The access token for authentication")
+):
     """
     Fetches account info from Teller API using the provided access token.
 
-    request (AccountRequest): The request body with accessToken parameter.
+    accessToken (str): The access token passed as a query parameter.
     Returns: JSON response with account data or error.
     """
-    access_token = request.accessToken
-    
-    if not access_token:
+    if not accessToken:
         raise HTTPException(status_code=400, detail="Missing accessToken parameter")
 
     try:
@@ -61,7 +57,7 @@ async def get_accounts(request: AccountRequest):
             raise HTTPException(status_code=500, detail="Failed to retrieve certificate or private key")
 
         api_url = "https://api.teller.io/accounts"
-        headers = {'Authorization': f'Bearer {access_token}'}
+        headers = {'Authorization': f'Bearer {accessToken}'}
         
         response = requests.get(api_url, headers=headers, cert=(cert, private_key))
         response.raise_for_status() 
@@ -73,4 +69,5 @@ async def get_accounts(request: AccountRequest):
         logger.error(f"Error making request to Teller API: {e}")
         raise HTTPException(status_code=500, detail="Failed to call Teller API")
 
+# This is the correct invocation of Mangum
 handler = Mangum(app)
