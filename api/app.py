@@ -93,26 +93,36 @@ async def get_accounts(
         raise HTTPException(status_code=400, detail="Missing accessToken parameter")
 
     try:
+        logger.info("Fetching secrets for TLS authentication.")
         cert, private_key = get_secret(SECRET_NAME)
         cert_file_path, key_file_path = generate_certificates(cert, private_key)
 
         api_url = "https://api.teller.io/accounts"
-        headers = {'Authorization': f'Bearer {accessToken}'}
+        headers = {
+            'Authorization': f'Bearer {accessToken}',
+            'Content-Type': 'application/json'
+        }
 
+        logger.info(f"Making request to Teller API at {api_url}")
         response = requests.get(api_url, headers=headers, cert=(cert_file_path, key_file_path))
-        response.raise_for_status() 
+        logger.info(f"Teller API response status code: {response.status_code}")
+
+        response.raise_for_status()
+        logger.info("Teller API request successful.")
         return response.json()
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making request to Teller API: {e}")
+        logger.debug(f"Request headers: {headers}")
         raise HTTPException(status_code=500, detail="Failed to call Teller API")
     except Exception as e:
         logger.error(f"Unexpected error in get_accounts: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while fetching account data")
     finally:
-        for file_path in locals().get('cert_file_path', []), locals().get('key_file_path', []):
+        # Cleanup temporary files
+        for file_path in [locals().get('cert_file_path'), locals().get('key_file_path')]:
             if file_path and os.path.exists(file_path):
                 os.remove(file_path)
-
+                logger.info(f"Temporary file {file_path} removed.")
 
 handler = Mangum(app)
