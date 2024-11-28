@@ -36,6 +36,11 @@ Resources:
             Method: GET
             RestApiId: !Ref ApiGateway
 
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+
 Outputs:
   ApiUrl:
     Description: "URL of the API"
