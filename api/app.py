@@ -36,6 +36,8 @@ def get_secret(secret_name):
         logger.error(f"Secret parsing error: {e}")
         raise HTTPException(status_code=500, detail="Missing expected fields in secret")
 
+import tempfile
+
 @app.get("/accounts")
 async def get_accounts(
     accessToken: str = Query(..., description="The access token for authentication")
@@ -56,18 +58,33 @@ async def get_accounts(
             logger.error("Failed to retrieve certificate or private key from secrets.")
             raise HTTPException(status_code=500, detail="Failed to retrieve certificate or private key")
 
+        # Create temporary files for cert and private key
+        with tempfile.NamedTemporaryFile(delete=False) as cert_file, tempfile.NamedTemporaryFile(delete=False) as key_file:
+            cert_file.write(cert.encode('utf-8'))
+            key_file.write(private_key.encode('utf-8'))
+            cert_file_path = cert_file.name
+            key_file_path = key_file.name
+
+        # Make the API request
         api_url = "https://api.teller.io/accounts"
         headers = {'Authorization': f'Bearer {accessToken}'}
-        
-        response = requests.get(api_url, headers=headers, cert=(cert, private_key))
-        response.raise_for_status() 
+
+        response = requests.get(api_url, headers=headers, cert=(cert_file_path, key_file_path))
+        response.raise_for_status()
         data = response.json()
-        
+
         return data
-    
+
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making request to Teller API: {e}")
         raise HTTPException(status_code=500, detail="Failed to call Teller API")
+
+    finally:
+        # Ensure the temporary files are deleted
+        if 'cert_file_path' in locals() and os.path.exists(cert_file_path):
+            os.remove(cert_file_path)
+        if 'key_file_path' in locals() and os.path.exists(key_file_path):
+            os.remove(key_file_path)
 
 # This is the correct invocation of Mangum
 handler = Mangum(app)
