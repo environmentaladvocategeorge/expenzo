@@ -11,7 +11,7 @@ import tempfile
 app = FastAPI()
 
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
-SECRET_NAME = os.getenv('SECRET_NAME', 'expenzo-dev-teller-secrets')
+SECRET_NAME = os.getenv('SECRET_NAME', 'expenzo-dev-teller-certificates')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
