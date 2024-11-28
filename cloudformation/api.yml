@@ -20,14 +20,14 @@ Resources:
       Environment:
         Variables:
           ENV: !Ref Environment
-          SECRET_NAME: earth-watcher-dev-teller-secrets
+          SECRET_NAME: expenzo-dev-teller-secrets
       Policies:
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:earth-watcher-dev-teller-secrets-*
+              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-secrets-*
       Events:
         EarthwatcherApi:
           Type: Api

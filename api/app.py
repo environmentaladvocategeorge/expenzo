@@ -10,7 +10,7 @@ from fastapi import FastAPI, HTTPException, Query
 app = FastAPI()
 
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
-SECRET_NAME = os.getenv('SECRET_NAME', 'earth-watcher-dev-teller-secrets')
+SECRET_NAME = os.getenv('SECRET_NAME', 'expenzo-dev-teller-secrets')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

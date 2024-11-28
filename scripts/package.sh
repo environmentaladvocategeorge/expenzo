@@ -5,7 +5,7 @@ set -e
 ROLE_ARN="$1"
 ACCOUNT_ID="$2"
 ENVIRONMENT="$3"
-BUCKET_NAME="earth-watcher-sam-${ENVIRONMENT}"
+BUCKET_NAME="expenzo-sam-${ENVIRONMENT}"
 REGION="us-east-1"
 
 # Bucket creation logic

@@ -25,7 +25,7 @@ const NavigationBar = () => {
   return (
     <Styled.NavigationMenuContainer isOpen={isOpen}>
       <Styled.Header>
-        <AppHeaderText>savingtree.io</AppHeaderText>
+        <AppHeaderText>expenzo.io</AppHeaderText>
         <IconButton onClick={toggleMenu} color="inherit">
           <ChevronLeftIcon />
         </IconButton>
