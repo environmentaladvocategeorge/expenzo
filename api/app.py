@@ -15,6 +15,7 @@ CERT_SECRET_NAME = os.getenv('CERT_SECRET_NAME', 'expenzo-dev-teller-cert')
 PK_SECRET_NAME = os.getenv('PK_SECRET_NAME', 'expenzo-dev-teller-pk')
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger().setLevel('INFO')
 logger = logging.getLogger(__name__)
 
 def get_secret(secret_name: str):
