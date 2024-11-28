@@ -11,7 +11,7 @@ Parameters:
     Description: "Base identifier for resource naming."
 
 Resources:
-  HelloWorldFunction:
+  EarthwatcherApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../api/
@@ -22,22 +22,19 @@ Resources:
           ENV: !Ref Environment
           SECRET_NAME: earth-watcher-dev-teller-secrets
       Policies:
-        - Effect: Allow
-          Action:
-            - secretsmanager:GetSecretValue
-          Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:earth-watcher-dev-teller-secrets-*
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:earth-watcher-dev-teller-secrets-*
       Events:
-        HelloWorldApi:
+        EarthwatcherApi:
           Type: Api
           Properties:
             Path: /accounts
             Method: GET
             RestApiId: !Ref ApiGateway
-
-  ApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: !Ref Environment
 
 Outputs:
   ApiUrl:
