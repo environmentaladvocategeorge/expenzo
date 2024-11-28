@@ -61,7 +61,6 @@ def generate_certificates(cert: str, private_key: str):
         HTTPException: If there is an error creating the temporary files.
     """
     try:
-        # Create certificate and private key files in /tmp directory
         cert_file_path = '/tmp/cert.pem'
         key_file_path = '/tmp/key.pem'
 
@@ -79,32 +78,38 @@ def generate_certificates(cert: str, private_key: str):
 
 @app.get("/accounts")
 async def get_accounts(
-    accessToken: str = Query(..., description="The access token for authentication")
+    authorization: str = Query(..., description="Authorization header containing the Bearer token")
 ):
     """
-    Fetches account info from Teller API using the provided access token.
+    Fetches account info from Teller API using the provided Bearer token.
 
     Args:
-        accessToken (str): The access token passed as a query parameter.
+        authorization (str): The Authorization header containing the Bearer token.
 
     Returns:
         JSON: Response data from Teller API.
 
     Raises:
-        HTTPException: For invalid access token, API errors, or other issues.
+        HTTPException: For missing/invalid token, API errors, or other issues.
     """
+    # Extract Bearer token
+    if not authorization or not authorization.startswith("Bearer "):
+        logger.error("Missing or invalid Authorization header.")
+        raise HTTPException(status_code=400, detail="Missing or invalid Authorization header")
+
+    accessToken = authorization.split("Bearer ")[1]
+
     if not accessToken:
-        logger.error("Missing accessToken parameter.")
-        raise HTTPException(status_code=400, detail="Missing accessToken parameter")
+        logger.error("Bearer token is empty.")
+        raise HTTPException(status_code=400, detail="Invalid Bearer token")
 
     try:
         logger.info("Fetching certificate and private key from AWS Secrets Manager.")
         
-        # Retrieve certificate and private key as separate secrets
-        cert = get_secret(CERT_SECRET_NAME)
-        private_key = get_secret(PK_SECRET_NAME)
-        
-        cert_file_path, key_file_path = generate_certificates(cert, private_key)
+        cert_file_path, key_file_path = generate_certificates(
+            get_secret(CERT_SECRET_NAME), 
+            get_secret(PK_SECRET_NAME)
+        )
 
         api_url = "https://api.teller.io/accounts"
         headers = {
@@ -129,10 +134,10 @@ async def get_accounts(
         logger.error(f"Unexpected error in get_accounts: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while fetching account data")
     finally:
-        # Cleanup temporary files
         for file_path in [locals().get('cert_file_path'), locals().get('key_file_path')]:
             if file_path and os.path.exists(file_path):
                 os.remove(file_path)
                 logger.info(f"Temporary file {file_path} removed.")
+
 
 handler = Mangum(app)
