@@ -3,10 +3,35 @@
 import { Box, useTheme, Button, Typography, Divider } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
+import { fetchAccounts } from "@/services/accountService";
+import { Account } from "@/types/api";
+import { useState, useEffect } from "react";
 
 const Home = () => {
   const theme = useTheme();
-  const openTellerConnect = useTellerConnect("app_p6qtvm8rcc524e1on4000");
+  const openTellerConnect = useTellerConnect(
+    process.env.NEXT_PUBLIC_APP_ID || ""
+  );
+
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadAccounts = async () => {
+      try {
+        const data = await fetchAccounts();
+        setAccounts(data.accounts);
+      } catch (err) {
+        setError("Failed to fetch accounts");
+      }
+    };
+
+    loadAccounts();
+  }, []);
+
+  console.log(accounts);
+
+  if (error) return <div>{error}</div>;
 
   return (
     <Box
