@@ -44,15 +44,11 @@ Resources:
     Properties:
       StageName: !Ref Environment
       Cors:
-        AllowOrigins:
-          - "http://localhost:3000"
-        AllowHeaders:
-          - "Content-Type"
-          - "Authorization"
-        AllowMethods:
-          - "GET"
-          - "POST"
-          - "OPTIONS"
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'http://localhost:3000'"
+        MaxAge: "'600'"
+        AllowCredentials: true
 
 Outputs:
   ApiUrl:
