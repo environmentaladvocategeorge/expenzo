@@ -26,8 +26,8 @@ def get_secret(secret_name):
         client = boto3.client('secretsmanager', region_name=AWS_REGION)
         response = client.get_secret_value(SecretId=secret_name)
         secret = json.loads(response['SecretString'])
-        cert = secret.get('certificate')
-        private_key = secret.get('private_key')
+        cert = secret.get('cert')
+        private_key = secret.get('privateKey')
         return cert, private_key
     except ClientError as e:
         logger.error(f"Error retrieving secret: {e}")
