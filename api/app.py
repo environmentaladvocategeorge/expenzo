@@ -148,5 +148,4 @@ async def get_accounts(
                 os.remove(file_path)
                 logger.info(f"Temporary file {file_path} removed.")
 
-
 handler = Mangum(app)

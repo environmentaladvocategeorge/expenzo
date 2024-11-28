@@ -22,6 +22,7 @@ const Home = () => {
         const data = await fetchAccounts();
         setAccounts(data.accounts);
       } catch (err) {
+        console.error(`Error ocurred fetching API: ${err}`);
         setError("Failed to fetch accounts");
       }
     };
