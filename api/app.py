@@ -7,25 +7,25 @@ import requests
 from requests.auth import HTTPBasicAuth
 from mangum import Mangum
 from fastapi import FastAPI, HTTPException, Query
-import tempfile
 
 app = FastAPI()
 
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
-SECRET_NAME = os.getenv('SECRET_NAME', 'expenzo-dev-teller-certificates')
+CERT_SECRET_NAME = os.getenv('CERT_SECRET_NAME', 'expenzo-dev-teller-cert')
+PK_SECRET_NAME = os.getenv('PK_SECRET_NAME', 'expenzo-dev-teller-pk')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def get_secret(secret_name: str):
     """
-    Retrieves certificate and private key from AWS Secrets Manager.
+    Retrieves a plaintext secret from AWS Secrets Manager.
 
     Args:
         secret_name (str): The secret name in AWS Secrets Manager.
 
     Returns:
-        tuple: (cert, private_key) strings containing the certificate and private key.
+        str: The secret string.
 
     Raises:
         HTTPException: If there is an error retrieving or parsing the secret.
@@ -33,19 +33,14 @@ def get_secret(secret_name: str):
     try:
         client = boto3.client('secretsmanager', region_name=AWS_REGION)
         response = client.get_secret_value(SecretId=secret_name)
-        secret = json.loads(response['SecretString'])
-        cert = secret.get('cert')
-        private_key = secret.get('privateKey')
-        if not cert or not private_key:
-            logger.error("Missing 'cert' or 'privateKey' in the secret.")
-            raise HTTPException(status_code=500, detail="Missing required fields in the secret")
-        return cert, private_key
+        secret = response['SecretString']
+        if not secret:
+            logger.error(f"Secret {secret_name} is empty.")
+            raise HTTPException(status_code=500, detail=f"Secret {secret_name} is empty")
+        return secret
     except ClientError as e:
-        logger.error(f"Error retrieving secret from Secrets Manager: {e}")
+        logger.error(f"Error retrieving secret {secret_name} from Secrets Manager: {e}")
         raise HTTPException(status_code=500, detail="Error retrieving credentials from AWS Secrets Manager")
-    except KeyError as e:
-        logger.error(f"Secret parsing error: {e}")
-        raise HTTPException(status_code=500, detail="Missing expected fields in secret")
     except Exception as e:
         logger.error(f"Unexpected error in get_secret: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while retrieving secrets")
@@ -81,7 +76,6 @@ def generate_certificates(cert: str, private_key: str):
         logger.error(f"Error generating certificate files: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate certificate files")
 
-
 @app.get("/accounts")
 async def get_accounts(
     accessToken: str = Query(..., description="The access token for authentication")
@@ -103,8 +97,12 @@ async def get_accounts(
         raise HTTPException(status_code=400, detail="Missing accessToken parameter")
 
     try:
-        logger.info("Fetching secrets for TLS authentication.")
-        cert, private_key = get_secret(SECRET_NAME)
+        logger.info("Fetching certificate and private key from AWS Secrets Manager.")
+        
+        # Retrieve certificate and private key as separate secrets
+        cert = get_secret(CERT_SECRET_NAME)
+        private_key = get_secret(PK_SECRET_NAME)
+        
         cert_file_path, key_file_path = generate_certificates(cert, private_key)
 
         api_url = "https://api.teller.io/accounts"

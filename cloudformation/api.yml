@@ -20,14 +20,17 @@ Resources:
       Environment:
         Variables:
           ENV: !Ref Environment
-          SECRET_NAME: expenzo-dev-teller-certificates
+          CERT_SECRET_NAME: expenzo-dev-teller-cert
+          PK_SECRET_NAME: expenzo-dev-teller-pk
       Policies:
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-certificates-*
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
       Events:
         ExpenzoApi:
           Type: Api
