@@ -74,6 +74,3 @@ async def get_accounts(request: AccountRequest):
         raise HTTPException(status_code=500, detail="Failed to call Teller API")
 
 handler = Mangum(app)
-
-def lambda_handler(event, context):
-    return handler(event, context)
