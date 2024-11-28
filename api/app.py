@@ -52,7 +52,7 @@ def get_secret(secret_name: str):
 
 def generate_certificates(cert: str, private_key: str):
     """
-    Generates temporary certificate and private key files with .pem extension.
+    Generates temporary certificate and private key files in the /tmp directory for AWS Lambda.
 
     Args:
         cert (str): Certificate string.
@@ -65,11 +65,18 @@ def generate_certificates(cert: str, private_key: str):
         HTTPException: If there is an error creating the temporary files.
     """
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pem") as cert_file, \
-             tempfile.NamedTemporaryFile(delete=False, suffix=".pem") as key_file:
-            cert_file.write(cert.encode('utf-8'))
-            key_file.write(private_key.encode('utf-8'))
-            return cert_file.name, key_file.name
+        # Create certificate and private key files in /tmp directory
+        cert_file_path = '/tmp/cert.pem'
+        key_file_path = '/tmp/key.pem'
+
+        with open(cert_file_path, 'w') as cert_file:
+            cert_file.write(cert)
+
+        with open(key_file_path, 'w') as key_file:
+            key_file.write(private_key)
+
+        return cert_file_path, key_file_path
+
     except Exception as e:
         logger.error(f"Error generating certificate files: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate certificate files")
