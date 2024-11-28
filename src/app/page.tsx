@@ -9,9 +9,9 @@ import { useState, useEffect } from "react";
 
 const Home = () => {
   const theme = useTheme();
-  const openTellerConnect = useTellerConnect(
-    process.env.NEXT_PUBLIC_APP_ID || ""
-  );
+  // const openTellerConnect = useTellerConnect(
+  //   process.env.NEXT_PUBLIC_APP_ID || ""
+  // );
 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +58,7 @@ const Home = () => {
       >
         <Button
           variant="contained"
-          onClick={openTellerConnect}
+          // onClick={openTellerConnect}
           sx={{
             color: theme.palette.neutral.white,
             ml: "auto",

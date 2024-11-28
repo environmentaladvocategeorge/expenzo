@@ -1,12 +1,11 @@
 import boto3
-import json
 import os
 import logging
 from botocore.exceptions import ClientError
 import requests
 from requests.auth import HTTPBasicAuth
 from mangum import Mangum
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -87,7 +86,7 @@ def generate_certificates(cert: str, private_key: str):
 
 @app.get("/accounts")
 async def get_accounts(
-    authorization: str = Query(..., description="Authorization header containing the Bearer token")
+    authorization: str = Header(..., description="Authorization header containing the Bearer token")
 ):
     """
     Fetches account info from Teller API using the provided Bearer token.
