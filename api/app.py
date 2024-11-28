@@ -4,16 +4,15 @@ import os
 import logging
 from botocore.exceptions import ClientError
 import requests
-from flask import Flask, jsonify, request
+from mangum import Mangum
 from werkzeug.exceptions import HTTPException
-
-app = Flask(__name__)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
 SECRET_NAME = os.getenv('SECRET_NAME', 'earth-watcher-dev-teller-secrets')
+
+# Initialize logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_secret(secret_name):
     """
@@ -36,25 +35,31 @@ def get_secret(secret_name):
         logger.error(f"Secret parsing error: {e}")
         raise HTTPException(description="Missing expected fields in secret", response=500)
 
-@app.route('/accounts', methods=['GET'])
-def get_accounts():
+def get_accounts(event, context):
     """
     Fetches account info from Teller API using the provided access token.
 
-    access_token (str): The access token from query params.
-    Returns: Tuple: JSON response with account data or error.
+    event (dict): The event passed by API Gateway.
+    context (LambdaContext): The context object provided by AWS Lambda.
+    Returns: dict: JSON response with account data or error.
     """
-    access_token = request.args.get('accessToken')
+    access_token = event.get('queryStringParameters', {}).get('accessToken')
     
     if not access_token:
-        return jsonify({"error": "Missing accessToken parameter"}), 400
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "Missing accessToken parameter"})
+        }
 
     try:
         cert, private_key = get_secret(SECRET_NAME)
 
         if not cert or not private_key:
             logger.error("Failed to retrieve certificate or private key from secrets.")
-            return jsonify({"error": "Failed to retrieve certificate or private key"}), 500
+            return {
+                "statusCode": 500,
+                "body": json.dumps({"error": "Failed to retrieve certificate or private key"})
+            }
 
         api_url = "https://api.teller.io/accounts"
         headers = {'Authorization': f'Bearer {access_token}'}
@@ -63,27 +68,25 @@ def get_accounts():
         response.raise_for_status() 
         data = response.json()
         
-        return jsonify(data)
+        return {
+            "statusCode": 200,
+            "body": json.dumps(data)
+        }
     
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making request to Teller API: {e}")
-        return jsonify({"error": "Failed to call Teller API"}), 500
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": "Failed to call Teller API"})
+        }
 
-@app.errorhandler(HTTPException)
-def handle_exception(e):
-    """
-    Global error handler for HTTPException.
+handler = Mangum(app=None) 
 
-    e (HTTPException): The exception object.
-    Returns: Tuple: JSON-formatted error message.
-    """
-    response = e.get_response()
-    response.data = json.dumps({
-        "error": str(e),
-        "message": e.description
-    })
-    response.content_type = "application/json"
-    return response
-
-if __name__ == "__main__":
-    app.run(debug=True)
+def lambda_handler(event, context):
+    if event['httpMethod'] == 'GET' and event['resource'] == '/accounts':
+        return get_accounts(event, context)
+    else:
+        return {
+            "statusCode": 404,
+            "body": json.dumps({"error": "Not Found"})
+        }
