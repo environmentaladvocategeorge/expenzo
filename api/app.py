@@ -132,7 +132,7 @@ async def get_accounts(
 
         response.raise_for_status()
         logger.info("Teller API request successful.")
-        return response.json()
+        return { "accounts": response.json() }
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making request to Teller API: {e}")

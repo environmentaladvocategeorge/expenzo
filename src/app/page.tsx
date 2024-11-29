@@ -1,11 +1,79 @@
 "use client";
 
-import { Box, useTheme, Button, Typography, Divider } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import {
+  Box,
+  useTheme,
+  Button,
+  Typography,
+  Divider,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
+import {
+  Add,
+  AccountBalance,
+  CreditCard,
+  FiberManualRecord,
+} from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { fetchAccounts } from "@/services/accountService";
 import { Account } from "@/types/api";
 import { useState, useEffect } from "react";
+
+const AccountRow = ({ account }: { account: Account }) => {
+  const theme = useTheme();
+  const isCreditCard =
+    account.type === "credit" && account.subtype === "credit_card";
+  const isChecking =
+    account.type === "depository" && account.subtype === "checking";
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        py: theme.spacing(1.5),
+        px: theme.spacing(2),
+        border: `1px solid ${theme.palette.neutral.gray}`,
+        borderRadius: theme.spacing(1),
+        mb: theme.spacing(2),
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        {isCreditCard && (
+          <CreditCard
+            sx={{ color: theme.palette.primary.main, mr: theme.spacing(1) }}
+          />
+        )}
+        {isChecking && (
+          <AccountBalance
+            sx={{ color: theme.palette.secondary.main, mr: theme.spacing(1) }}
+          />
+        )}
+        <Box>
+          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+            {account.institution.name}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: theme.palette.text.secondary }}
+          >
+            {account.name}
+          </Typography>
+        </Box>
+      </Box>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Typography variant="body1" sx={{ mr: theme.spacing(1) }}>
+          ••••
+        </Typography>
+        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+          {account.last_four}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 const Home = () => {
   const theme = useTheme();
@@ -14,6 +82,7 @@ const Home = () => {
   );
 
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,15 +91,15 @@ const Home = () => {
         const data = await fetchAccounts();
         setAccounts(data.accounts);
       } catch (err) {
-        console.error(`Error ocurred fetching API: ${err}`);
+        console.error(`Error occurred fetching API: ${err}`);
         setError("Failed to fetch accounts");
+      } finally {
+        setLoading(false);
       }
     };
 
     loadAccounts();
   }, []);
-
-  console.log(accounts);
 
   if (error) return <div>{error}</div>;
 
@@ -42,13 +111,35 @@ const Home = () => {
         backgroundColor: theme.palette.neutral.white,
       }}
     >
-      <Typography variant="h4">Accounts (0)</Typography>
+      <Typography variant="h4">Accounts ({accounts?.length})</Typography>
+
+      {loading ? (
+        <Box
+          sx={{
+            width: "100%",
+            padding: theme.spacing(4),
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress size={64} />
+        </Box>
+      ) : (
+        <Box>
+          {accounts?.map((account) => (
+            <AccountRow key={account.id} account={account} />
+          ))}
+        </Box>
+      )}
+
       <Divider
         sx={{
           backgroundColor: theme.palette.neutral.black,
           my: theme.spacing(2),
         }}
       />
+
       <Box
         sx={{
           display: "flex",

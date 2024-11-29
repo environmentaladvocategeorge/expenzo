@@ -14,7 +14,7 @@ export interface Account {
   subtype: string;
   currency: string;
   id: string;
-  lastFour: string;
+  last_four: string;
   status: string;
 }
 
