@@ -105,7 +105,9 @@ const Home = () => {
         backgroundColor: theme.palette.neutral.white,
       }}
     >
-      <Typography variant="h4">Accounts ({accounts?.length})</Typography>
+      <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
+        Accounts ({accounts?.length})
+      </Typography>
 
       {loading ? (
         <Box
