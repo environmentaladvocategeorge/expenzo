@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { authenticateUser } from "@/lib/cognito";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { logoutUser } from "@/lib/cognito";
 
 interface AuthContextType {
   user: CognitoUserSession | null;
@@ -40,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    logoutUser();
     setUser(null);
     setIsAuthenticated(false);
     setShowLoginModal(true);

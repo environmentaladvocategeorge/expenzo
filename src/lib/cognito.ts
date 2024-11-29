@@ -36,5 +36,27 @@ export const authenticateUser = (
     onFailure: (err: Error) => {
       callback(err, null);
     },
+    newPasswordRequired: () => {
+      const newPassword = prompt("Please enter a new password");
+      cognitoUser.completeNewPasswordChallenge(
+        newPassword || "",
+        {},
+        {
+          onSuccess: (result: CognitoUserSession) => {
+            callback(null, result);
+          },
+          onFailure: (err: Error) => {
+            callback(err, null);
+          },
+        }
+      );
+    },
   });
+};
+
+export const logoutUser = () => {
+  const cognitoUser = userPool.getCurrentUser();
+  if (cognitoUser) {
+    cognitoUser.signOut();
+  }
 };

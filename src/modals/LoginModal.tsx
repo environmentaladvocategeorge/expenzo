@@ -27,10 +27,8 @@ const LoginModal = ({
     const { username, password } = data;
     try {
       await login(username, password);
-      alert("Login successful!");
       onClose();
     } catch (error) {
-      alert("Login failed. Please check your username and password.");
       console.error("Login error:", error);
     }
   };
