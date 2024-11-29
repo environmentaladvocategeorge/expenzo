@@ -1,9 +1,15 @@
 import React from "react";
-import { Modal, Box, TextField, Button, Typography } from "@mui/material";
+import {
+  Modal,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuth } from "@/contexts/AuthenticationContext";
 
-// Define the input types
 interface LoginFormInputs {
   username: string;
   password: string;
@@ -16,7 +22,7 @@ const LoginModal = ({
   open: boolean;
   onClose: () => void;
 }) => {
-  const { login } = useAuth();
+  const { login, isLoggingIn } = useAuth();
   const {
     register,
     handleSubmit,
@@ -77,8 +83,13 @@ const LoginModal = ({
             color="primary"
             fullWidth
             sx={{ mt: 2 }}
+            disabled={isLoggingIn}
           >
-            Sign In
+            {isLoggingIn ? (
+              <CircularProgress size={24} sx={{ color: "white" }} />
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
       </Box>

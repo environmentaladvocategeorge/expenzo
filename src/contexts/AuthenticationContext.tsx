@@ -10,6 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   showLoginModal: boolean;
   setShowLoginModal: (value: boolean) => void;
+  isLoggingIn: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,8 +19,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<CognitoUserSession | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const login = async (username: string, password: string): Promise<void> => {
+    setIsLoggingIn(true);
+
     return new Promise<void>((resolve, reject) => {
       authenticateUser(
         username,
@@ -27,12 +31,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         (err: Error | null, result: CognitoUserSession | null) => {
           if (err) {
             console.error("Login failed", err);
+            setIsLoggingIn(false);
             reject(err);
           } else {
             console.log("Login success", result);
             setUser(result);
             setIsAuthenticated(true);
             setShowLoginModal(false);
+            setIsLoggingIn(false);
             resolve();
           }
         }
@@ -56,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         showLoginModal,
         setShowLoginModal,
+        isLoggingIn,
       }}
     >
       {children}
