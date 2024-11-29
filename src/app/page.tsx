@@ -7,14 +7,8 @@ import {
   Typography,
   Divider,
   CircularProgress,
-  IconButton,
 } from "@mui/material";
-import {
-  Add,
-  AccountBalance,
-  CreditCard,
-  FiberManualRecord,
-} from "@mui/icons-material";
+import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { fetchAccounts } from "@/services/accountService";
 import { Account } from "@/types/api";
@@ -33,7 +27,7 @@ const AccountRow = ({ account }: { account: Account }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        py: theme.spacing(1.5),
+        py: theme.spacing(2),
         px: theme.spacing(2),
         border: `1px solid ${theme.palette.neutral.gray}`,
         borderRadius: theme.spacing(1),
