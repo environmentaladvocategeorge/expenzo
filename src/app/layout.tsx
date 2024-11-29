@@ -8,7 +8,7 @@ import {
   useNavigationMenu,
 } from "@/contexts/NavigationMenuContext";
 import theme from "@/theme/theme";
-import { NavigationBar } from "@/components";
+import { NavigationMenu } from "@/components";
 import { PageContainer } from "@/global.styles";
 import { AuthProvider } from "@/contexts/AuthenticationContext";
 
@@ -57,7 +57,7 @@ const LayoutContent = ({ children }: { children: ReactNode }) => {
             transition: "all 0.3s ease-in-out",
           }}
         >
-          <NavigationBar />
+          <NavigationMenu />
           <PageContainer>{children}</PageContainer>
         </Box>
       </body>

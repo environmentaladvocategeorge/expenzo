@@ -1,4 +1,4 @@
-import * as Styled from "./NavigationBar.styled";
+import * as Styled from "./NavigationMenu.styles";
 import { IconButton, Box, Typography, Button } from "@mui/material";
 import { ChevronLeft as ChevronLeftIcon } from "@mui/icons-material";
 import { AppHeaderText, Link, WhiteDivider } from "@/global.styles";
@@ -21,7 +21,7 @@ const routes = [
   { label: "Budgets", path: "/budgets", icon: AttachMoneyOutlined },
 ];
 
-const NavigationBar = () => {
+const NavigationMenu = () => {
   const { isOpen, toggleMenu } = useNavigationMenu();
   const currentPath = usePathname();
   const { isAuthenticated, logout } = useAuth();
@@ -92,4 +92,4 @@ const NavigationBar = () => {
   );
 };
 
-export default NavigationBar;
+export default NavigationMenu;
