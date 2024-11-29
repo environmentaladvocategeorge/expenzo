@@ -13,7 +13,6 @@ import {
   WalletOutlined,
   AttachMoneyOutlined,
 } from "@mui/icons-material";
-import { useState } from "react";
 
 const routes = [
   { label: "Dashboard", path: "/", icon: HomeOutlined },
