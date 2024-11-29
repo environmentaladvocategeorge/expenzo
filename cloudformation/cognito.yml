@@ -29,7 +29,7 @@ Resources:
           RequireNumbers: true
           RequireSymbols: true
           RequireUppercase: true
-      MfaConfiguration: OFF
+      MfaConfiguration: "OFF"
       UsernameAttributes:
         - email
 
