@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from certificate_service import CertificateService
+from services.certificate_service import CertificateService
 import logging
 
 logger = logging.getLogger(__name__)
