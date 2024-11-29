@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -6,6 +6,7 @@ import {
   Button,
   Typography,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuth } from "@/contexts/AuthenticationContext";
@@ -23,6 +24,7 @@ const LoginModal = ({
   onClose: () => void;
 }) => {
   const { login, isLoggingIn } = useAuth();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -36,11 +38,12 @@ const LoginModal = ({
       onClose();
     } catch (error) {
       console.error("Login error:", error);
+      setErrorMessage("Invalid username or password. Please try again.");
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose} aria-labelledby="login-modal-title">
+    <Modal open={open} onClose={onClose}>
       <Box
         sx={{
           position: "absolute",
@@ -54,8 +57,13 @@ const LoginModal = ({
           borderRadius: 2,
         }}
       >
-        <Typography id="login-modal-title" variant="h6" component="h2" mb={2}>
-          Sign In
+        {errorMessage && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
+        <Typography id="login-modal-title" variant="h6" component="h2">
+          Login
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
@@ -88,7 +96,7 @@ const LoginModal = ({
             {isLoggingIn ? (
               <CircularProgress size={24} sx={{ color: "white" }} />
             ) : (
-              "Sign In"
+              "Login"
             )}
           </Button>
         </form>

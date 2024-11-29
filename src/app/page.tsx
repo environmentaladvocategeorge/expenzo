@@ -104,7 +104,7 @@ const Home = () => {
     };
 
     handleAuthentication();
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [isAuthenticated]);
 
   if (error) return <Typography> An error has occured.</Typography>;
 
@@ -112,7 +112,9 @@ const Home = () => {
     <>
       <LoginModal
         open={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
+        onClose={() => {
+          setShowLoginModal(false);
+        }}
       />
       {isAuthenticated && (
         <Box

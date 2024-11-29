@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { useNavigationMenu } from "@/contexts/NavigationMenuContext";
 import { useAuth } from "@/contexts/AuthenticationContext";
-import LoginModal from "@/modals/LoginModal";
+
 import {
   HomeOutlined,
   WalletOutlined,
@@ -24,8 +24,7 @@ const routes = [
 const NavigationMenu = () => {
   const { isOpen, toggleMenu } = useNavigationMenu();
   const currentPath = usePathname();
-  const { isAuthenticated, logout } = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { isAuthenticated, logout, setShowLoginModal } = useAuth();
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -83,10 +82,6 @@ const NavigationMenu = () => {
             Login
           </Button>
         )}
-        <LoginModal
-          open={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-        />
       </Box>
     </Styled.NavigationMenuContainer>
   );
