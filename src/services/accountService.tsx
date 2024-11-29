@@ -1,4 +1,4 @@
-import apiClient from "../apiClient";
+import apiClient from "@/lib/apiClient";
 import { GetAccountsResponse } from "../types/api";
 
 export const fetchAccounts = async (): Promise<GetAccountsResponse> => {

@@ -10,15 +10,18 @@ import {
 import theme from "@/theme/theme";
 import { NavigationBar } from "@/components";
 import { PageContainer } from "@/global.styles";
+import { AuthProvider } from "@/contexts/AuthenticationContext";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <NavigationMenuProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <LayoutContent>{children}</LayoutContent>
-      </ThemeProvider>
-    </NavigationMenuProvider>
+    <AuthProvider>
+      <NavigationMenuProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <LayoutContent>{children}</LayoutContent>
+        </ThemeProvider>
+      </NavigationMenuProvider>
+    </AuthProvider>
   );
 };
 

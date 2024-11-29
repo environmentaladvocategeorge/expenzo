@@ -47,7 +47,7 @@ const theme = createTheme({
       main: "#18b2f2",
     },
     neutral: {
-      white: "#FFFFFF",
+      white: "#ffffff",
       lightGray: "#f4f6f6",
       gray: "#a6a6a6",
       black: "#191919",
@@ -85,6 +85,7 @@ const theme = createTheme({
         root: {
           textTransform: "uppercase",
           fontWeight: 700,
+          color: "#ffffff",
         },
       },
     },

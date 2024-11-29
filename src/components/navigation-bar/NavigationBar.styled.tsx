@@ -25,4 +25,5 @@ export const NavigationMenuContainer = styled(Box, {
   flexDirection: "column",
   overflow: "hidden",
   color: theme.palette.neutral.white,
+  justifyContent: "space-between",
 }));

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import {
   Box,
   useTheme,
@@ -12,7 +13,8 @@ import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { fetchAccounts } from "@/services/accountService";
 import { Account } from "@/types/api";
-import { useState, useEffect } from "react";
+import LoginModal from "@/modals/LoginModal";
+import { useAuth } from "@/contexts/AuthenticationContext";
 
 const AccountRow = ({ account }: { account: Account }) => {
   const theme = useTheme();
@@ -78,9 +80,18 @@ const Home = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
 
   useEffect(() => {
-    const loadAccounts = async () => {
+    const handleAuthentication = async () => {
+      if (!isAuthenticated) {
+        setShowLoginModal(true);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
       try {
         const data = await fetchAccounts();
         setAccounts(data.accounts);
@@ -92,70 +103,75 @@ const Home = () => {
       }
     };
 
-    loadAccounts();
-  }, []);
-
-  if (error) return <div>{error}</div>;
+    handleAuthentication();
+  }, [isAuthenticated, setShowLoginModal]);
 
   return (
-    <Box
-      sx={{
-        borderRadius: theme.spacing(2),
-        padding: theme.spacing(4),
-        backgroundColor: theme.palette.neutral.white,
-      }}
-    >
-      <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
-        Accounts ({accounts?.length})
-      </Typography>
-
-      {loading ? (
+    <>
+      <LoginModal
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
+      {isAuthenticated && (
         <Box
           sx={{
-            width: "100%",
+            borderRadius: theme.spacing(2),
             padding: theme.spacing(4),
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            backgroundColor: theme.palette.neutral.white,
           }}
         >
-          <CircularProgress size={64} />
-        </Box>
-      ) : (
-        <Box>
-          {accounts?.map((account) => (
-            <AccountRow key={account.id} account={account} />
-          ))}
+          <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
+            Accounts ({accounts?.length})
+          </Typography>
+
+          {loading ? (
+            <Box
+              sx={{
+                width: "100%",
+                padding: theme.spacing(4),
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={64} />
+            </Box>
+          ) : (
+            <Box>
+              {accounts?.map((account) => (
+                <AccountRow key={account.id} account={account} />
+              ))}
+            </Box>
+          )}
+
+          <Divider
+            sx={{
+              backgroundColor: theme.palette.neutral.black,
+              my: theme.spacing(2),
+            }}
+          />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={openTellerConnect}
+              sx={{
+                ml: "auto",
+              }}
+              endIcon={<Add />}
+            >
+              Connect Account
+            </Button>
+          </Box>
         </Box>
       )}
-
-      <Divider
-        sx={{
-          backgroundColor: theme.palette.neutral.black,
-          my: theme.spacing(2),
-        }}
-      />
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={openTellerConnect}
-          sx={{
-            color: theme.palette.neutral.white,
-            ml: "auto",
-          }}
-          endIcon={<Add />}
-        >
-          Connect Account
-        </Button>
-      </Box>
-    </Box>
+    </>
   );
 };
 
