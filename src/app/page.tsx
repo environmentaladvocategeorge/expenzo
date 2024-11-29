@@ -106,6 +106,8 @@ const Home = () => {
     handleAuthentication();
   }, [isAuthenticated, setShowLoginModal]);
 
+  if (error) return <Typography> An error has occured.</Typography>;
+
   return (
     <>
       <LoginModal
