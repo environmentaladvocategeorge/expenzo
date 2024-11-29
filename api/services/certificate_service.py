@@ -1,4 +1,5 @@
 import logging
+import os
 from repositories.secrets_repository import SecretsRepository
 
 logger = logging.getLogger(__name__)
@@ -25,10 +26,17 @@ class CertificateService:
             logger.error(f"Error generating certificate files: {e}")
             raise RuntimeError("Failed to generate certificate files")
 
-    def load_certificates(self, cert_name: str, pk_name: str) -> tuple:
+    def load_certificates(self) -> tuple:
+        cert_name = os.getenv('CERT_SECRET_NAME')
+        pk_name = os.getenv('PK_SECRET_NAME')
+
         if self.cert_file_path and self.key_file_path:
             logger.info("Using cached certificates")
             return self.cert_file_path, self.key_file_path
+
+        if not cert_name or not pk_name:
+            logger.error("Certificate or private key secret name is missing from environment variables")
+            raise RuntimeError("Missing certificate or private key secret names")
 
         cert = self.secrets_repository.get_secret(cert_name)
         private_key = self.secrets_repository.get_secret(pk_name)

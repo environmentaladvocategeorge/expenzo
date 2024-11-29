@@ -18,7 +18,7 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: !Sub "${ResourceBaseIdentifier}-userpool-${Environment}"
-      AliasAttributes:
+      UsernameAttributes:
         - email
       AutoVerifiedAttributes:
         - email
@@ -30,8 +30,6 @@ Resources:
           RequireSymbols: true
           RequireUppercase: true
       MfaConfiguration: "OFF"
-      UsernameAttributes:
-        - email
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient

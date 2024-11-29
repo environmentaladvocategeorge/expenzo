@@ -9,9 +9,9 @@ class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
 
-    def get_accounts(self, access_token: str, cert_name: str, pk_name: str):
-        cert_file_path, key_file_path = self.certificate_service.load_certificates(cert_name, pk_name)
-
+    def get_accounts(self, access_token: str):
+        cert_file_path, key_file_path = self.certificate_service.load_certificates()
+        
         api_url = "https://api.teller.io/accounts"
         headers = {'Content-Type': 'application/json'}
         auth = HTTPBasicAuth(access_token, '')
