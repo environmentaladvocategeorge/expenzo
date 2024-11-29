@@ -136,7 +136,7 @@ const Home = () => {
                 alignItems: "center",
               }}
             >
-              <CircularProgress size={64} />
+              <CircularProgress size={56} />
             </Box>
           ) : (
             <Box>
