@@ -1,11 +1,12 @@
 import requests
 from requests.auth import HTTPBasicAuth
+from certificate_service import CertificateService
 import logging
 
 logger = logging.getLogger(__name__)
 
 class TellerService:
-    def __init__(self, certificate_service):
+    def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
 
     def get_accounts(self, access_token: str, cert_name: str, pk_name: str):

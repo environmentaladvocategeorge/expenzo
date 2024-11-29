@@ -6,7 +6,8 @@ router = APIRouter()
 CERT_SECRET_NAME = 'expenzo-dev-teller-cert'
 PK_SECRET_NAME = 'expenzo-dev-teller-pk'
 
-def create_accounts_controller(teller_service: TellerService):
+def create_accounts_controller(teller_service: TellerService) -> APIRouter:
+    
     @router.get("/accounts")
     async def get_accounts(authorization: str = Header(..., description="Authorization header containing the Bearer token")):
         if not authorization or not authorization.startswith("Bearer "):

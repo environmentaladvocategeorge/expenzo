@@ -1,10 +1,10 @@
-import os
 import logging
+from repositories.secrets_repository import SecretsRepository
 
 logger = logging.getLogger(__name__)
 
 class CertificateService:
-    def __init__(self, secrets_repository):
+    def __init__(self, secrets_repository: SecretsRepository):
         self.secrets_repository = secrets_repository
         self.cert_file_path = None
         self.key_file_path = None
