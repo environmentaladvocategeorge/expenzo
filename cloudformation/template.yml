@@ -17,26 +17,6 @@ Parameters:
     Description: "ARN of the IAM role for deployment."
 
 Resources:
-  # Kinesis Nested Stack
-  Kinesis:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: kinesis.yml
-      Parameters:
-        Environment: !Ref Environment
-        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
-
-  # Lambda Nested Stack
-  Lambda:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: lambda.yml
-      Parameters:
-        Environment: !Ref Environment
-        KinesisStreamName: !GetAtt Kinesis.Outputs.KinesisStreamName
-        KinesisStreamArn: !GetAtt Kinesis.Outputs.KinesisStreamArn
-        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
-
   # UI Nested Stack
   UI:
     Type: AWS::Serverless::Application
