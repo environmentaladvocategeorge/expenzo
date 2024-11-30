@@ -1,3 +1,21 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for the API Service
+
+Parameters:
+  Environment:
+    Type: String
+    Description: "Deployment environment."
+  ResourceBaseIdentifier:
+    Type: String
+    Description: "Base identifier for resource naming."
+  CognitoUserPoolId:
+    Type: String
+    Description: "The ID of the Cognito User Pool used for authentication."
+  CognitoUserPoolClientId:
+    Type: String
+    Description: "The Client ID for the Cognito User Pool used for authentication."
+
 Resources:
   ExpenzoApiFunction:
     Type: AWS::Serverless::Function
@@ -28,20 +46,6 @@ Resources:
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer
-        OptionsMethod:
-          Type: Api
-          Properties:
-            Path: /accounts
-            Method: OPTIONS
-            RestApiId: !Ref ApiGateway
-            Auth:
-              Authorizer: NONE
-            Cors:
-              AllowMethods: "'GET,POST,OPTIONS'"
-              AllowHeaders: "'Content-Type,Authorization'"
-              AllowOrigin: "'http://localhost:3000'"
-              MaxAge: "'600'"
-              AllowCredentials: true
 
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -54,9 +58,15 @@ Resources:
         MaxAge: "'600'"
         AllowCredentials: true
       Auth:
+        AddDefaultAuthorizerToCorsPreflight: False
         DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
             IdentitySource: "method.request.header.Authorization"
             ValidationExpression: "^Bearer [A-Za-z0-9-_=.]+$"
+
+Outputs:
+  ApiUrl:
+    Description: "URL of the API"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/accounts"
