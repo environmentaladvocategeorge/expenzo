@@ -8,10 +8,6 @@ const apiClient = () => {
 
   client.interceptors.request.use(
     async (config) => {
-      const token = config.headers?.AuthorizationToken as string | null;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
       return config;
     },
     (error) => Promise.reject(error)
