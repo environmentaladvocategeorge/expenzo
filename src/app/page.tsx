@@ -80,7 +80,7 @@ const Home = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, showLoginModal, setShowLoginModal, getAccessToken } =
+  const { isAuthenticated, showLoginModal, setShowLoginModal, getToken } =
     useAuth();
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const Home = () => {
       setLoading(true);
 
       try {
-        const data = await fetchAccounts(getAccessToken);
+        const data = await fetchAccounts(getToken);
         setAccounts(data.accounts);
       } catch (err) {
         console.error(`Error occurred fetching API: ${err}`);

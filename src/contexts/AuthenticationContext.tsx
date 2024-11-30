@@ -5,7 +5,7 @@ import { logoutUser } from "@/lib/cognito";
 
 interface AuthContextType {
   user: CognitoUserSession | null;
-  getAccessToken: () => string | null;
+  getToken: () => string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -22,9 +22,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const getAccessToken = (): string | null => {
+  const getToken = (): string | null => {
     try {
-      return user?.getAccessToken().getJwtToken() || null;
+      console.log(user);
+      return user?.getIdToken().getJwtToken() || null;
     } catch (error) {
       console.error("Failed to get access token:", error);
       return null;
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
-        getAccessToken,
+        getToken,
         login,
         logout,
         isAuthenticated,
