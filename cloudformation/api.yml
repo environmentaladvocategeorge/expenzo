@@ -64,6 +64,10 @@ Resources:
             UserPoolArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
             IdentitySource: "method.request.header.Authorization"
             ValidationExpression: "^Bearer [A-Za-z0-9-_=.]+$"
+      MethodSettings:
+        - ResourcePath: /accounts
+          HttpMethod: OPTIONS
+          AuthorizationType: NONE
 
 Outputs:
   ApiUrl:

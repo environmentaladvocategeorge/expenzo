@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException, Query
 from services.teller_service import TellerService
 
 router = APIRouter()
@@ -6,13 +6,11 @@ router = APIRouter()
 def create_accounts_controller(teller_service: TellerService) -> APIRouter:
 
     @router.get("/accounts")
-    async def get_accounts(authorization: str = Header(..., description="Authorization header containing the Bearer token")):
-        if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=400, detail="Invalid Authorization header")
-
-        access_token = authorization.split("Bearer ")[1]
+    async def get_accounts(
+        access_token: str = Query(..., description="Access token as a query parameter")
+    ):
         if not access_token:
-            raise HTTPException(status_code=400, detail="Invalid Bearer token")
+            raise HTTPException(status_code=400, detail="Access token is required")
 
         try:
             accounts = teller_service.get_accounts(access_token)
