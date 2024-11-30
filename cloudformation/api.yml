@@ -9,6 +9,12 @@ Parameters:
   ResourceBaseIdentifier:
     Type: String
     Description: "Base identifier for resource naming."
+  CognitoUserPoolId:
+    Type: String
+    Description: "The ID of the Cognito User Pool used for authentication."
+  CognitoUserPoolClientId:
+    Type: String
+    Description: "The Client ID for the Cognito User Pool used for authentication."
 
 Resources:
   ExpenzoApiFunction:
@@ -38,6 +44,8 @@ Resources:
             Path: /accounts
             Method: GET
             RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   ApiGateway:
     Type: AWS::Serverless::Api
@@ -49,6 +57,13 @@ Resources:
         AllowOrigin: "'http://localhost:3000'"
         MaxAge: "'600'"
         AllowCredentials: true
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
+            IdentitySource: "method.request.header.Authorization"
+            ValidationExpression: "^Bearer [A-Za-z0-9-_=.]+$"
 
 Outputs:
   ApiUrl:
