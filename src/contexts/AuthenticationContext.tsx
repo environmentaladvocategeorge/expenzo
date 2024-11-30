@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getToken = (): string | null => {
     try {
-      console.log(user);
       return user?.getIdToken().getJwtToken() || null;
     } catch (error) {
       console.error("Failed to get access token:", error);
