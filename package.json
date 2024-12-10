@@ -6,12 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint --fix src/**/*.{js,jsx,ts,tsx}",
     "prepare": "husky install"
   },
-"lint-staged": {
-  "src/**/*.{js,jsx,ts,tsx}": "eslint --fix"
-},
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": "eslint --fix"
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
