@@ -33,4 +33,4 @@ Outputs:
     Value: !Ref ExpenzoTable
   ExpenzoTableNameArn:
     Description: "The ARN of the DynamoDB table."
-    Value: !Ref ExpenzoTable.Arn
+    Value: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ExpenzoTable}"
