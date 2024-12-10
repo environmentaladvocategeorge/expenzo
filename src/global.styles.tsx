@@ -1,6 +1,6 @@
 import { Box, Divider, styled, Typography } from "@mui/material";
 
-export const AppHeaderText = styled(Typography)(({ theme }) => ({
+export const AppHeaderText = styled(Typography)(() => ({
   fontWeight: 700,
   fontSize: "24px",
   color: "black",

@@ -8,7 +8,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import PaymentScheduleSummary from "./_components/PaymentScheduleSummary";
-import PaymentSchedulerForm from "./_components/PaymentSchedulerForm";
+import { PaymentSchedulerForm } from "@/types/payment-scheduler-form";
 import { GridPageContainer } from "@/global.styles";
 
 const steps = ["Cash Flow In", "Payments", "Cash Flow Out", "Review"];

@@ -105,6 +105,7 @@ const Home = () => {
     };
 
     handleAuthentication();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   if (error) return <Typography> An error has occured.</Typography>;

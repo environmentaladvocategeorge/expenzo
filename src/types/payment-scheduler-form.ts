@@ -1,8 +1,8 @@
-interface PaymentSchedulerForm {
+export interface PaymentSchedulerForm {
   cashFlowIn: {
     paymentCadence: string;
   };
-  payments: {};
-  cashFlowOut: {};
-  review: {};
+  payments: object;
+  cashFlowOut: object;
+  review: object;
 }
