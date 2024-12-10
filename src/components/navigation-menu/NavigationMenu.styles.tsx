@@ -27,5 +27,5 @@ export const NavigationMenuContainer = styled(Box, {
   color: theme.palette.neutral.white,
   justifyContent: "space-between",
   borderRight: "2px solid #e7e8e8",
-  zIndex: 9999,
+  zIndex: 1299,
 }));

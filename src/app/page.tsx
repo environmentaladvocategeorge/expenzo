@@ -13,7 +13,6 @@ import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { createAccount } from "@/services/accountService";
 import { Account } from "@/types/api";
-import LoginModal from "@/modals/LoginModal";
 import { useAuth } from "@/contexts/AuthenticationContext";
 
 const AccountRow = ({ account }: { account: Account }) => {
@@ -80,8 +79,7 @@ const Home = () => {
   const accounts: any[] = [];
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, showLoginModal, setShowLoginModal, getToken } =
-    useAuth();
+  const { isAuthenticated, setShowLoginModal, getToken } = useAuth();
 
   useEffect(() => {
     const handleAuthentication = async () => {
@@ -122,12 +120,6 @@ const Home = () => {
 
   return (
     <>
-      <LoginModal
-        open={showLoginModal}
-        onClose={() => {
-          setShowLoginModal(false);
-        }}
-      />
       {isAuthenticated && (
         <Box
           sx={{

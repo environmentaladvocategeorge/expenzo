@@ -10,7 +10,8 @@ import {
 import theme from "@/theme/theme";
 import { NavigationMenu } from "@/components";
 import { PageContainer } from "@/global.styles";
-import { AuthProvider } from "@/contexts/AuthenticationContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthenticationContext";
+import LoginModal from "@/modals/LoginModal";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
@@ -27,6 +28,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
 const LayoutContent = ({ children }: { children: ReactNode }) => {
   const { isOpen, toggleMenu } = useNavigationMenu();
+  const { showLoginModal, setShowLoginModal } = useAuth();
 
   return (
     <html lang="en">
@@ -57,6 +59,12 @@ const LayoutContent = ({ children }: { children: ReactNode }) => {
             transition: "all 0.3s ease-in-out",
           }}
         >
+          <LoginModal
+            open={showLoginModal}
+            onClose={() => {
+              setShowLoginModal(false);
+            }}
+          />
           <NavigationMenu />
           <PageContainer>{children}</PageContainer>
         </Box>
