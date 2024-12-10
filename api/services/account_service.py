@@ -1,5 +1,5 @@
 import datetime
-from api.models.account_model import Account
+from models.account_model import Account
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 

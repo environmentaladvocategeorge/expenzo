@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Body
-from api.schema.account_schema import AccountCreateRequest
+from schema.account_schema import AccountCreateRequest
 from services.teller_service import TellerService
 from services.account_service import AccountService
 
