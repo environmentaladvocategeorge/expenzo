@@ -46,3 +46,12 @@ Resources:
       Parameters:
         Environment: !Ref Environment
         ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
+
+  # Cognito Nested Stack
+  DB:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: db.yml
+      Parameters:
+        Environment: !Ref Environment
+        ResourceBaseIdentifier: !Ref ResourceBaseIdentifier

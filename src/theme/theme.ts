@@ -1,5 +1,5 @@
 import { createTheme } from "@mui/material/styles";
-import { Poppins } from "next/font/google";
+import { Poppins, Eczar } from "next/font/google";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -7,6 +7,7 @@ declare module "@mui/material/styles" {
       white: string;
       lightGray: string;
       gray: string;
+      darkGray: string;
       black: string;
     };
   }
@@ -16,6 +17,7 @@ declare module "@mui/material/styles" {
       white: string;
       lightGray: string;
       gray: string;
+      darkGray: string;
       black: string;
     };
   }
@@ -33,23 +35,31 @@ declare module "@mui/material/styles" {
   }
 }
 
-const poppins = Poppins({
+export const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
+});
+
+export const eczar = Eczar({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#FF7F32",
+      main: "#8fad86",
+      light: "#f5faf5",
+      dark: "#6c8b67",
     },
     secondary: {
       main: "#18b2f2",
     },
     neutral: {
-      white: "#ffffff",
+      white: "#fafafa",
       lightGray: "#f4f6f6",
       gray: "#a6a6a6",
+      darkGray: "#434646",
       black: "#191919",
     },
   },
@@ -85,7 +95,22 @@ const theme = createTheme({
         root: {
           textTransform: "uppercase",
           fontWeight: 700,
-          color: "#ffffff",
+          color: "#fafafa",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "& fieldset": {
+            borderColor: "#8fad86",
+          },
+          "&:hover fieldset": {
+            borderColor: "#6c8b67 !important",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#8fad86",
+          },
         },
       },
     },

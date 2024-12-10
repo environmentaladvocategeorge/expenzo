@@ -11,10 +11,10 @@ Parameters:
     Description: "Base identifier for resource naming."
 
 Resources:
-  PersonalFinanceTable:
+  ExpenzoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub "${ResourceBaseIdentifier}-PersonalFinance-${Environment}"
+      TableName: !Sub "${ResourceBaseIdentifier}-${Environment}"
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: PK
@@ -28,6 +28,6 @@ Resources:
           KeyType: RANGE
 
 Outputs:
-  PersonalFinanceTableName:
+  ExpenzoTableTableName:
     Description: "The name of the DynamoDB table."
-    Value: !Ref PersonalFinanceTable
+    Value: !Ref ExpenzoTable

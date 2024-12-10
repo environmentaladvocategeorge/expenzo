@@ -1,10 +1,12 @@
 import * as Styled from "./NavigationMenu.styles";
 import { IconButton, Box, Typography, Button } from "@mui/material";
-import { ChevronLeft as ChevronLeftIcon } from "@mui/icons-material";
+import {
+  ChevronLeft as ChevronLeftIcon,
+  CalendarMonthOutlined as CalendarIcon,
+} from "@mui/icons-material";
 import { AppHeaderText, Link, WhiteDivider } from "@/global.styles";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
-
 import { useNavigationMenu } from "@/contexts/NavigationMenuContext";
 import { useAuth } from "@/contexts/AuthenticationContext";
 
@@ -18,6 +20,11 @@ const routes = [
   { label: "Dashboard", path: "/", icon: HomeOutlined },
   { label: "Accounts", path: "/accounts", icon: WalletOutlined },
   { label: "Budgets", path: "/budgets", icon: AttachMoneyOutlined },
+  {
+    label: "Scheduler",
+    path: "/scheduler",
+    icon: CalendarIcon,
+  },
 ];
 
 const NavigationMenu = () => {
@@ -49,7 +56,15 @@ const NavigationMenu = () => {
               isActive={currentPath === path}
               sx={{ display: "flex", alignItems: "center", mb: 2 }}
             >
-              <Icon sx={(theme) => ({ marginRight: theme.spacing(2) })} />
+              <Icon
+                sx={(theme) => ({
+                  marginRight: theme.spacing(2),
+                  color:
+                    currentPath === path
+                      ? theme.palette.primary.main
+                      : "inherit",
+                })}
+              />
               {isOpen && <Typography variant="body1">{label}</Typography>}
             </Link>
           </NextLink>
