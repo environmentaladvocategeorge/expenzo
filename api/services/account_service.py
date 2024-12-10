@@ -1,3 +1,4 @@
+import datetime
 from api.models.account_model import Account
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
@@ -5,10 +6,13 @@ from schema.account_schema import AccountCreateRequest
 class AccountService:
     def create_account(self, account_request: AccountCreateRequest):
         account = Account(
+            PK="123",
+            SK="345",
             Provider=account_request.provider,
             ProviderID=account_request.provider_id,
-            EntityType=account_request.entity_type,
+            EntityType="ACCOUNT",
             EntityData=account_request.entity_data,
+            Timestamp=int(datetime.utcnow().timestamp()),
             Metadata=account_request.metadata,
         )
         item = account.model_dump()
