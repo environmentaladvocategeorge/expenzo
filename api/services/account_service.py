@@ -1,7 +1,11 @@
 from datetime import datetime, timezone
+import logging
 from models.account_model import Account
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class AccountService:
     def create_account(self, account_request: AccountCreateRequest):
@@ -15,7 +19,12 @@ class AccountService:
             Timestamp=int(datetime.now(timezone.utc).timestamp()),
             Metadata=account_request.metadata,
         )
+
         item = account.model_dump()
+
+        logger.info("Creating account item: %s", item)
+        
         table = db_client.get_table()
         table.put_item(Item=item)
-        return {"message": "Account created successfully", "item": item}
+        
+        return item
