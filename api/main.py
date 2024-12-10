@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-from api.services.account_service import AccountService
+from services.account_service import AccountService
 from controllers.accounts_controller import create_accounts_controller
 from services.certificate_service import CertificateService
 from services.teller_service import TellerService
