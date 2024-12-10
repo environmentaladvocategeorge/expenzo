@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template with DynamoDB Table for Personal Finance App
+Description: SAM Template for the API Service
 
 Parameters:
   Environment:
@@ -9,25 +9,64 @@ Parameters:
   ResourceBaseIdentifier:
     Type: String
     Description: "Base identifier for resource naming."
+  CognitoUserPoolId:
+    Type: String
+    Description: "The ID of the Cognito User Pool used for authentication."
+  CognitoUserPoolClientId:
+    Type: String
+    Description: "The Client ID for the Cognito User Pool used for authentication."
 
 Resources:
-  PersonalFinanceTable:
-    Type: AWS::DynamoDB::Table
+  ExpenzoApiFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      TableName: !Sub "${ResourceBaseIdentifier}-PersonalFinance-${Environment}"
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: PK
-          AttributeType: S
-        - AttributeName: SK
-          AttributeType: S
-      KeySchema:
-        - AttributeName: PK
-          KeyType: HASH
-        - AttributeName: SK
-          KeyType: RANGE
+      CodeUri: ../api/
+      Handler: main.handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          ENV: !Ref Environment
+          CERT_SECRET_NAME: expenzo-dev-teller-cert
+          PK_SECRET_NAME: expenzo-dev-teller-pk
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
+      Events:
+        ExpenzoApi:
+          Type: Api
+          Properties:
+            Path: /accounts
+            Method: GET
+            RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'http://localhost:3000'"
+        MaxAge: "'600'"
+        AllowCredentials: true
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: False
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
+            IdentitySource: "method.request.header.Authorization"
+            ValidationExpression: "^Bearer [A-Za-z0-9-_=.]+$"
 
 Outputs:
-  PersonalFinanceTableName:
-    Description: "The name of the DynamoDB table."
-    Value: !Ref PersonalFinanceTable
+  ApiUrl:
+    Description: "URL of the API"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/accounts"
