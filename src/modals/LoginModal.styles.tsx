@@ -37,6 +37,6 @@ export const SubmitButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
-export const LoadingIndicator = styled(CircularProgress)(({ theme }) => ({
+export const LoadingIndicator = styled(CircularProgress)(() => ({
   color: "white",
 }));

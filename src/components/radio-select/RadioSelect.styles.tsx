@@ -31,11 +31,11 @@ export const LabelWrapper = styled(Box)({
   gap: "8px",
 });
 
-export const Radio = styled(MUIRadio)(({ theme }) => ({
+export const Radio = styled(MUIRadio)(() => ({
   cursor: "pointer",
 }));
 
-export const Label = styled(Typography)(({ theme }) => ({
+export const Label = styled(Typography)(() => ({
   fontSize: "16px",
   fontWeight: 500,
 }));

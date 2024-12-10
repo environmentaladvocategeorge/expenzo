@@ -1,5 +1,5 @@
 import { eczar } from "@/theme/theme";
-import { Box, Divider, Radio, Typography, useTheme } from "@mui/material";
+import { Divider, Typography, useTheme } from "@mui/material";
 import RadioSelectGroup from "@/components/radio-select-group/RadioSelectGroup";
 import { useFormContext } from "react-hook-form";
 
@@ -17,7 +17,7 @@ const CashFlowInFormSection = () => {
           textAlign: "center",
         }}
       >
-        Let's calculate your cash flow in.
+        {"Let's calculate your cash flow in."}
       </Typography>
       <Divider
         sx={{
