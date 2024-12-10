@@ -7,3 +7,10 @@ class AccountSchema(BaseModel):
     EntityType: str
     EntityData: Dict[str, str]
     Metadata: Optional[Dict] = {}
+
+class AccountCreateRequest(BaseModel):
+    provider: str
+    provider_id: str
+    entity_type: str
+    entity_data: Dict[str, str]
+    metadata: Optional[Dict] = {}
