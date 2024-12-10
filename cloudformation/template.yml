@@ -37,6 +37,7 @@ Resources:
         ResourceBaseIdentifier: !Ref ResourceBaseIdentifier
         CognitoUserPoolId: !GetAtt Cognito.Outputs.CognitoUserPoolId
         CognitoUserPoolClientId: !GetAtt Cognito.Outputs.CognitoUserPoolClientId
+        DynamoDBTableName: !GetAtt DB.Outputs.ExpenzoTableName
 
   # Cognito Nested Stack
   Cognito:

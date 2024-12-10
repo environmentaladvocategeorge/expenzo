@@ -15,6 +15,9 @@ Parameters:
   CognitoUserPoolClientId:
     Type: String
     Description: "The Client ID for the Cognito User Pool used for authentication."
+  DynamoDBTableName:
+    Type: String
+    Description: "The name for the table the API will communicate with"
 
 Resources:
   ExpenzoApiFunction:
@@ -28,6 +31,7 @@ Resources:
           ENV: !Ref Environment
           CERT_SECRET_NAME: expenzo-dev-teller-cert
           PK_SECRET_NAME: expenzo-dev-teller-pk
+          DYNAMO_TABLE_NAME: !Ref DynamoDBTableName
       Policies:
         - Version: "2012-10-17"
           Statement:
