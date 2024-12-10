@@ -42,13 +42,19 @@ Resources:
                 - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
                 - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
       Events:
-        ExpenzoApi:
+        ExpenzoApiGet:
           Type: Api
           Properties:
             Path: /accounts
-            Method:
-              - GET
-              - POST
+            Method: GET
+            RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
+        ExpenzoApiPost:
+          Type: Api
+          Properties:
+            Path: /accounts
+            Method: POST
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer
