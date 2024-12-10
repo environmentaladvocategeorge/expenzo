@@ -46,7 +46,9 @@ Resources:
           Type: Api
           Properties:
             Path: /accounts
-            Method: GET
+            Method:
+              - GET
+              - POST
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
-import { fetchAccounts } from "@/services/accountService";
+import { createAccount } from "@/services/accountService";
 import { Account } from "@/types/api";
 import LoginModal from "@/modals/LoginModal";
 import { useAuth } from "@/contexts/AuthenticationContext";
@@ -77,7 +77,7 @@ const Home = () => {
     process.env.NEXT_PUBLIC_APP_ID || ""
   );
 
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const accounts: any[] = [];
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated, showLoginModal, setShowLoginModal, getToken } =
@@ -94,8 +94,18 @@ const Home = () => {
       setLoading(true);
 
       try {
-        const data = await fetchAccounts(getToken);
-        setAccounts(data.accounts);
+        // const data = await fetchAccounts(getToken);
+        // setAccounts(data.accounts);
+        const data = await createAccount(
+          {
+            provider: "SampleProvider",
+            provider_id: "1234",
+            entity_data: { key: "value" },
+            metadata: { info: "sample" },
+          },
+          getToken
+        );
+        console.log(data);
       } catch (err) {
         console.error(`Error occurred fetching API: ${err}`);
         setError("Failed to fetch accounts");

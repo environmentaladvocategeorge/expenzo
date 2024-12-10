@@ -18,6 +18,13 @@ export interface Account {
   status: string;
 }
 
+export interface AccountCreateRequest {
+  provider: string;
+  provider_id: string;
+  entity_data: Record<string, string>;
+  metadata?: Record<string, any>;
+}
+
 export interface GetAccountsResponse {
   accounts: Account[];
 }
