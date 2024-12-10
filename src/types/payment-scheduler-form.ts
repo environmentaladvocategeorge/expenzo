@@ -1,4 +1,4 @@
-export interface PaymentSchedulerForm {
+export interface PaymentSchedulerFormType {
   cashFlowIn: {
     paymentCadence: string;
   };

@@ -8,14 +8,15 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import PaymentScheduleSummary from "./_components/PaymentScheduleSummary";
-import { PaymentSchedulerForm } from "@/types/payment-scheduler-form";
+import { PaymentSchedulerFormType } from "@/types/payment-scheduler-form";
 import { GridPageContainer } from "@/global.styles";
+import PaymentSchedulerForm from "./_components/PaymentSchedulerForm";
 
 const steps = ["Cash Flow In", "Payments", "Cash Flow Out", "Review"];
 
 const Scheduler = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const methods = useForm<PaymentSchedulerForm>({
+  const methods = useForm<PaymentSchedulerFormType>({
     defaultValues: {
       cashFlowIn: {
         paymentCadence: "",
