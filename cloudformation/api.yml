@@ -17,7 +17,10 @@ Parameters:
     Description: "The Client ID for the Cognito User Pool used for authentication."
   DynamoDBTableName:
     Type: String
-    Description: "The name for the table the API will communicate with"
+    Description: "The name for the table the API will communicate with."
+  DynamoDBTableArn:
+    Type: String
+    Description: "The ARN for the table the API will communicate with."
 
 Resources:
   ExpenzoApiFunction:
@@ -31,7 +34,8 @@ Resources:
           ENV: !Ref Environment
           CERT_SECRET_NAME: expenzo-dev-teller-cert
           PK_SECRET_NAME: expenzo-dev-teller-pk
-          DYNAMO_TABLE_NAME: !Ref DynamoDBTableName
+          DYNAMO_DB_TABLE_NAME: !Ref DynamoDBTableName
+          AWS_REGION: !Ref "AWS::Region"
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -41,6 +45,14 @@ Resources:
               Resource:
                 - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
                 - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
+            - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !Ref DynamoDBTableArn
       Events:
         ExpenzoApiGet:
           Type: Api

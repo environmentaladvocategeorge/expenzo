@@ -38,6 +38,7 @@ Resources:
         CognitoUserPoolId: !GetAtt Cognito.Outputs.CognitoUserPoolId
         CognitoUserPoolClientId: !GetAtt Cognito.Outputs.CognitoUserPoolClientId
         DynamoDBTableName: !GetAtt DB.Outputs.ExpenzoTableName
+        DynamoDBTableArn: !GetAtt DB.Outputs.ExpenzoTableNameArn
 
   # Cognito Nested Stack
   Cognito:

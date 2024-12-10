@@ -31,3 +31,6 @@ Outputs:
   ExpenzoTableName:
     Description: "The name of the DynamoDB table."
     Value: !Ref ExpenzoTable
+  ExpenzoTableNameArn:
+    Description: "The ARN of the DynamoDB table."
+    Value: !Ref ExpenzoTable.Arn
