@@ -3,7 +3,6 @@ import os
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-from fastapi.responses import JSONResponse
 from services.account_service import AccountService
 from controllers.accounts_controller import create_accounts_controller
 from services.certificate_service import CertificateService
@@ -30,10 +29,7 @@ app.add_middleware(
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled error: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "An unexpected error occurred. Please try again later."}
-    )
+    raise HTTPException(status_code=500, detail="An unexpected error occurred. Please try again later.")
 
 aws_region = os.getenv('AWS_REGION', 'us-east-1')
 secrets_repository = SecretsRepository(region_name=aws_region)
