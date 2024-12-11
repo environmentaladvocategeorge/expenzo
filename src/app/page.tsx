@@ -72,14 +72,15 @@ const AccountRow = ({ account }: { account: Account }) => {
 
 const Home = () => {
   const theme = useTheme();
+  const { isAuthenticated, setShowLoginModal, getToken } = useAuth();
   const openTellerConnect = useTellerConnect(
-    process.env.NEXT_PUBLIC_APP_ID || ""
+    process.env.NEXT_PUBLIC_APP_ID || "",
+    getToken
   );
 
   const accounts: any[] = [];
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, setShowLoginModal, getToken } = useAuth();
 
   useEffect(() => {
     const handleAuthentication = async () => {
