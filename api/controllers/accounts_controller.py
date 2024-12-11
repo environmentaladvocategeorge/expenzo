@@ -24,7 +24,7 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
         account_request: AccountCreateRequest = Body(..., description="Account creation data")
     ):
         try:
-            account = account_service.create_account(account_request)
+            account = account_service.create_account_link(account_request)
             return {"account": account}
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))

@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
-import { createAccount } from "@/services/accountService";
 import { Account } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 
@@ -72,15 +71,13 @@ const AccountRow = ({ account }: { account: Account }) => {
 
 const Home = () => {
   const theme = useTheme();
-  const { isAuthenticated, setShowLoginModal, getToken } = useAuth();
+  const { isAuthenticated, setShowLoginModal } = useAuth();
   const openTellerConnect = useTellerConnect(
-    process.env.NEXT_PUBLIC_APP_ID || "",
-    getToken
+    process.env.NEXT_PUBLIC_APP_ID || ""
   );
 
   const accounts: any[] = [];
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthentication = async () => {
@@ -91,33 +88,11 @@ const Home = () => {
       }
 
       setLoading(true);
-
-      try {
-        // const data = await fetchAccounts(getToken);
-        // setAccounts(data.accounts);
-        const data = await createAccount(
-          {
-            provider: "SampleProvider",
-            provider_id: "1234",
-            entity_data: { key: "value" },
-            metadata: { info: "sample" },
-          },
-          getToken
-        );
-        console.log(data);
-      } catch (err) {
-        console.error(`Error occurred fetching API: ${err}`);
-        setError("Failed to fetch accounts");
-      } finally {
-        setLoading(false);
-      }
     };
 
     handleAuthentication();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
-
-  if (error) return <Typography> An error has occured.</Typography>;
 
   return (
     <>
