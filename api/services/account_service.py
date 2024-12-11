@@ -8,9 +8,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class AccountService:
-    def create_account_link(self, account_link_request: AccountCreateRequest):
+    def create_account_link(self, account_link_request: AccountCreateRequest, user_id: str):
         account = AccountLink(
-            PK='123', 
+            PK=user_id, 
             SK=f"Provider#{account_link_request.provider}#AccountLink#{account_link_request.provider_id}",
             Provider=account_link_request.provider,
             ProviderID=account_link_request.provider_id,

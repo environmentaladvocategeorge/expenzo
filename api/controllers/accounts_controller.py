@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException, Query, Body
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest
 from services.teller_service import TellerService
 from services.account_service import AccountService
 
 router = APIRouter()
+
+auth_service = AuthenticationService()
 
 def create_accounts_controller(teller_service: TellerService, account_service: AccountService) -> APIRouter:
     @router.get("/accounts")
@@ -21,10 +24,11 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
 
     @router.post("/accounts")
     async def create_account(
-        account_request: AccountCreateRequest = Body(..., description="Account creation data")
+        account_request: AccountCreateRequest = Body(..., description="Account creation data"),
+        user_id: str = Depends(auth_service.extract_user_id)
     ):
         try:
-            account = account_service.create_account_link(account_request)
+            account = account_service.create_account_link(account_request, user_id)
             return {"account": account}
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))

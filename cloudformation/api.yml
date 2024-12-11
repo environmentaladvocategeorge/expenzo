@@ -35,6 +35,8 @@ Resources:
           CERT_SECRET_NAME: expenzo-dev-teller-cert
           PK_SECRET_NAME: expenzo-dev-teller-pk
           DYNAMO_DB_TABLE_NAME: !Ref DynamoDBTableName
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClientId
       Policies:
         - Version: "2012-10-17"
           Statement:
