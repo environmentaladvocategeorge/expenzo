@@ -60,3 +60,43 @@ export const logoutUser = () => {
     cognitoUser.signOut();
   }
 };
+
+export const reAuthenticateUser = (
+  callback: (error: Error | null, result: CognitoUserSession | null) => void
+) => {
+  const cognitoUser = userPool.getCurrentUser();
+
+  if (cognitoUser) {
+    cognitoUser.getSession((err, session) => {
+      if (err) {
+        console.error("Failed to get session:", err);
+        callback(err, null);
+      } else {
+        console.log("Session found:", session);
+
+        // Check if the session is expired or about to expire
+        if (session.isValid()) {
+          console.log("Session is valid");
+          callback(null, session);
+        } else {
+          // Refresh the session using the refresh token if the session is expired
+          cognitoUser.refreshSession(
+            session.getRefreshToken(),
+            (err, newSession) => {
+              if (err) {
+                console.error("Failed to refresh session:", err);
+                callback(err, null);
+              } else {
+                console.log("Session refreshed:", newSession);
+                callback(null, newSession);
+              }
+            }
+          );
+        }
+      }
+    });
+  } else {
+    // If no user is found, return an error or null session
+    callback(new Error("No current user found"), null);
+  }
+};

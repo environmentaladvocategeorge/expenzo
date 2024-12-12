@@ -1,7 +1,16 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
-import { authenticateUser } from "@/lib/cognito";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
+import {
+  authenticateUser,
+  logoutUser,
+  reAuthenticateUser,
+} from "@/lib/cognito";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
-import { logoutUser } from "@/lib/cognito";
 
 interface AuthContextType {
   user: CognitoUserSession | null;
@@ -21,6 +30,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Attempt re-authentication on component mount
+  useEffect(() => {
+    reAuthenticateUser((err, session) => {
+      if (err) {
+        setIsAuthenticated(false);
+        setShowLoginModal(true);
+      } else {
+        setUser(session);
+        setShowLoginModal(false);
+        setIsAuthenticated(true);
+      }
+    });
+  }, []);
 
   const getToken = (): string | null => {
     try {
