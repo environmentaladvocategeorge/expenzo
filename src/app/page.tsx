@@ -96,7 +96,9 @@ const Home = () => {
     process.env.NEXT_PUBLIC_APP_ID || ""
   );
 
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [debitAccounts, setDebitAccounts] = useState<Account[]>([]);
+  const [creditAccounts, setCreditAccounts] = useState<Account[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -110,7 +112,8 @@ const Home = () => {
       try {
         setLoading(true);
         const accountsData = await fetchAccounts(getToken);
-        setAccounts(accountsData.accounts);
+        setDebitAccounts(accountsData.debit);
+        setCreditAccounts(accountsData.credit);
       } catch (error) {
         console.error("Error fetching accounts:", error);
       } finally {
@@ -124,63 +127,124 @@ const Home = () => {
   return (
     <>
       {isAuthenticated && (
-        <Box
-          sx={{
-            borderRadius: theme.spacing(2),
-            padding: theme.spacing(4),
-            backgroundColor: theme.palette.neutral.white,
-          }}
-        >
-          <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
-            Accounts ({accounts.length})
-          </Typography>
+        <>
+          <Box
+            sx={{
+              borderRadius: theme.spacing(2),
+              padding: theme.spacing(4),
+              backgroundColor: theme.palette.neutral.white,
+              margin: theme.spacing(2),
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
+              Debit ({debitAccounts.length})
+            </Typography>
 
-          {loading ? (
+            {loading ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  padding: theme.spacing(4),
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CircularProgress size={56} />
+              </Box>
+            ) : (
+              <Box>
+                {debitAccounts.map((account) => (
+                  <AccountRow key={account.details.id} account={account} />
+                ))}
+              </Box>
+            )}
+
+            <Divider
+              sx={{
+                backgroundColor: theme.palette.neutral.black,
+                my: theme.spacing(2),
+              }}
+            />
+
             <Box
               sx={{
-                width: "100%",
-                padding: theme.spacing(4),
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
-              <CircularProgress size={56} />
+              <Button
+                variant="contained"
+                onClick={openTellerConnect}
+                sx={{
+                  ml: "auto",
+                }}
+                endIcon={<Add />}
+              >
+                Connect Account
+              </Button>
             </Box>
-          ) : (
-            <Box>
-              {accounts.map((account) => (
-                <AccountRow key={account.details.id} account={account} />
-              ))}
-            </Box>
-          )}
-
-          <Divider
-            sx={{
-              backgroundColor: theme.palette.neutral.black,
-              my: theme.spacing(2),
-            }}
-          />
-
+          </Box>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              borderRadius: theme.spacing(2),
+              padding: theme.spacing(4),
+              backgroundColor: theme.palette.neutral.white,
+              margin: theme.spacing(2),
             }}
           >
-            <Button
-              variant="contained"
-              onClick={openTellerConnect}
+            <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
+              Credit ({creditAccounts.length})
+            </Typography>
+
+            {loading ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  padding: theme.spacing(4),
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CircularProgress size={56} />
+              </Box>
+            ) : (
+              <Box>
+                {creditAccounts.map((account) => (
+                  <AccountRow key={account.details.id} account={account} />
+                ))}
+              </Box>
+            )}
+
+            <Divider
               sx={{
-                ml: "auto",
+                backgroundColor: theme.palette.neutral.black,
+                my: theme.spacing(2),
               }}
-              endIcon={<Add />}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              Connect Account
-            </Button>
+              <Button
+                variant="contained"
+                onClick={openTellerConnect}
+                sx={{
+                  ml: "auto",
+                }}
+                endIcon={<Add />}
+              >
+                Connect Account
+              </Button>
+            </Box>
           </Box>
-        </Box>
+        </>
       )}
     </>
   );

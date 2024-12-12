@@ -39,7 +39,8 @@ export interface AccountCreateRequest {
 }
 
 export interface GetAccountsResponse {
-  accounts: Account[];
+  debit: Account[];
+  credit: Account[];
 }
 
 export interface AccountCreateRequest {
