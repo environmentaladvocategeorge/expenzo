@@ -7,7 +7,7 @@ class Institution(BaseModel):
     id: str
 
 class Links(BaseModel):
-    account: str
+    account: Optional[str] = None 
     self: str
     balances: Optional[str] = None
     transactions: Optional[str] = None
