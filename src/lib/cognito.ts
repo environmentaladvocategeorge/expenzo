@@ -67,36 +67,38 @@ export const reAuthenticateUser = (
   const cognitoUser = userPool.getCurrentUser();
 
   if (cognitoUser) {
-    cognitoUser.getSession((err, session) => {
-      if (err) {
-        console.error("Failed to get session:", err);
-        callback(err, null);
-      } else {
-        console.log("Session found:", session);
-
-        // Check if the session is expired or about to expire
-        if (session.isValid()) {
-          console.log("Session is valid");
-          callback(null, session);
+    cognitoUser.getSession(
+      (err: Error | null, session: CognitoUserSession | null) => {
+        if (err) {
+          console.error("Failed to get session:", err);
+          callback(err, null);
         } else {
-          // Refresh the session using the refresh token if the session is expired
-          cognitoUser.refreshSession(
-            session.getRefreshToken(),
-            (err, newSession) => {
-              if (err) {
-                console.error("Failed to refresh session:", err);
-                callback(err, null);
-              } else {
-                console.log("Session refreshed:", newSession);
-                callback(null, newSession);
-              }
+          if (session && session.isValid()) {
+            callback(null, session);
+          } else {
+            const refreshToken = session?.getRefreshToken();
+
+            if (refreshToken) {
+              cognitoUser.refreshSession(
+                refreshToken,
+                (refreshErr, newSession) => {
+                  if (refreshErr) {
+                    console.error("Failed to refresh session:", refreshErr);
+                    callback(refreshErr, null);
+                  } else {
+                    callback(null, newSession);
+                  }
+                }
+              );
+            } else {
+              console.error("No refresh token available");
+              callback(new Error("No refresh token available"), null);
             }
-          );
+          }
         }
       }
-    });
+    );
   } else {
-    // If no user is found, return an error or null session
     callback(new Error("No current user found"), null);
   }
 };

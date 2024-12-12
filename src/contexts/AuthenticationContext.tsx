@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Attempt re-authentication on component mount
   useEffect(() => {
     reAuthenticateUser((err, session) => {
       if (err) {
