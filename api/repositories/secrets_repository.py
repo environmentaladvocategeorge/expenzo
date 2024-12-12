@@ -8,6 +8,7 @@ logging.basicConfig(
     format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class SecretsRepository:
     def __init__(self, region_name: str):

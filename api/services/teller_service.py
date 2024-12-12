@@ -10,6 +10,8 @@ logging.basicConfig(
     format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
