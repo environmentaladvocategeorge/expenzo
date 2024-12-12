@@ -41,7 +41,7 @@ const AccountRow = ({ account }: { account: Account }) => {
             alignItems: "center",
           }}
         >
-          {account.institution.id === "chase" ? (
+          {account.details.institution.id === "chase" ? (
             <SiChase size={28} />
           ) : (
             <SiBankofamerica size={32} />
@@ -52,22 +52,31 @@ const AccountRow = ({ account }: { account: Account }) => {
             variant="body1"
             sx={{ color: theme.palette.text.secondary }}
           >
-            {account.institution.name}
+            {account.details.institution.name}
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: theme.palette.text.secondary }}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            {account.name}
-          </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              {account.details.name}
+            </Typography>
+            <Typography variant="body1" sx={{ mx: theme.spacing(1) }}>
+              ••••
+            </Typography>
+            <Typography variant="body1">{account.details.last_four}</Typography>
+          </Box>
         </Box>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Typography variant="body1" sx={{ mr: theme.spacing(1) }}>
-          ••••
-        </Typography>
         <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-          {account.last_four}
+          {`$ ${account.balance.available}`}
         </Typography>
       </Box>
     </Box>
@@ -135,7 +144,7 @@ const Home = () => {
           ) : (
             <Box>
               {accounts.map((account) => (
-                <AccountRow key={account.id} account={account} />
+                <AccountRow key={account.details.id} account={account} />
               ))}
             </Box>
           )}

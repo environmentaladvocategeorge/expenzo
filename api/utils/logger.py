@@ -7,4 +7,5 @@ def get_logger(name: str = __name__):
             level=logging.INFO,
             format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
         )
+    logger.setLevel(logging.INFO)
     return logger
