@@ -3,6 +3,10 @@ import logging
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 class SecretsRepository:

@@ -5,8 +5,11 @@ import logging
 from typing import List
 from models.teller import Account, AccountBalance
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
-
 class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service

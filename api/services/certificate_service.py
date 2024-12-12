@@ -2,6 +2,10 @@ import logging
 import os
 from repositories.secrets_repository import SecretsRepository
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 class CertificateService:
