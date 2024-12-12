@@ -13,6 +13,7 @@ import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { Account } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
+import { fetchAccounts } from "@/services/accountService";
 
 const AccountRow = ({ account }: { account: Account }) => {
   const theme = useTheme();
@@ -71,12 +72,12 @@ const AccountRow = ({ account }: { account: Account }) => {
 
 const Home = () => {
   const theme = useTheme();
-  const { isAuthenticated, setShowLoginModal } = useAuth();
+  const { isAuthenticated, setShowLoginModal, getToken } = useAuth();
   const openTellerConnect = useTellerConnect(
     process.env.NEXT_PUBLIC_APP_ID || ""
   );
 
-  const accounts: any[] = [];
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -87,11 +88,18 @@ const Home = () => {
         return;
       }
 
-      setLoading(true);
+      try {
+        setLoading(true);
+        const accountsData = await fetchAccounts(getToken);
+        setAccounts(accountsData.accounts);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     handleAuthentication();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   return (
@@ -105,7 +113,7 @@ const Home = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
-            Accounts ({accounts?.length})
+            Accounts ({accounts.length})
           </Typography>
 
           {loading ? (
@@ -122,7 +130,7 @@ const Home = () => {
             </Box>
           ) : (
             <Box>
-              {accounts?.map((account) => (
+              {accounts.map((account) => (
                 <AccountRow key={account.id} account={account} />
               ))}
             </Box>

@@ -17,7 +17,6 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
             accounts = await asyncio.gather(
                 *[teller_service.get_accounts(account_link.ProviderID) for account_link in account_links]
             )
-
             return {"accounts": [account for sublist in accounts for account in sublist]}
         except RuntimeError as e:
             raise HTTPException(status_code=500, detail=str(e))

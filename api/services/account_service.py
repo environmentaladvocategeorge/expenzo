@@ -5,7 +5,6 @@ from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 from boto3.dynamodb.conditions import Key, Attr
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class AccountService:
