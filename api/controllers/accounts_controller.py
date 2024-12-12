@@ -2,7 +2,7 @@ import asyncio
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Body
 from services.authentication_service import AuthenticationService
-from schema.account_schema import AccountCreateRequest
+from schema.account_schema import AccountCreateRequest, AccountCreateResponse, AccountGetResponse
 from services.teller_service import TellerService
 from services.account_service import AccountService
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def create_accounts_controller(teller_service: TellerService, account_service: AccountService) -> APIRouter:
     @router.get("/accounts")
-    async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)):
+    async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)) -> AccountGetResponse:
         try:
             account_links = account_service.get_account_links(user_id)
             tasks = [
@@ -41,7 +41,7 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
     async def create_account(
         account_request: AccountCreateRequest = Body(..., description="Account creation data"),
         user_id: str = Depends(auth_service.extract_user_id)
-    ):
+    ) -> AccountCreateResponse:
         try:
             account = account_service.create_account_link(account_request, user_id)
             logger.info(f"Account link created successfully for user {user_id}: {account}")
