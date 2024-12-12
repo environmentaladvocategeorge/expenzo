@@ -36,8 +36,7 @@ const useTellerConnect = (applicationId: string) => {
           };
 
           try {
-            const data = await createAccount(accountLinkRequest, getToken);
-            console.log(data);
+            await createAccount(accountLinkRequest, getToken);
           } catch (error) {
             console.error("Error creating account:", error);
           }

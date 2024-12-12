@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsLoggingIn(false);
             reject(err);
           } else {
-            console.log("Login success", result);
             setUser(result);
             setIsAuthenticated(true);
             setShowLoginModal(false);

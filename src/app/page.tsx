@@ -9,7 +9,8 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
-import { Add, AccountBalance, CreditCard } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
+import { SiChase, SiBankofamerica } from "react-icons/si";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { Account } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
@@ -17,11 +18,6 @@ import { fetchAccounts } from "@/services/accountService";
 
 const AccountRow = ({ account }: { account: Account }) => {
   const theme = useTheme();
-  const isCreditCard =
-    account.type === "credit" && account.subtype === "credit_card";
-  const isChecking =
-    account.type === "depository" && account.subtype === "checking";
-
   return (
     <Box
       sx={{
@@ -36,18 +32,26 @@ const AccountRow = ({ account }: { account: Account }) => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        {isCreditCard && (
-          <CreditCard
-            sx={{ color: theme.palette.primary.main, mr: theme.spacing(1) }}
-          />
-        )}
-        {isChecking && (
-          <AccountBalance
-            sx={{ color: theme.palette.secondary.main, mr: theme.spacing(1) }}
-          />
-        )}
-        <Box>
-          <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+        <Box
+          sx={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {account.institution.id === "chase" ? (
+            <SiChase size={28} />
+          ) : (
+            <SiBankofamerica size={32} />
+          )}
+        </Box>
+        <Box sx={{ marginLeft: theme.spacing(2) }}>
+          <Typography
+            variant="body1"
+            sx={{ color: theme.palette.text.secondary }}
+          >
             {account.institution.name}
           </Typography>
           <Typography

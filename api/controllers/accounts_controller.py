@@ -17,16 +17,24 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
     async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)):
         try:
             account_links = account_service.get_account_links(user_id)
-            accounts = await asyncio.gather(
-                *[teller_service.get_accounts(account_link.ProviderID) for account_link in account_links]
-            )
-            logger.info(f"Account lins retrieved from teller for {user_id}: {accounts}")
-            return {"accounts": [account for sublist in accounts for account in sublist]}
-        except RuntimeError as e:
-            logger.error(f"Runtime error occurred while fetching accounts for user {user_id}: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
+            tasks = [
+                asyncio.gather(
+                    *[
+                        teller_service.get_account_balance(account_link.ProviderID, account.id)
+                        for account in await teller_service.get_accounts(account_link.ProviderID)
+                    ]
+                )
+                for account_link in account_links
+            ]
+            accounts_with_balances = [
+                {"account": account, "balance": balance}
+                for account_link, account_balances in zip(account_links, await asyncio.gather(*tasks))
+                for account, balance in zip(await teller_service.get_accounts(account_link.ProviderID), account_balances)
+            ]
+            logger.info(f"Account links retrieved from Teller for {user_id}: {accounts_with_balances}")
+            return {"accounts": accounts_with_balances}
         except Exception as e:
-            logger.exception(f"Unexpected error occurred while fetching accounts for user {user_id}: {str(e)}")
+            logger.exception(f"Error occurred while fetching accounts for user {user_id}: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal server error")
 
     @router.post("/accounts")
