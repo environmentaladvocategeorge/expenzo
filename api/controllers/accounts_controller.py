@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Body
+import asyncio
+from fastapi import APIRouter, Depends, HTTPException, Body
 from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest
 from services.teller_service import TellerService
@@ -10,15 +11,14 @@ auth_service = AuthenticationService()
 
 def create_accounts_controller(teller_service: TellerService, account_service: AccountService) -> APIRouter:
     @router.get("/accounts")
-    async def get_accounts(
-        access_token: str = Query(..., description="Access token as a query parameter")
-    ):
-        if not access_token:
-            raise HTTPException(status_code=400, detail="Access token is required")
-
+    async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)):
         try:
-            accounts = teller_service.get_accounts(access_token)
-            return {"accounts": accounts}
+            account_links = account_service.get_account_links(user_id)
+            accounts = await asyncio.gather(
+                *[teller_service.get_accounts(account_link.ProviderID) for account_link in account_links]
+            )
+
+            return {"accounts": [account for sublist in accounts for account in sublist]}
         except RuntimeError as e:
             raise HTTPException(status_code=500, detail=str(e))
 

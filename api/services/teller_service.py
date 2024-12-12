@@ -9,7 +9,16 @@ class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
 
-    def get_accounts(self, access_token: str):
+    def get_accounts(self, access_token: str) -> dict[str, any]:
+        """
+        Fetches from Teller the accounts for a given access token,
+
+        Args:
+            access_token (str): The access token from the account link
+
+        Returns:
+            response (dict[str, any]): An array of Teller account objects
+        """
         cert_file_path, key_file_path = self.certificate_service.load_certificates()
         
         api_url = "https://api.teller.io/accounts"

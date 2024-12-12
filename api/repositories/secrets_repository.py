@@ -11,6 +11,15 @@ class SecretsRepository:
 
     def get_secret(self, secret_name: str) -> str:
         try:
+            """
+            Return a secret from AWS Secrets manager
+
+            Args:
+                secret_name (str): Name of the AWS secret.
+
+            Returns:
+                secret (str): The retrieved secret value
+            """
             response = self.client.get_secret_value(SecretId=secret_name)
             secret = response.get('SecretString')
             if not secret:

@@ -6,14 +6,24 @@ logger = logging.getLogger(__name__)
 
 class CertificateService:
     def __init__(self, secrets_repository: SecretsRepository):
-        self.secrets_repository = secrets_repository
-        self.cert_file_path = None
-        self.key_file_path = None
+        self.secrets_repository: SecretsRepository = secrets_repository
+        self.cert_file_path: str | None = None
+        self.key_file_path: str | None = None
 
-    def generate_certificates(self, cert: str, private_key: str) -> tuple:
+    def generate_certificates(self, cert: str, private_key: str) -> tuple[str, str]:
+        """
+        Generates certificate and private key files in the temporary directory.
+
+        Args:
+            cert (str): The certificate content.
+            private_key (str): The private key content.
+
+        Returns:
+            tuple[str, str]: Paths to the generated certificate and private key files.
+        """
         try:
-            cert_file_path = '/tmp/cert.pem'
-            key_file_path = '/tmp/key.pem'
+            cert_file_path: str = '/tmp/cert.pem'
+            key_file_path: str = '/tmp/key.pem'
 
             with open(cert_file_path, 'w') as cert_file:
                 cert_file.write(cert)
@@ -26,9 +36,15 @@ class CertificateService:
             logger.error(f"Error generating certificate files: {e}")
             raise RuntimeError("Failed to generate certificate files")
 
-    def load_certificates(self) -> tuple:
-        cert_name = os.getenv('CERT_SECRET_NAME')
-        pk_name = os.getenv('PK_SECRET_NAME')
+    def load_certificates(self) -> tuple[str, str]:
+        """
+        Loads certificate and private key files, fetching them from secrets if not cached.
+
+        Returns:
+            tuple[str, str]: Paths to the certificate and private key files.
+        """
+        cert_name: str | None = os.getenv('CERT_SECRET_NAME')
+        pk_name: str | None = os.getenv('PK_SECRET_NAME')
 
         if self.cert_file_path and self.key_file_path:
             logger.info("Using cached certificates")
@@ -38,8 +54,8 @@ class CertificateService:
             logger.error("Certificate or private key secret name is missing from environment variables")
             raise RuntimeError("Missing certificate or private key secret names")
 
-        cert = self.secrets_repository.get_secret(cert_name)
-        private_key = self.secrets_repository.get_secret(pk_name)
+        cert: str = self.secrets_repository.get_secret(cert_name)
+        private_key: str = self.secrets_repository.get_secret(pk_name)
 
         self.cert_file_path, self.key_file_path = self.generate_certificates(cert, private_key)
         return self.cert_file_path, self.key_file_path
