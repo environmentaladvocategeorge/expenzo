@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from typing import Optional
 
 
@@ -7,10 +7,10 @@ class Institution(BaseModel):
     id: str
 
 class Links(BaseModel):
-    account: HttpUrl
-    self: HttpUrl
-    balances: Optional[HttpUrl] = None
-    transactions: Optional[HttpUrl] = None
+    account: str
+    self: str
+    balances: Optional[str] = None
+    transactions: Optional[str] = None
 
 class AccountBalance(BaseModel):
     ledger: str
