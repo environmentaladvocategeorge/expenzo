@@ -29,7 +29,7 @@ Resources:
       CodeUri: ../api/
       Handler: main.handler
       Runtime: python3.9
-      TimeoutInSeconds: 30
+      Timeout: 30
       Environment:
         Variables:
           ENV: !Ref Environment
