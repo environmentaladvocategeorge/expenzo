@@ -1,6 +1,7 @@
 import asyncio
+from typing import Union
 from fastapi import APIRouter, Depends, HTTPException, Body
-from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
+from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES, TellerAccount, TellerAccountBalance
 from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest, AccountCreateResponse, AccountGetResponse
 from services.teller_service import TellerService
@@ -25,12 +26,12 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                 )
                 for account_link in account_links
             ]
-            accounts_with_balances = [
+            accounts_with_balances : list[dict[str, Union[TellerAccount, TellerAccountBalance]]] = [
                 {"details": account, "balance": balance}
                 for account_link, account_balances in zip(account_links, await asyncio.gather(*tasks))
                 for account, balance in zip(await teller_service.get_accounts(account_link.ProviderID), account_balances)
             ]
-            
+
             categorized_accounts = {"debit": [], "credit": []}
             for account_data in accounts_with_balances:
                 subtype = account_data["details"].subtype
@@ -40,7 +41,7 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                     categorized_accounts["credit"].append(account_data)
 
             logger.info(f"Categorized account links retrieved for {user_id}: {categorized_accounts}")
-            return {"accounts": categorized_accounts}
+            return { categorized_accounts }
         
         except Exception as e:
             logger.exception(f"Error occurred while fetching accounts for user {user_id}: {str(e)}")
