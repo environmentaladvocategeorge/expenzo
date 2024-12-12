@@ -46,12 +46,6 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
             account = account_service.create_account_link(account_request, user_id)
             logger.info(f"Account link created successfully for user {user_id}: {account}")
             return {"account": account}
-        except ValueError as e:
-            logger.error(f"Validation error while creating account for user {user_id}: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-        except RuntimeError as e:
-            logger.error(f"Runtime error occurred while creating account for user {user_id}: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
         except Exception as e:
             logger.exception(f"Unexpected error occurred while creating account for user {user_id}: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal server error")
