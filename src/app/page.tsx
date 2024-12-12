@@ -134,6 +134,8 @@ const Home = () => {
               padding: theme.spacing(4),
               backgroundColor: theme.palette.neutral.white,
               margin: theme.spacing(2),
+              boxShadow:
+                "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
             }}
           >
             <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
@@ -192,6 +194,8 @@ const Home = () => {
               padding: theme.spacing(4),
               backgroundColor: theme.palette.neutral.white,
               margin: theme.spacing(2),
+              boxShadow:
+                "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
             }}
           >
             <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
