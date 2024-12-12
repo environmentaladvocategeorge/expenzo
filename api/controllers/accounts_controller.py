@@ -25,7 +25,7 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                 for account_link in account_links
             ]
             accounts_with_balances = [
-                {"account": account, "balance": balance}
+                {"details": account, "balance": balance}
                 for account_link, account_balances in zip(account_links, await asyncio.gather(*tasks))
                 for account, balance in zip(await teller_service.get_accounts(account_link.ProviderID), account_balances)
             ]
