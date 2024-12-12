@@ -17,20 +17,18 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
     async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)) -> AccountGetResponse:
         try:
             account_links = account_service.get_account_links(user_id)
-            tasks = [
-                asyncio.gather(
-                    *[
-                        teller_service.get_account_balance(account_link.ProviderID, account.id)
-                        for account in await teller_service.get_accounts(account_link.ProviderID)
-                    ]
-                )
-                for account_link in account_links
-            ]
-            accounts_with_balances : list[dict[str, Union[TellerAccount, TellerAccountBalance]]] = [
-                {"details": account, "balance": balance}
-                for account_link, account_balances in zip(account_links, await asyncio.gather(*tasks))
-                for account, balance in zip(await teller_service.get_accounts(account_link.ProviderID), account_balances)
-            ]
+
+            account_data_tasks = []
+            for account_link in account_links:
+                accounts = await teller_service.get_accounts(account_link.ProviderID)
+                balance_tasks = [teller_service.get_account_balance(account_link.ProviderID, account.id) for account in accounts]
+                account_data_tasks.append(asyncio.create_task(asyncio.gather(*balance_tasks)))
+
+            accounts_with_balances = []
+            for account_link, balance_results in zip(account_links, await asyncio.gather(*account_data_tasks)):
+                accounts = await teller_service.get_accounts(account_link.ProviderID) 
+                for account, balance in zip(accounts, balance_results):
+                    accounts_with_balances.append({"details": account, "balance": balance})
 
             categorized_accounts = {"debit": [], "credit": []}
             for account_data in accounts_with_balances:
@@ -41,11 +39,12 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                     categorized_accounts["credit"].append(account_data)
 
             logger.info(f"Categorized account links retrieved for {user_id}: {categorized_accounts}")
-            return { "debit": categorized_accounts["debit"], "credit": categorized_accounts["credit"] }
-        
+            return {"debit": categorized_accounts["debit"], "credit": categorized_accounts["credit"]}
+
         except Exception as e:
-            logger.exception(f"Error occurred while fetching accounts for user {user_id}: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
+            logger.error(f"Error retrieving accounts for user {user_id}: {e}")
+            raise HTTPException(status_code=500, detail="Failed to retrieve accounts")
+
 
     @router.post("/accounts")
     async def create_account(
