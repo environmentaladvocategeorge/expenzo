@@ -31,10 +31,11 @@ class TellerService:
             response = requests.get(api_url, headers=headers, auth=auth, cert=(cert_file_path, key_file_path))
             response.raise_for_status()
             logger.info("Response from Teller: %s", response.json())
-            return [Account(**account) for account in response.json()]
+            return response.json()
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
+        
         
     async def get_account_balance(self, access_token: str, account_id: str) -> AccountBalance:
         """
