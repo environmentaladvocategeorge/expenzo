@@ -6,20 +6,17 @@ class Institution(BaseModel):
     name: str
     id: str
 
-
 class Links(BaseModel):
     account: HttpUrl
     self: HttpUrl
     balances: Optional[HttpUrl] = None
     transactions: Optional[HttpUrl] = None
 
-
 class AccountBalance(BaseModel):
     ledger: str
     account_id: str
     available: str
     links: Links
-
 
 class Account(BaseModel):
     enrollment_id: str

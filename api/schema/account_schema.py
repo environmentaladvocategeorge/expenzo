@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, Union
 from models.teller import Account, AccountBalance
-from models.account_model import AccountLink
+from models.account import AccountLink
 
 class AccountCreateRequest(BaseModel):
     provider: str

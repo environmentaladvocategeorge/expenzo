@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 import logging
-from models.account_model import AccountLink
+from models.account import AccountLink
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 from boto3.dynamodb.conditions import Key, Attr
