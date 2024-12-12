@@ -41,7 +41,7 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                     categorized_accounts["credit"].append(account_data)
 
             logger.info(f"Categorized account links retrieved for {user_id}: {categorized_accounts}")
-            return { "debit": categorized_accounts["debit"], "credit": categorized_accounts["debit"] }
+            return { "debit": categorized_accounts["debit"], "credit": categorized_accounts["credit"] }
         
         except Exception as e:
             logger.exception(f"Error occurred while fetching accounts for user {user_id}: {str(e)}")
