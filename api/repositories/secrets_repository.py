@@ -1,14 +1,9 @@
 import boto3
-import logging
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
+from utils.logger import get_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 class SecretsRepository:
     def __init__(self, region_name: str):

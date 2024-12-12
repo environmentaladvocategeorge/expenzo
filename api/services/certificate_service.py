@@ -1,13 +1,9 @@
 import logging
 import os
 from repositories.secrets_repository import SecretsRepository
+from utils.logger import get_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 class CertificateService:
     def __init__(self, secrets_repository: SecretsRepository):

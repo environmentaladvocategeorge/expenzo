@@ -1,20 +1,14 @@
 import asyncio
-import logging
 from fastapi import APIRouter, Depends, HTTPException, Body
 from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest, AccountCreateResponse, AccountGetResponse
 from services.teller_service import TellerService
 from services.account_service import AccountService
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 router = APIRouter()
-
 auth_service = AuthenticationService()
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 def create_accounts_controller(teller_service: TellerService, account_service: AccountService) -> APIRouter:
     @router.get("/accounts")

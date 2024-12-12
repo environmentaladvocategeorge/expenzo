@@ -8,14 +8,9 @@ from controllers.accounts_controller import create_accounts_controller
 from services.certificate_service import CertificateService
 from services.teller_service import TellerService
 from repositories.secrets_repository import SecretsRepository
+from utils.logger import get_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
+logger = get_logger(__name__)
 app = FastAPI()
 
 origins = [

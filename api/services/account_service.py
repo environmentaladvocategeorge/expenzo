@@ -1,16 +1,11 @@
 from datetime import datetime, timezone
-import logging
 from models.account import AccountLink
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 from boto3.dynamodb.conditions import Key, Attr
+from utils.logger import get_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 class AccountService:
     def create_account_link(self, account_link_request: AccountCreateRequest, user_id: str) -> AccountLink:
