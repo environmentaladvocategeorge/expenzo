@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import APIRouter, Depends, HTTPException, Body
+from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest, AccountCreateResponse, AccountGetResponse
 from services.teller_service import TellerService
@@ -29,8 +30,18 @@ def create_accounts_controller(teller_service: TellerService, account_service: A
                 for account_link, account_balances in zip(account_links, await asyncio.gather(*tasks))
                 for account, balance in zip(await teller_service.get_accounts(account_link.ProviderID), account_balances)
             ]
-            logger.info(f"Account links retrieved from Teller for {user_id}: {accounts_with_balances}")
-            return {"accounts": accounts_with_balances}
+            
+            categorized_accounts = {"debit": [], "credit": []}
+            for account_data in accounts_with_balances:
+                subtype = account_data["details"].subtype
+                if subtype in DEPOSITORY_SUBTYPES:
+                    categorized_accounts["debit"].append(account_data)
+                elif subtype in CREDIT_SUBTYPES:
+                    categorized_accounts["credit"].append(account_data)
+
+            logger.info(f"Categorized account links retrieved for {user_id}: {categorized_accounts}")
+            return {"accounts": categorized_accounts}
+        
         except Exception as e:
             logger.exception(f"Error occurred while fetching accounts for user {user_id}: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal server error")

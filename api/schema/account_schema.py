@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, Union
-from models.teller import Account, AccountBalance
+from models.teller import TellerAccount, TellerAccountBalance
 from models.account import AccountLink
 
 class AccountCreateRequest(BaseModel):
@@ -13,4 +13,5 @@ class AccountCreateResponse(BaseModel):
     account: AccountLink
 
 class AccountGetResponse(BaseModel):
-    accounts: list[dict[str, Union[Account, AccountBalance]]]
+    debit: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]
+    credit: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]

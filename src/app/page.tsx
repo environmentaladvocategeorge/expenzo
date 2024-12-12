@@ -74,9 +74,15 @@ const AccountRow = ({ account }: { account: Account }) => {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-          {`$ ${account.balance.available}`}
+      <Box>
+        <Typography
+          variant="body1"
+          sx={{ fontWeight: "bold", textAlign: "right" }}
+        >
+          {`$ ${account.balance.ledger}`}
+        </Typography>
+        <Typography variant="body1" sx={{ color: theme.palette.neutral.gray }}>
+          {`Available: $${account.balance.available}`}
         </Typography>
       </Box>
     </Box>

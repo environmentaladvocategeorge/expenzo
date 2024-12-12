@@ -1,17 +1,23 @@
 from pydantic import BaseModel
 
-class Institution(BaseModel):
+class TellerInstitution(BaseModel):
     name: str
     id: str
 
-class AccountBalance(BaseModel):
+class TellerAccountBalance(BaseModel):
     ledger: str
     account_id: str
     available: str
 
-class Account(BaseModel):
+DEPOSITORY_SUBTYPES = {
+    "checking", "savings", "money_market", "certificate_of_deposit", "treasury", "sweep"
+}
+
+CREDIT_SUBTYPES = {"credit_card"}
+
+class TellerAccount(BaseModel):
     enrollment_id: str
-    institution: Institution
+    institution: TellerInstitution
     type: str
     name: str
     subtype: str

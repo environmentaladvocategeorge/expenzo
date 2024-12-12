@@ -2,7 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from services.certificate_service import CertificateService
 from typing import List
-from models.teller import Account, AccountBalance
+from models.teller import TellerAccount, TellerAccountBalance
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -11,7 +11,7 @@ class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
 
-    async def get_accounts(self, access_token: str) -> List[Account]:
+    async def get_accounts(self, access_token: str) -> List[TellerAccount]:
         """
         Fetches from Teller the accounts for a given access token,
 
@@ -31,12 +31,12 @@ class TellerService:
             response = requests.get(api_url, headers=headers, auth=auth, cert=(cert_file_path, key_file_path))
             response.raise_for_status()
             logger.info("Response from Teller: %s", response.json())
-            return[Account(**account) for account in response.json()]
+            return[TellerAccount(**account) for account in response.json()]
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
         
-    async def get_account_balance(self, access_token: str, account_id: str) -> AccountBalance:
+    async def get_account_balance(self, access_token: str, account_id: str) -> TellerAccountBalance:
         """
         Fetches the account balance from Teller for a given account ID using the provided access token.
 
