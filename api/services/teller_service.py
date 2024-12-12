@@ -9,7 +9,7 @@ class TellerService:
     def __init__(self, certificate_service: CertificateService):
         self.certificate_service = certificate_service
 
-    def get_accounts(self, access_token: str) -> dict[str, any]:
+    async def get_accounts(self, access_token: str) -> dict[str, any]:
         """
         Fetches from Teller the accounts for a given access token,
 
