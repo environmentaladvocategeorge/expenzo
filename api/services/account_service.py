@@ -149,22 +149,39 @@ class AccountService:
                 accounts_with_balances.append({"details": account, "balance": balance})
         return accounts_with_balances
 
-    def _categorize_accounts(self, accounts_with_balances: list[dict]) -> dict[str, list[dict]]:
+    def categorize_accounts(accounts_with_balances: list[dict]) -> dict[str, dict]:
         """
-        Categorize accounts into debit and credit categories.
+        Categorize accounts into debit and credit categories and calculate total balances.
 
         Args:
             accounts_with_balances (list[dict]): Accounts with their balances.
 
         Returns:
-            dict[str, list[dict]]: Categorized accounts with 'debit' and 'credit' keys.
+            dict[str, dict]: Categorized accounts with total balances and account details.
         """
         logger.info("Categorizing accounts")
-        categorized_accounts = {"debit": [], "credit": []}
+        categorized_accounts = {
+            "debit": {"accounts": [], "total_ledger": 0, "total_available": 0},
+            "credit": {"accounts": [], "total_ledger": 0, "total_available": 0},
+        }
+
         for account_data in accounts_with_balances:
             subtype = account_data["details"].subtype
+            balance = account_data["balance"]
+
+            # Parse ledger and available balances as floats
+            ledger_balance = float(balance.ledger)
+            available_balance = float(balance.available)
+
             if subtype in DEPOSITORY_SUBTYPES:
-                categorized_accounts["debit"].append(account_data)
+                categorized_accounts["debit"]["accounts"].append(account_data)
+                categorized_accounts["debit"]["total_ledger"] += ledger_balance
+                categorized_accounts["debit"]["total_available"] += available_balance
+
             elif subtype in CREDIT_SUBTYPES:
-                categorized_accounts["credit"].append(account_data)
+                categorized_accounts["credit"]["accounts"].append(account_data)
+                # For credit accounts, ledger balance is considered negative
+                categorized_accounts["credit"]["total_ledger"] += -ledger_balance
+                categorized_accounts["credit"]["total_available"] += -available_balance
+
         return categorized_accounts
