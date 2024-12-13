@@ -180,6 +180,6 @@ class AccountService:
             elif subtype in CREDIT_SUBTYPES:
                 categorized_accounts["credit"].accounts.append(account_data)
                 categorized_accounts["credit"].total_ledger += -ledger_balance
-                categorized_accounts["credit"].total_available += -available_balance
+                categorized_accounts["credit"].total_available += available_balance
 
         return dict(categorized_accounts)
