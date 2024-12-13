@@ -2,7 +2,8 @@ import asyncio
 from datetime import datetime, timezone
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
-from models.account import AccountLink, Account, AccountBalance
+from models.account import AccountLink
+from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 from boto3.dynamodb.conditions import Key, Attr
@@ -91,7 +92,7 @@ class AccountService:
 
         return self._categorize_accounts(accounts_with_balances)
     
-    async def _fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[Account]]:
+    async def _fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
         """
         Fetch all accounts for a list of account links.
 
@@ -107,7 +108,7 @@ class AccountService:
         ]
         return await asyncio.gather(*account_data_tasks)
 
-    async def _fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[Account]]) -> list[list[AccountBalance]]:
+    async def _fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerAccountBalance]]:
         """
         Fetch all balances for a list of account links and their corresponding accounts.
 
@@ -128,7 +129,7 @@ class AccountService:
         return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in balance_tasks])
 
     def _combine_accounts_and_balances(
-        self, account_links: list[AccountLink], all_accounts: list[list[Account]], all_balances: list[list[AccountBalance]]
+        self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:
         """
         Combine accounts and their balances into a single list.
