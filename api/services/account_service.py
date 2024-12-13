@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 from datetime import datetime, timezone
+from typing import Union
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
 from models.account import AccountLink
@@ -150,7 +151,7 @@ class AccountService:
                 accounts_with_balances.append({"details": account, "balance": balance})
         return accounts_with_balances
 
-    def _categorize_accounts(accounts_with_balances: list[dict]) -> dict[str, dict]:
+    def _categorize_accounts(accounts_with_balances: list[dict]) -> dict[str, dict[str, Union[list[Union[TellerAccount, TellerAccountBalance]], float]]]:
         """
         Categorize accounts into debit and credit categories and calculate total balances.
 
@@ -158,7 +159,7 @@ class AccountService:
             accounts_with_balances (list[dict]): Accounts with their balances.
 
         Returns:
-            dict[str, dict]: Categorized accounts with total balances and account details.
+            dict[str, dict[str, Union[list[Union[TellerAccount, TellerAccountBalance]], float]]]: Categorized accounts with total balances and account details.
         """
         logger.info("Categorizing accounts")
         
