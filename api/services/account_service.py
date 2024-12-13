@@ -7,7 +7,7 @@ from services.teller_service import TellerService
 from models.account import AccountLink
 from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
-from schema.account_schema import AccountCreateRequest
+from schema.account_schema import AccountCreateRequest, CategorizedAccounts
 from boto3.dynamodb.conditions import Key, Attr
 from utils.logger import get_logger
 
@@ -150,8 +150,8 @@ class AccountService:
             for account, balance in zip(accounts, balances):
                 accounts_with_balances.append({"details": account, "balance": balance})
         return accounts_with_balances
-
-    def _categorize_accounts(self, accounts_with_balances: list[dict]) -> dict[str, dict[str, Union[list[Union[TellerAccount, TellerAccountBalance]], float]]]:
+    
+    def _categorize_accounts(self, accounts_with_balances: list[dict]) -> dict[str, CategorizedAccounts]:
         """
         Categorize accounts into debit and credit categories and calculate total balances.
 
@@ -159,11 +159,11 @@ class AccountService:
             accounts_with_balances (list[dict]): Accounts with their balances.
 
         Returns:
-            dict[str, dict[str, Union[list[Union[TellerAccount, TellerAccountBalance]], float]]]: Categorized accounts with total balances and account details.
+            dict[CategorizedAccounts]: Categorized accounts with total balances and account details.
         """
         logger.info("Categorizing accounts")
         
-        categorized_accounts = defaultdict(lambda: {"accounts": [], "total_ledger": 0, "total_available": 0})
+        categorized_accounts = defaultdict(lambda: CategorizedAccounts(accounts=[], total_ledger=0, total_available=0))
         
         for account_data in accounts_with_balances:
             subtype = account_data["details"].subtype
@@ -173,14 +173,13 @@ class AccountService:
             available_balance = balance.available
 
             if subtype in DEPOSITORY_SUBTYPES:
-                categorized_accounts["debit"]["accounts"].append(account_data)
-                categorized_accounts["debit"]["total_ledger"] += ledger_balance
-                categorized_accounts["debit"]["total_available"] += available_balance
+                categorized_accounts["debit"].accounts.append(account_data)
+                categorized_accounts["debit"].total_ledger += ledger_balance
+                categorized_accounts["debit"].total_available += available_balance
 
             elif subtype in CREDIT_SUBTYPES:
-                categorized_accounts["credit"]["accounts"].append(account_data)
-                categorized_accounts["credit"]["total_ledger"] += -ledger_balance
-                categorized_accounts["credit"]["total_available"] += -available_balance
+                categorized_accounts["credit"].accounts.append(account_data)
+                categorized_accounts["credit"].total_ledger += -ledger_balance
+                categorized_accounts["credit"].total_available += -available_balance
 
-        # Return a regular dict to maintain expected structure
         return dict(categorized_accounts)
