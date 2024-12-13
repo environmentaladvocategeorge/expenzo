@@ -151,7 +151,7 @@ class AccountService:
                 accounts_with_balances.append({"details": account, "balance": balance})
         return accounts_with_balances
     
-    def _categorize_accounts(self, accounts_with_balances: list[dict]) -> dict[str, CategorizedAccounts]:
+    def _categorize_accounts(self, accounts_with_balances: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]) -> dict[str, CategorizedAccounts]:
         """
         Categorize accounts into debit and credit categories and calculate total balances.
 
