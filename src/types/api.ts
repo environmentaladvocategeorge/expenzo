@@ -39,8 +39,12 @@ export interface AccountCreateRequest {
 }
 
 export interface GetAccountsResponse {
-  debit: Account[];
-  credit: Account[];
+  debit: { total_ledger: number; total_available: number; accounts: Account[] };
+  credit: {
+    total_ledger: number;
+    total_available: number;
+    accounts: Account[];
+  };
 }
 
 export interface AccountCreateRequest {

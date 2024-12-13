@@ -169,7 +169,6 @@ class AccountService:
             subtype = account_data["details"].subtype
             balance = account_data["balance"]
 
-            # Parse ledger and available balances as floats
             ledger_balance = float(balance.ledger)
             available_balance = float(balance.available)
 
@@ -180,7 +179,6 @@ class AccountService:
 
             elif subtype in CREDIT_SUBTYPES:
                 categorized_accounts["credit"]["accounts"].append(account_data)
-                # For credit accounts, ledger balance is considered negative
                 categorized_accounts["credit"]["total_ledger"] += -ledger_balance
                 categorized_accounts["credit"]["total_available"] += -available_balance
 

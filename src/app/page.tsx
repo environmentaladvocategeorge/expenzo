@@ -39,8 +39,8 @@ const Home = () => {
       try {
         setLoading(true);
         const accountsData = await fetchAccounts(getToken);
-        setDebitAccounts(accountsData.debit);
-        setCreditAccounts(accountsData.credit);
+        setDebitAccounts(accountsData.debit.accounts);
+        setCreditAccounts(accountsData.credit.accounts);
       } catch (error) {
         console.error("Error fetching accounts:", error);
       } finally {
