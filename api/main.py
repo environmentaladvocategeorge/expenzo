@@ -34,8 +34,8 @@ aws_region = os.getenv('AWS_REGION', 'us-east-1')
 secrets_repository = SecretsRepository(region_name=aws_region)
 certificate_service = CertificateService(secrets_repository=secrets_repository)
 teller_service = TellerService(certificate_service=certificate_service)
-account_service = AccountService()
+account_service = AccountService(teller_service=teller_service)
 
-app.include_router(create_accounts_controller(teller_service, account_service))
+app.include_router(create_accounts_controller(account_service))
 
 handler = Mangum(app)

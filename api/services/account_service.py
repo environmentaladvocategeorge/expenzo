@@ -1,5 +1,8 @@
+import asyncio
 from datetime import datetime, timezone
-from models.account import AccountLink
+from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
+from services.teller_service import TellerService
+from models.account import AccountLink, Account, AccountBalance
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest
 from boto3.dynamodb.conditions import Key, Attr
@@ -8,6 +11,9 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class AccountService:
+    def __init__(self, teller_service: TellerService):
+        self.teller_service = teller_service
+
     def create_account_link(self, account_link_request: AccountCreateRequest, user_id: str) -> AccountLink:
         """
         Creates a new account link and stores it in the DynamoDB table.
@@ -17,7 +23,7 @@ class AccountService:
             user_id (str): The unique identifier for the user to whom this account link belongs.
 
         Returns:
-            account (AccountLink): The newly created AccountLink object.
+            AccountLink: The newly created AccountLink object.
         """
         account = AccountLink(
             PK=user_id, 
@@ -47,7 +53,7 @@ class AccountService:
             user_id (str): The user ID whose account links are to be retrieved.
 
         Returns:
-            account_links (list[AccountLink]): A list of AccountLink objects for the given user ID.
+            list[AccountLink]: A list of AccountLink objects for the given user ID.
         """
         table = db_client.get_table()
 
@@ -59,6 +65,105 @@ class AccountService:
         items = response.get("Items", [])
         account_links = [AccountLink(**item) for item in items]
 
-        logger.info("Retrieved account links for user %s: %s", user_id, account_links)
+        logger.info("Retrieved %d account links for user %s", len(account_links), user_id)
 
         return account_links
+    
+    async def get_categorized_accounts(self, user_id: str) -> dict[str, list[dict]]:
+        """
+        Fetch accounts and categorize them into debit and credit groups.
+
+        Args:
+            user_id (str): The user ID whose accounts need to be fetched and categorized.
+
+        Returns:
+            dict[str, list[dict]]: Categorized accounts with 'debit' and 'credit' keys.
+        """
+        logger.info("Fetching account links for user %s", user_id)
+        account_links = self.get_account_links(user_id)
+
+        logger.info("Fetching accounts and balances for user %s", user_id)
+        all_accounts = await self._fetch_all_accounts(account_links)
+        all_balances = await self._fetch_all_balances(account_links, all_accounts)
+
+        logger.info("Combining accounts and balances for user %s", user_id)
+        accounts_with_balances = self._combine_accounts_and_balances(account_links, all_accounts, all_balances)
+
+        return self._categorize_accounts(accounts_with_balances)
+    
+    async def _fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[Account]]:
+        """
+        Fetch all accounts for a list of account links.
+
+        Args:
+            account_links (list[AccountLink]): The account links for which accounts need to be fetched.
+
+        Returns:
+            list[list[Account]]: A list of lists of Account objects.
+        """
+        logger.info("Fetching all accounts for %d account links", len(account_links))
+        account_data_tasks = [
+            self.teller_service.get_accounts(account_link.ProviderID) for account_link in account_links
+        ]
+        return await asyncio.gather(*account_data_tasks)
+
+    async def _fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[Account]]) -> list[list[AccountBalance]]:
+        """
+        Fetch all balances for a list of account links and their corresponding accounts.
+
+        Args:
+            account_links (list[AccountLink]): The account links for which balances need to be fetched.
+            all_accounts (list[list[Account]]): The accounts corresponding to the account links.
+
+        Returns:
+            list[list[AccountBalance]]: A list of lists of AccountBalance objects.
+        """
+        logger.info("Fetching all balances for accounts")
+        balance_tasks = [
+            [
+                self.teller_service.get_account_balance(account_link.ProviderID, account.id) for account in accounts
+            ]
+            for account_link, accounts in zip(account_links, all_accounts)
+        ]
+        return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in balance_tasks])
+
+    def _combine_accounts_and_balances(
+        self, account_links: list[AccountLink], all_accounts: list[list[Account]], all_balances: list[list[AccountBalance]]
+    ) -> list[dict]:
+        """
+        Combine accounts and their balances into a single list.
+
+        Args:
+            account_links (list[AccountLink]): The account links.
+            all_accounts (list[list[Account]]): The accounts.
+            all_balances (list[list[AccountBalance]]): The balances.
+
+        Returns:
+            list[dict]: A list of dictionaries containing account details and balances.
+        """
+        logger.info("Combining accounts and balances")
+        accounts_with_balances = []
+        for _, accounts, balances in zip(account_links, all_accounts, all_balances):
+            for account, balance in zip(accounts, balances):
+                accounts_with_balances.append({"details": account, "balance": balance})
+        return accounts_with_balances
+
+    def _categorize_accounts(self, accounts_with_balances: list[dict]) -> dict[str, list[dict]]:
+        """
+        Categorize accounts into debit and credit categories.
+
+        Args:
+            accounts_with_balances (list[dict]): Accounts with their balances.
+
+        Returns:
+            dict[str, list[dict]]: Categorized accounts with 'debit' and 'credit' keys.
+        """
+        logger.info("Categorizing accounts")
+        categorized_accounts = {"debit": [], "credit": []}
+        for account_data in accounts_with_balances:
+            subtype = account_data["details"].subtype
+            if subtype in DEPOSITORY_SUBTYPES:
+                categorized_accounts["debit"].append(account_data)
+            elif subtype in CREDIT_SUBTYPES:
+                categorized_accounts["credit"].append(account_data)
+        return categorized_accounts
