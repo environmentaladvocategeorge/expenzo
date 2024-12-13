@@ -54,7 +54,9 @@ class CertificateService:
         if not cert_name or not pk_name:
             logger.error("Certificate or private key secret name is missing from environment variables")
             raise RuntimeError("Missing certificate or private key secret names")
-
+        
+        logger.info("Certificates not found, retrieving from secrets repository.")
+        
         cert: str = self.secrets_repository.get_secret(cert_name)
         private_key: str = self.secrets_repository.get_secret(pk_name)
 

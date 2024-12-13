@@ -24,6 +24,7 @@ class SecretsRepository:
             secret = response.get('SecretString')
             if not secret:
                 raise HTTPException(status_code=500, detail=f"Secret {secret_name} is empty")
+            logger.info("Retrieved %s", secret_name)
             return secret
         except ClientError as e:
             logger.error(f"Error retrieving secret {secret_name}: {e}")
