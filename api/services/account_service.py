@@ -149,7 +149,7 @@ class AccountService:
                 accounts_with_balances.append({"details": account, "balance": balance})
         return accounts_with_balances
 
-    def categorize_accounts(accounts_with_balances: list[dict]) -> dict[str, dict]:
+    def _categorize_accounts(accounts_with_balances: list[dict]) -> dict[str, dict]:
         """
         Categorize accounts into debit and credit categories and calculate total balances.
 
