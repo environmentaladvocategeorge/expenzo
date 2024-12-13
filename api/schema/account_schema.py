@@ -13,5 +13,6 @@ class AccountCreateResponse(BaseModel):
     account: AccountLink
 
 class AccountGetResponse(BaseModel):
-    debit: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]
-    credit: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]
+    net_worth: float | int
+    debit: list[dict[str, Union[TellerAccount, TellerAccountBalance, float, float]]]
+    credit: list[dict[str, Union[TellerAccount, TellerAccountBalance, float, float]]]
