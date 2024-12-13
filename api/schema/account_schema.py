@@ -12,6 +12,11 @@ class AccountCreateRequest(BaseModel):
 class AccountCreateResponse(BaseModel):
     account: AccountLink
 
+class CategorizedAccounts:
+    accounts: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]
+    total_ledger: float
+    total_available: float
+
 class AccountGetResponse(BaseModel):
-    debit: list[dict[str, Union[list[dict[str, Union[TellerAccount, TellerAccountBalance]]], float]]]
-    credit: list[dict[str, Union[list[dict[str, Union[TellerAccount, TellerAccountBalance]]], float]]]
+    debit: CategorizedAccounts
+    credit: CategorizedAccounts
