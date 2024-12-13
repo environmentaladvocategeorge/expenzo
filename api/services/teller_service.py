@@ -48,7 +48,7 @@ class TellerService:
             AccountBalance: An AccountBalance object containing the balance information.
         """
         cert_file_path, key_file_path = self.certificate_service.load_certificates()
-        
+
         api_url = f"https://api.teller.io/accounts/{account_id}/balances"
         headers = {'Content-Type': 'application/json'}
         auth = HTTPBasicAuth(access_token, '')
@@ -56,8 +56,16 @@ class TellerService:
         try:
             response = requests.get(api_url, headers=headers, auth=auth, cert=(cert_file_path, key_file_path))
             response.raise_for_status()
-            logger.info("Response from Teller: %s", response.json())
-            return TellerAccountBalance(**response.json())
+            data = response.json()
+
+            if 'ledger' in data:
+                data['ledger'] = float(data['ledger'])
+            if 'available' in data:
+                data['available'] = float(data['available'])
+            
+            logger.info("Response from Teller: %s", data)
+            return TellerAccountBalance(**data)
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
+

@@ -5,9 +5,9 @@ class TellerInstitution(BaseModel):
     id: str
 
 class TellerAccountBalance(BaseModel):
-    ledger: str
+    ledger: float
     account_id: str
-    available: str
+    available: float
 
 DEPOSITORY_SUBTYPES = {
     "checking", "savings", "money_market", "certificate_of_deposit", "treasury", "sweep"
