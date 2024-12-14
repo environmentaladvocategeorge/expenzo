@@ -80,9 +80,8 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,OPTIONS'"
         AllowHeaders: "'Content-Type,Authorization'"
-         AllowOrigin: "*"
+        AllowOrigin: "'*'"
         MaxAge: "'600'"
-        AllowCredentials: true
       Auth:
         AddDefaultAuthorizerToCorsPreflight: False
         DefaultAuthorizer: CognitoAuthorizer
