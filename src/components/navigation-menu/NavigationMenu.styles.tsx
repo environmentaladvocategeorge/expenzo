@@ -20,7 +20,7 @@ export const NavigationMenuContainer = styled(Box, {
 })<NavigationMenuContainerProps>(({ theme, isOpen }) => ({
   backgroundColor: theme.palette.neutral.lightGray,
   height: "100%",
-  width: isOpen ? 248 : 100,
+  width: isOpen ? 248 : 88,
   gap: theme.spacing(1),
   transition: "width 0.3s ease-in-out",
   display: "flex",

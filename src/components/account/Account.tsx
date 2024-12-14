@@ -1,9 +1,32 @@
 import { Account as AccountType } from "@/types/api";
 import { Box, Typography, useTheme } from "@mui/material";
-import { SiChase, SiBankofamerica } from "react-icons/si";
+import {
+  SiChase,
+  SiBankofamerica,
+  SiWellsfargo,
+  SiAmericanexpress,
+} from "react-icons/si";
+import { MdOutlinePayments } from "react-icons/md";
+import { formatCurrency } from "@/utils/string_utils";
 
 const Account = ({ account }: { account: AccountType }) => {
   const theme = useTheme();
+
+  const getInstitutionIcon = (institutionId: string) => {
+    switch (institutionId) {
+      case "chase":
+        return <SiChase size={28} />;
+      case "bank_of_america":
+        return <SiBankofamerica size={32} />;
+      case "american_express":
+        return <SiAmericanexpress size={32} />;
+      case "wells_fargo":
+        return <SiWellsfargo size={32} />;
+      default:
+        return <MdOutlinePayments size={32} />;
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -27,11 +50,7 @@ const Account = ({ account }: { account: AccountType }) => {
             alignItems: "center",
           }}
         >
-          {account.details.institution.id === "chase" ? (
-            <SiChase size={28} />
-          ) : (
-            <SiBankofamerica size={32} />
-          )}
+          {getInstitutionIcon(account.details.institution.id)}
         </Box>
         <Box sx={{ marginLeft: theme.spacing(2) }}>
           <Typography
@@ -40,24 +59,12 @@ const Account = ({ account }: { account: AccountType }) => {
           >
             {account.details.institution.name}
           </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+          <Typography
+            variant="body2"
+            sx={{ color: theme.palette.text.secondary }}
           >
-            <Typography
-              variant="body2"
-              sx={{ color: theme.palette.text.secondary }}
-            >
-              {account.details.name}
-            </Typography>
-            <Typography variant="body1" sx={{ mx: theme.spacing(1) }}>
-              ••••
-            </Typography>
-            <Typography variant="body1">{account.details.last_four}</Typography>
-          </Box>
+            {account.details.name}
+          </Typography>
         </Box>
       </Box>
       <Box>
@@ -65,10 +72,10 @@ const Account = ({ account }: { account: AccountType }) => {
           variant="body1"
           sx={{ fontWeight: "bold", textAlign: "right" }}
         >
-          {`$ ${account.balance.ledger}`}
+          {formatCurrency(account.balance.ledger)}
         </Typography>
         <Typography variant="body2" sx={{ color: theme.palette.neutral.gray }}>
-          {`Available: $${account.balance.available}`}
+          {`Available: ${formatCurrency(account.balance.available)}`}
         </Typography>
       </Box>
     </Box>

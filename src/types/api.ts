@@ -4,9 +4,9 @@ export interface Institution {
 }
 
 export interface AccountBalance {
-  ledger: string;
+  ledger: number;
   account_id: string;
-  available: string;
+  available: number;
 }
 
 export interface AccountDetails {

@@ -24,7 +24,7 @@ interface NavigationMenuProviderProps {
 export const NavigationMenuProvider = ({
   children,
 }: NavigationMenuProviderProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const openMenu = () => setIsOpen(true);
   const closeMenu = () => setIsOpen(false);
