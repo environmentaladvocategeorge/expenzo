@@ -85,7 +85,7 @@ class AccountService:
         logger.info("Fetching account links for user %s", user_id)
         account_links = self.get_account_links(user_id)
 
-        if (account_links): 
+        if not account_links:
             logger.info("No account links found for %s, returning empty response.", user_id)
             return CategorizedAccounts()
  
