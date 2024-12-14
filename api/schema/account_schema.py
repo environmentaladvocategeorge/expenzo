@@ -13,9 +13,9 @@ class AccountCreateResponse(BaseModel):
     account: AccountLink
 
 class CategorizedAccounts(BaseModel):
-    accounts: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]
-    total_ledger: float
-    total_available: float
+    accounts: list[dict[str, Union[TellerAccount, TellerAccountBalance]]] = []
+    total_ledger: float = 0.0
+    total_available: float = 0.0
 
 class AccountGetResponse(BaseModel):
     debit: CategorizedAccounts
