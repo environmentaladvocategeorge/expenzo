@@ -6,12 +6,11 @@ import {
   useTheme,
   Button,
   Typography,
-  Divider,
   CircularProgress,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
-import { Account as AccountType } from "@/types/api";
+import { GetAccountsResponse } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchAccounts } from "@/services/accountService";
 import Account from "@/components/account/Account";
@@ -23,9 +22,7 @@ const Home = () => {
     process.env.NEXT_PUBLIC_APP_ID || ""
   );
 
-  const [debitAccounts, setDebitAccounts] = useState<AccountType[]>([]);
-  const [creditAccounts, setCreditAccounts] = useState<AccountType[]>([]);
-
+  const [accounts, setAccounts] = useState<GetAccountsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,8 +36,7 @@ const Home = () => {
       try {
         setLoading(true);
         const accountsData = await fetchAccounts(getToken);
-        setDebitAccounts(accountsData.debit.accounts);
-        setCreditAccounts(accountsData.credit.accounts);
+        setAccounts(accountsData);
       } catch (error) {
         console.error("Error fetching accounts:", error);
       } finally {
@@ -54,21 +50,51 @@ const Home = () => {
   return (
     <>
       {isAuthenticated && (
-        <>
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            padding: theme.spacing(2),
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={openTellerConnect}
+              sx={{
+                ml: "auto",
+              }}
+              endIcon={<Add />}
+            >
+              Connect Account
+            </Button>
+          </Box>
           <Box
             sx={{
               borderRadius: theme.spacing(2),
               padding: theme.spacing(4),
               backgroundColor: theme.palette.neutral.white,
-              margin: theme.spacing(2),
+              my: theme.spacing(2),
               boxShadow:
                 "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
             }}
           >
-            <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
-              Debit ({debitAccounts.length})
+            <Typography
+              variant="body2"
+              sx={{ color: theme.palette.neutral.gray }}
+            >
+              DEBIT ACCOUNTS
             </Typography>
-
+            <Typography
+              variant="h6"
+              sx={{ marginBottom: theme.spacing(2) }}
+            >{`$ ${accounts?.debit.total_ledger}`}</Typography>
             {loading ? (
               <Box
                 sx={{
@@ -83,52 +109,33 @@ const Home = () => {
               </Box>
             ) : (
               <Box>
-                {debitAccounts.map((account) => (
+                {accounts?.debit.accounts.map((account) => (
                   <Account key={account.details.id} account={account} />
                 ))}
               </Box>
             )}
-
-            <Divider
-              sx={{
-                backgroundColor: theme.palette.neutral.black,
-                my: theme.spacing(2),
-              }}
-            />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                variant="contained"
-                onClick={openTellerConnect}
-                sx={{
-                  ml: "auto",
-                }}
-                endIcon={<Add />}
-              >
-                Connect Account
-              </Button>
-            </Box>
           </Box>
           <Box
             sx={{
               borderRadius: theme.spacing(2),
               padding: theme.spacing(4),
               backgroundColor: theme.palette.neutral.white,
-              margin: theme.spacing(2),
               boxShadow:
                 "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
             }}
           >
-            <Typography variant="h4" sx={{ mb: theme.spacing(2) }}>
-              Credit ({creditAccounts.length})
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.neutral.gray,
+              }}
+            >
+              CREDIT CARDS
             </Typography>
-
+            <Typography
+              variant="h6"
+              sx={{ marginBottom: theme.spacing(2) }}
+            >{`$ ${accounts?.credit.total_ledger}`}</Typography>
             {loading ? (
               <Box
                 sx={{
@@ -143,39 +150,13 @@ const Home = () => {
               </Box>
             ) : (
               <Box>
-                {creditAccounts.map((account) => (
+                {accounts?.credit.accounts.map((account) => (
                   <Account key={account.details.id} account={account} />
                 ))}
               </Box>
             )}
-
-            <Divider
-              sx={{
-                backgroundColor: theme.palette.neutral.black,
-                my: theme.spacing(2),
-              }}
-            />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                variant="contained"
-                onClick={openTellerConnect}
-                sx={{
-                  ml: "auto",
-                }}
-                endIcon={<Add />}
-              >
-                Connect Account
-              </Button>
-            </Box>
           </Box>
-        </>
+        </Box>
       )}
     </>
   );

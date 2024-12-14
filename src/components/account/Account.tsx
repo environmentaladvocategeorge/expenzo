@@ -67,7 +67,7 @@ const Account = ({ account }: { account: AccountType }) => {
         >
           {`$ ${account.balance.ledger}`}
         </Typography>
-        <Typography variant="body1" sx={{ color: theme.palette.neutral.gray }}>
+        <Typography variant="body2" sx={{ color: theme.palette.neutral.gray }}>
           {`Available: $${account.balance.available}`}
         </Typography>
       </Box>

@@ -99,6 +99,16 @@ const theme = createTheme({
         },
       },
     },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: "#8fad86",
+        },
+        arrow: {
+          color: "#8fad86",
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {

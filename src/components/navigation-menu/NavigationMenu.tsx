@@ -1,11 +1,11 @@
 import * as Styled from "./NavigationMenu.styles";
-import { IconButton, Box, Typography, Button } from "@mui/material";
+import { IconButton, Box, Typography, Button, Tooltip } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   CalendarMonthOutlined as CalendarIcon,
+  MenuOutlined as MenuOutlinedIcon,
 } from "@mui/icons-material";
-import { AppHeaderText, Link, WhiteDivider } from "@/global.styles";
-import NextLink from "next/link";
+import { AppHeaderText, WhiteDivider } from "@/global.styles";
 import { usePathname } from "next/navigation";
 import { useNavigationMenu } from "@/contexts/NavigationMenuContext";
 import { useAuth } from "@/contexts/AuthenticationContext";
@@ -43,31 +43,49 @@ const NavigationMenu = () => {
   return (
     <Styled.NavigationMenuContainer isOpen={isOpen}>
       <Styled.Header>
-        <AppHeaderText>expenzo.io</AppHeaderText>
-        <IconButton onClick={toggleMenu} color="inherit">
-          <ChevronLeftIcon />
-        </IconButton>
+        {isOpen ? (
+          <>
+            <AppHeaderText>expenzo.io</AppHeaderText>
+            <Tooltip title={`Collapse Menu`} arrow placement="right">
+              <IconButton onClick={toggleMenu} color="inherit">
+                <ChevronLeftIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        ) : (
+          <Tooltip title={"Open Menu"} arrow placement="right">
+            <IconButton onClick={toggleMenu} color="inherit">
+              <MenuOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </Styled.Header>
       <WhiteDivider />
-      <Box sx={{ padding: 2, flexGrow: 1 }}>
+      <Box
+        sx={{
+          padding: 2,
+          height: "100%",
+          width: "100%",
+        }}
+      >
         {routes.map(({ label, path, icon: Icon }) => (
-          <NextLink href={path} key={label} passHref>
-            <Link
-              isActive={currentPath === path}
-              sx={{ display: "flex", alignItems: "center", mb: 2 }}
+          <Tooltip title={`Go to ${label}`} arrow placement="right" key={label}>
+            <Styled.NavigationLink
+              href={path}
+              passHref
+              isActive={currentPath == path}
+              isOpen={isOpen}
             >
-              <Icon
-                sx={(theme) => ({
-                  marginRight: theme.spacing(2),
-                  color:
-                    currentPath === path
-                      ? theme.palette.primary.main
-                      : "inherit",
-                })}
-              />
-              {isOpen && <Typography variant="body1">{label}</Typography>}
-            </Link>
-          </NextLink>
+              <>
+                <Icon
+                  sx={{
+                    marginRight: isOpen ? (theme) => theme.spacing(2) : 0,
+                  }}
+                />
+                {isOpen && <Typography variant="body1">{label}</Typography>}
+              </>
+            </Styled.NavigationLink>
+          </Tooltip>
         ))}
       </Box>
       <Box

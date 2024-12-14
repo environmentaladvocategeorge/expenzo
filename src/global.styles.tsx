@@ -17,14 +17,16 @@ export const Link = styled("span", {
 })<LinkProps>(({ theme, isActive }) => ({
   padding: theme.spacing(2),
   borderRadius: theme.spacing(1),
+  width: "100%",
   transition: "background-color 0.3s, color 0.3s",
-  display: "inline-flex",
+  display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   fontWeight: 500,
-  color: isActive ? theme.palette.neutral.darkGray : theme.palette.neutral.gray,
+  color: isActive ? theme.palette.primary.main : theme.palette.neutral.gray,
   "&:hover": {
-    backgroundColor: theme.palette.primary.main,
     color: theme.palette.neutral.white,
+    backgroundColor: theme.palette.primary.main,
   },
 }));
 

@@ -1,12 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ThemeProvider, CssBaseline, IconButton, Box } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
-import {
-  NavigationMenuProvider,
-  useNavigationMenu,
-} from "@/contexts/NavigationMenuContext";
+import { ThemeProvider, CssBaseline, Box } from "@mui/material";
+import { NavigationMenuProvider } from "@/contexts/NavigationMenuContext";
 import theme from "@/theme/theme";
 import { NavigationMenu } from "@/components";
 import { PageContainer } from "@/global.styles";
@@ -27,7 +23,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
 };
 
 const LayoutContent = ({ children }: { children: ReactNode }) => {
-  const { isOpen, toggleMenu } = useNavigationMenu();
   const { showLoginModal, setShowLoginModal } = useAuth();
 
   return (
@@ -39,19 +34,6 @@ const LayoutContent = ({ children }: { children: ReactNode }) => {
         <title>Expenzo</title>
       </head>
       <body>
-        {!isOpen && (
-          <IconButton
-            onClick={toggleMenu}
-            sx={{
-              position: "absolute",
-              top: 20,
-              left: 20,
-              zIndex: 1000,
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-        )}
         <Box
           sx={{
             display: "flex",
