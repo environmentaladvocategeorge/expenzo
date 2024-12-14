@@ -72,7 +72,7 @@ class AccountService:
 
         return account_links
     
-    async def get_categorized_accounts(self, user_id: str) -> dict[str, list[dict]]:
+    async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
         Fetch accounts and categorize them into debit and credit groups.
 
@@ -80,14 +80,14 @@ class AccountService:
             user_id (str): The user ID whose accounts need to be fetched and categorized.
 
         Returns:
-            dict[str, list[dict]]: Categorized accounts with 'debit' and 'credit' keys.
+            dict[str, CategorizedAccounts]: Categorized accounts with 'debit' and 'credit' keys.
         """
         logger.info("Fetching account links for user %s", user_id)
         account_links = self.get_account_links(user_id)
 
         if not account_links:
             logger.info("No account links found for %s, returning empty response.", user_id)
-            return CategorizedAccounts()
+            return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
  
         logger.info("Fetching accounts and balances for user %s", user_id)
         all_accounts = await self._fetch_all_accounts(account_links)

@@ -14,7 +14,8 @@ logger = get_logger(__name__)
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://dc0ahfsbt39rt.cloudfront.net"
 ]
 
 app.add_middleware(
