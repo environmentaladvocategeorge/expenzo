@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, useTheme, Button, Typography } from "@mui/material";
+import { Box, useTheme, Button, Typography, Skeleton } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { GetAccountsResponse } from "@/types/api";
@@ -53,30 +53,37 @@ const Home = () => {
             overflowY: "scroll",
           }}
         >
-          {accounts && (
-            <Box
-              sx={{
-                borderRadius: theme.spacing(2),
-                padding: theme.spacing(4),
-                backgroundColor: theme.palette.neutral.white,
-                my: theme.spacing(2),
-                boxShadow:
-                  "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
-              }}
+          <Box
+            sx={{
+              borderRadius: theme.spacing(2),
+              padding: theme.spacing(4),
+              backgroundColor: theme.palette.neutral.white,
+              my: theme.spacing(2),
+              boxShadow:
+                "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{ color: theme.palette.neutral.gray, fontWeight: 700 }}
             >
-              <Typography
-                variant="body1"
-                sx={{ color: theme.palette.neutral.gray, fontWeight: 700 }}
-              >
-                NET WORTH
-              </Typography>
+              NET WORTH
+            </Typography>
+            {loading || !accounts ? (
+              <Skeleton
+                sx={{
+                  height: "32px",
+                  width: "120px",
+                }}
+              />
+            ) : (
               <Typography variant="h5">
                 {formatCurrency(
                   accounts.debit.total_ledger + accounts.credit.total_ledger
                 )}
               </Typography>
-            </Box>
-          )}
+            )}
+          </Box>
           <AccountAccordion
             title="DEBIT ACCOUNTS"
             balance={accounts?.debit.total_ledger || 0}

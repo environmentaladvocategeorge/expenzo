@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  IconButton,
-  Collapse,
-} from "@mui/material";
+import { Box, Typography, IconButton, Collapse, Skeleton } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import Account from "../account/Account";
 import { Account as AccountType } from "@/types/api";
+import AccountSkeleton from "../account-skeleton/AccountSkeleton";
 
 interface AccountAccordionProps {
   title: string;
@@ -58,7 +53,16 @@ const AccountAccordion = ({
           >
             {title}
           </Typography>
-          <Typography variant="h6">{formatCurrency(balance)}</Typography>
+          {loading ? (
+            <Skeleton
+              sx={{
+                height: "32px",
+                width: "120px",
+              }}
+            />
+          ) : (
+            <Typography variant="h6">{formatCurrency(balance)}</Typography>
+          )}
         </Box>
 
         <IconButton
@@ -74,16 +78,8 @@ const AccountAccordion = ({
 
       <Collapse in={expanded} timeout="auto">
         {loading ? (
-          <Box
-            sx={{
-              width: "100%",
-              padding: 4,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <CircularProgress size={56} />
+          <Box sx={{ marginTop: 2 }}>
+            <AccountSkeleton />
           </Box>
         ) : (
           <Box sx={{ marginTop: 2 }}>
