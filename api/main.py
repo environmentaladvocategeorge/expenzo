@@ -42,30 +42,4 @@ scheduler_service = SchedulerService(account_service=account_service)
 
 app.include_router(create_accounts_controller(account_service))
 
-api_handler = Mangum(app)
-
-async def process_event(event: Dict[str, Any], context: Any):
-    """
-    Entry point for Lambda. Handles both API Gateway and direct invocations.
-    """
-    logger.info("Received event: %s", event)
-
-    if "httpMethod" in event:
-        logger.info("Invoked by API Gateway")
-        return await api_handler(event, context)
-    
-    if event.get("source") == "aws.events":
-        logger.info("Invoked by EventBridge rule (Scheduled event)")
-        result = await scheduler_service.consolidate_account_balances()
-        return {
-            "statusCode": 200,
-            "body": f"Task completed: {result}"
-        }
-
-    return {
-        "statusCode": 400,
-        "body": "Invalid invocation source."
-    }
-
-def handler(event, context):
-    return process_event(event, context)
+handler = Mangum(app)
