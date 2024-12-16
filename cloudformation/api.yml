@@ -108,6 +108,7 @@ Resources:
   ExpenzoApiFunctionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: ExpenzoApiFunctionRoleName
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -119,6 +120,7 @@ Resources:
   ExpenzoScheduledTaskFunctionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: ExpenzoScheduledTaskFunctionRoleName
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
