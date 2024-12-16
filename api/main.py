@@ -40,7 +40,7 @@ account_service = AccountService(teller_service=teller_service)
 
 app.include_router(create_accounts_controller(account_service))
 
-handler = Mangum(app)
+api_handler = Mangum(app)
 
 def lambda_handler(event: Dict[str, Any], context: Any):
     """
@@ -50,7 +50,7 @@ def lambda_handler(event: Dict[str, Any], context: Any):
 
     if "httpMethod" in event:
         logger.info("Invoked by API Gateway")
-        return handler(event, context)
+        return api_handler(event, context)
     
     if event.get("source") == "aws.events":
         logger.info("Invoked by EventBridge rule (Scheduled event)")
