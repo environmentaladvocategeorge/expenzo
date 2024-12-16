@@ -23,31 +23,6 @@ Parameters:
     Description: "The ARN for the table the API will communicate with."
 
 Resources:
-  ExpenzoExecutionPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: ExpenzoExecutionPolicy
-      Roles:
-        - !GetAtt ExpenzoApiFunctionRole.Arn
-        - !GetAtt ExpenzoScheduledTaskFunctionRole.Arn
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action:
-              - secretsmanager:GetSecretValue
-            Resource:
-              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
-              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
-          - Effect: Allow
-            Action:
-              - dynamodb:PutItem
-              - dynamodb:GetItem
-              - dynamodb:UpdateItem
-              - dynamodb:Query
-              - dynamodb:Scan
-            Resource: !Ref DynamoDBTableArn
-
   ExpenzoApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -63,7 +38,23 @@ Resources:
           DYNAMO_DB_TABLE_NAME: !Ref DynamoDBTableName
           COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
           COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClientId
-      Role: !GetAtt ExpenzoApiFunctionRole.Arn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+                - dynamodb:Scan
+              Resource: !Ref DynamoDBTableArn
       Events:
         ExpenzoApiGet:
           Type: Api
@@ -97,37 +88,29 @@ Resources:
           DYNAMO_DB_TABLE_NAME: !Ref DynamoDBTableName
           COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
           COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClientId
-      Role: !GetAtt ExpenzoScheduledTaskFunctionRole.Arn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-cert-*
+                - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:expenzo-dev-teller-pk-*
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+                - dynamodb:Scan
+              Resource: !Ref DynamoDBTableArn
       Events:
         ExpenzoScheduledEvent:
           Type: Schedule
           Properties:
             Schedule: rate(1 hour)
             Input: "{}"
-
-  ExpenzoApiFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ExpenzoApiFunctionRoleName
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
-
-  ExpenzoScheduledTaskFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ExpenzoScheduledTaskFunctionRoleName
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: lambda.amazonaws.com
 
   ApiGateway:
     Type: AWS::Serverless::Api
