@@ -7,6 +7,7 @@ class Account(BaseModel):
     Provider: str
     ProviderID: str
     EntityType: str
+    EntityID: str
     EntityData: Dict[str, str]
     Timestamp: int
     Metadata: Optional[Dict] = {}

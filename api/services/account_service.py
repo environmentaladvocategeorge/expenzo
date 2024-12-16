@@ -48,27 +48,36 @@ class AccountService:
         
         return account
     
-    def get_account_links(self, user_id: str) -> list[AccountLink]:
+    def get_account_links(self, user_id: str = None) -> list[AccountLink]:
         """
-        Retrieve all account link objects for a given user ID where EntityType = 'Account Link'.
+        Retrieve account link objects. If user_id is provided, it fetches account links for that user.
+        If user_id is not provided, it fetches account links for all users across all applications.
 
         Args:
-            user_id (str): The user ID whose account links are to be retrieved.
+            user_id (str, optional): The user ID whose account links are to be retrieved. If not provided, fetches all account links.
 
         Returns:
-            list[AccountLink]: A list of AccountLink objects for the given user ID.
+            list[AccountLink]: A list of AccountLink objects.
         """
         table = db_client.get_table()
 
-        response = table.query(
-            KeyConditionExpression=Key("PK").eq(user_id),
-            FilterExpression=Attr("EntityType").eq("Account Link")
-        )
+        if user_id:
+            response = table.query(
+                KeyConditionExpression=Key("PK").eq(user_id),
+                FilterExpression=Attr("EntityType").eq("Account Link")
+            )
+        else:
+            response = table.scan(
+                FilterExpression=Attr("EntityType").eq("Account Link")
+            )
 
         items = response.get("Items", [])
         account_links = [AccountLink(**item) for item in items]
 
-        logger.info("Retrieved %d account links for user %s", len(account_links), user_id)
+        if user_id:
+            logger.info("Retrieved %d account links for user %s", len(account_links), user_id)
+        else:
+            logger.info("Retrieved %d account links for all users", len(account_links))
 
         return account_links
     
@@ -90,15 +99,15 @@ class AccountService:
             return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
  
         logger.info("Fetching accounts and balances for user %s", user_id)
-        all_accounts = await self._fetch_all_accounts(account_links)
-        all_balances = await self._fetch_all_balances(account_links, all_accounts)
+        all_accounts = await self.fetch_all_accounts(account_links)
+        all_balances = await self.fetch_all_balances(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
-        accounts_with_balances = self._combine_accounts_and_balances(account_links, all_accounts, all_balances)
+        accounts_with_balances = self.combine_accounts_and_balances(account_links, all_accounts, all_balances)
 
         return self._categorize_accounts(accounts_with_balances)
     
-    async def _fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
+    async def fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
         """
         Fetch all accounts for a list of account links.
 
@@ -114,7 +123,7 @@ class AccountService:
         ]
         return await asyncio.gather(*account_data_tasks)
 
-    async def _fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerAccountBalance]]:
+    async def fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerAccountBalance]]:
         """
         Fetch all balances for a list of account links and their corresponding accounts.
 
@@ -154,7 +163,7 @@ class AccountService:
         ]
         return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in transaction_tasks])
     
-    def _combine_accounts_and_balances(
+    def combine_accounts_and_balances(
         self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:
         """
