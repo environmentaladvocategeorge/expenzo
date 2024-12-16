@@ -41,10 +41,11 @@ class SchedulerService:
             table = db_client.get_table()
             account = Account(
                 PK=account_link.PK,
-                 SK=f"Provider#{account_link.Provide}#Account#{account_link.ProviderID}",
+                SK=f"Provider#{account_link.Provide}#Account#{account_link.ProviderID}",
                 Provider= account_link.Provider,
                 ProviderID= account_link.ProviderID,
                 EntityType="Account",
+                EntityID=account.details.id,
                 EntityData= account.details,
                 Timestamp= int
             )
