@@ -11,7 +11,6 @@ from services.teller_service import TellerService
 from services.scheduler_service import SchedulerService
 from repositories.secrets_repository import SecretsRepository
 from utils.logger import get_logger
-import asyncio
 
 logger = get_logger(__name__)
 app = FastAPI()
@@ -47,7 +46,7 @@ api_handler = Mangum(app)
 
 async def process_event(event: Dict[str, Any], context: Any):
     """
-    Event procesor that handles both API Gateway and direct invocations through EventBridge
+    Entry point for Lambda. Handles both API Gateway and direct invocations.
     """
     logger.info("Received event: %s", event)
 
@@ -69,4 +68,4 @@ async def process_event(event: Dict[str, Any], context: Any):
     }
 
 def handler(event, context):
-    return asyncio.run(process_event(event, context))
+    return process_event(event, context)
