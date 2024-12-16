@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Any, Dict
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -40,3 +41,26 @@ account_service = AccountService(teller_service=teller_service)
 app.include_router(create_accounts_controller(account_service))
 
 handler = Mangum(app)
+
+def lambda_handler(event: Dict[str, Any], context: Any):
+    """
+    Entry point for Lambda. Handles both API Gateway and direct invocations.
+    """
+    logger.info("Received event: %s", event)
+
+    if "httpMethod" in event:
+        logger.info("Invoked by API Gateway")
+        return handler(event, context)
+    
+    if event.get("source") == "aws.events":
+        logger.info("Invoked by EventBridge rule (Scheduled event)")
+        result = "HELLO"
+        return {
+            "statusCode": 200,
+            "body": f"Task completed: {result}"
+        }
+    
+    return {
+        "statusCode": 400,
+        "body": "Invalid invocation source."
+    }

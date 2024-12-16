@@ -19,7 +19,7 @@ const computeStatistics = (
     denominator > 0 ? (numerator / denominator) * 100 : 0;
 
   const totalCreditLimit =
-    accounts.credit.total_ledger + accounts.credit.total_available;
+    Math.abs(accounts.credit.total_ledger) + accounts.credit.total_available;
 
   const usedCredit = totalCreditLimit - accounts.credit.total_available;
 
