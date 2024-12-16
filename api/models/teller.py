@@ -27,14 +27,9 @@ class TellerAccount(BaseModel):
     last_four: str
     status: str
 
-class TellerCounterparty(BaseModel):
-    name: str
-    type: str
-
 class TellerTransactionDetails(BaseModel):
     processing_status: str
-    category: str
-    counterparty: TellerCounterparty
+    category: Optional[str]
 
 class TellerTransaction(BaseModel):
     details: TellerTransactionDetails
