@@ -56,7 +56,7 @@ def lambda_handler(event: Dict[str, Any], context: Any):
     
     if event.get("source") == "aws.events":
         logger.info("Invoked by EventBridge rule (Scheduled event)")
-        result = SchedulerService.consolidate_account_balances()
+        result = scheduler_service.consolidate_account_balances()
         return {
             "statusCode": 200,
             "body": f"Task completed: {result}"
