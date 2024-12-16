@@ -27,7 +27,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../api/
-      Handler: main.lambda_handler
+      Handler: main.handler
       Runtime: python3.9
       Timeout: 240
       Environment:

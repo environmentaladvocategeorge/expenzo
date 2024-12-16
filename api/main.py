@@ -11,6 +11,7 @@ from services.teller_service import TellerService
 from services.scheduler_service import SchedulerService
 from repositories.secrets_repository import SecretsRepository
 from utils.logger import get_logger
+import asyncio
 
 logger = get_logger(__name__)
 app = FastAPI()
@@ -44,15 +45,15 @@ app.include_router(create_accounts_controller(account_service))
 
 api_handler = Mangum(app)
 
-async def lambda_handler(event: Dict[str, Any], context: Any):
+async def process_event(event: Dict[str, Any], context: Any):
     """
-    Entry point for Lambda. Handles both API Gateway and direct invocations.
+    Event procesor that handles both API Gateway and direct invocations through EventBridge
     """
     logger.info("Received event: %s", event)
 
     if "httpMethod" in event:
         logger.info("Invoked by API Gateway")
-        return api_handler(event, context)
+        return await api_handler(event, context)
     
     if event.get("source") == "aws.events":
         logger.info("Invoked by EventBridge rule (Scheduled event)")
@@ -61,8 +62,11 @@ async def lambda_handler(event: Dict[str, Any], context: Any):
             "statusCode": 200,
             "body": f"Task completed: {result}"
         }
-    
+
     return {
         "statusCode": 400,
         "body": "Invalid invocation source."
     }
+
+def handler(event, context):
+    return asyncio.run(process_event(event, context))
