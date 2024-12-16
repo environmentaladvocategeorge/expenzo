@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, useTheme, Button, Typography, Skeleton } from "@mui/material";
+import {
+  Box,
+  useTheme,
+  Button,
+  Typography,
+  Skeleton,
+  Grid2,
+} from "@mui/material";
 import { Add } from "@mui/icons-material";
 import useTellerConnect from "../hooks/useTellerConnect";
 import { GetAccountsResponse } from "@/types/api";
@@ -9,6 +16,7 @@ import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchAccounts } from "@/services/accountService";
 import { formatCurrency } from "@/utils/string_utils";
 import AccountAccordion from "@/components/account-accordion/AccountAccordion";
+import AccountSummary from "@/components/account-summary/AccountSummary";
 
 const Home = () => {
   const theme = useTheme();
@@ -61,50 +69,33 @@ const Home = () => {
               my: theme.spacing(2),
               boxShadow:
                 "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{ color: theme.palette.neutral.gray, fontWeight: 700 }}
-            >
-              NET WORTH
-            </Typography>
-            {loading || !accounts ? (
-              <Skeleton
-                sx={{
-                  height: "32px",
-                  width: "120px",
-                }}
-              />
-            ) : (
-              <Typography variant="h5">
-                {formatCurrency(
-                  accounts.debit.total_ledger + accounts.credit.total_ledger
-                )}
-              </Typography>
-            )}
-          </Box>
-          <AccountAccordion
-            title="DEBIT ACCOUNTS"
-            balance={accounts?.debit.total_ledger || 0}
-            accounts={accounts?.debit.accounts || []}
-            loading={loading}
-            formatCurrency={formatCurrency}
-          />
-          <AccountAccordion
-            title="CREDIT CARDS"
-            balance={accounts?.credit.total_ledger || 0}
-            accounts={accounts?.credit.accounts || []}
-            loading={loading}
-            formatCurrency={formatCurrency}
-          />
-          <Box
-            sx={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
+            <Box>
+              <Typography
+                variant="body1"
+                sx={{ color: theme.palette.neutral.gray, fontWeight: 700 }}
+              >
+                NET WORTH
+              </Typography>
+              {loading || !accounts ? (
+                <Skeleton
+                  sx={{
+                    height: "32px",
+                    width: "120px",
+                  }}
+                />
+              ) : (
+                <Typography variant="h5">
+                  {formatCurrency(
+                    accounts.debit.total_ledger + accounts.credit.total_ledger
+                  )}
+                </Typography>
+              )}
+            </Box>
             <Button
               variant="contained"
               onClick={openTellerConnect}
@@ -117,6 +108,34 @@ const Home = () => {
               Connect Account
             </Button>
           </Box>
+
+          <Grid2 container spacing={2}>
+            <Grid2 size={8}>
+              <Box>
+                <AccountAccordion
+                  title="DEBIT ACCOUNTS"
+                  balance={accounts?.debit.total_ledger || 0}
+                  accounts={accounts?.debit.accounts || []}
+                  loading={loading}
+                  formatCurrency={formatCurrency}
+                />
+                <AccountAccordion
+                  title="CREDIT CARDS"
+                  balance={accounts?.credit.total_ledger || 0}
+                  accounts={accounts?.credit.accounts || []}
+                  loading={loading}
+                  formatCurrency={formatCurrency}
+                />
+              </Box>
+            </Grid2>
+
+            <Grid2 size={4}>
+              <AccountSummary
+                accounts={accounts}
+                formatCurrency={formatCurrency}
+              />
+            </Grid2>
+          </Grid2>
         </Box>
       )}
     </>

@@ -5,7 +5,7 @@ from typing import Union
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
 from models.account import AccountLink
-from models.teller import TellerAccountBalance, TellerAccount
+from models.teller import TellerAccountBalance, TellerAccount, TellerTransaction
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest, CategorizedAccounts
 from boto3.dynamodb.conditions import Key, Attr
@@ -92,6 +92,7 @@ class AccountService:
         logger.info("Fetching accounts and balances for user %s", user_id)
         all_accounts = await self._fetch_all_accounts(account_links)
         all_balances = await self._fetch_all_balances(account_links, all_accounts)
+        all_transactions = await self._fetch_all_transactions(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
         accounts_with_balances = self._combine_accounts_and_balances(account_links, all_accounts, all_balances)
@@ -133,7 +134,27 @@ class AccountService:
             for account_link, accounts in zip(account_links, all_accounts)
         ]
         return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in balance_tasks])
+    
+    async def _fetch_all_transactions(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerTransaction]]:
+        """
+        Fetch all transactions for a list of account links and their corresponding accounts.
 
+        Args:
+            account_links (list[AccountLink]): The account links for which balances need to be fetched.
+            all_accounts (list[list[Account]]): The accounts corresponding to the account links.
+
+        Returns:
+            list[list[TellerTransaction]]: A list of lists of TellerTransaction objects.
+        """
+        logger.info("Fetching all transactions for accounts")
+        transaction_tasks = [
+            [
+                self.teller_service.get_account_transactions(account_link.ProviderID, account.id) for account in accounts
+            ]
+            for account_link, accounts in zip(account_links, all_accounts)
+        ]
+        return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in transaction_tasks])
+    
     def _combine_accounts_and_balances(
         self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:

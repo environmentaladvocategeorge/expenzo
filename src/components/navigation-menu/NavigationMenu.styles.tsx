@@ -47,7 +47,6 @@ export const NavigationLink = styled(NextLink, {
   borderRadius: theme.spacing(1),
   transition: "background-color 0.3s, color 0.3s, justify-content 0.3s",
   justifyContent: isOpen ? "flex-start" : "center",
-  fontWeight: 500,
   color: isActive ? theme.palette.primary.main : theme.palette.neutral.gray,
   marginBottom: theme.spacing(1),
   "&:hover": {

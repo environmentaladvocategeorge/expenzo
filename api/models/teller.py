@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class TellerInstitution(BaseModel):
@@ -24,4 +25,24 @@ class TellerAccount(BaseModel):
     currency: str
     id: str
     last_four: str
+    status: str
+
+class TellerCounterparty(BaseModel):
+    name: str
+    type: str
+
+class TellerTransactionDetails(BaseModel):
+    processing_status: str
+    category: str
+    counterparty: TellerCounterparty
+
+class TellerTransaction(BaseModel):
+    details: TellerTransactionDetails
+    running_balance: Optional[float]
+    description: str
+    id: str
+    date: str
+    account_id: str
+    amount: float
+    type: str
     status: str

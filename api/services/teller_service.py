@@ -2,7 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from services.certificate_service import CertificateService
 from typing import List
-from models.teller import TellerAccount, TellerAccountBalance
+from models.teller import TellerAccount, TellerAccountBalance, TellerTransaction
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,7 +19,7 @@ class TellerService:
             access_token (str): The access token from the account link
 
         Returns:
-            List[Account]: A list of Teller account objects
+            List[TellerAccount]: A list of TellerAccount objects
         """
         cert_file_path, key_file_path = self.certificate_service.load_certificates()
         
@@ -45,7 +45,7 @@ class TellerService:
             account_id (str): The unique identifier for the account whose balance is to be fetched.
 
         Returns:
-            AccountBalance: An AccountBalance object containing the balance information.
+            TellerAccountBalance: A TellerAccountBalance object containing the balance information.
         """
         cert_file_path, key_file_path = self.certificate_service.load_certificates()
 
@@ -65,6 +65,34 @@ class TellerService:
             
             logger.info("Response from Teller: %s", data)
             return TellerAccountBalance(**data)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Teller API request error: {e}")
+            raise RuntimeError("Failed to call Teller API")
+        
+    async def get_account_transactions(self, access_token: str, account_id: str) -> List[TellerTransaction]:
+        """
+        Fetches the transactions for an account from Teller for a given account ID using the provided access token.
+
+        Args:
+            access_token (str): The access token associated with the linked account.
+            account_id (str): The unique identifier for the account whose transactions is to be fetched.
+
+        Returns:
+            List[TellerTransaction]: A list of TellerTransaction objects.
+        """
+        cert_file_path, key_file_path = self.certificate_service.load_certificates()
+
+        api_url = f"https://api.teller.io/accounts/{account_id}/transactions"
+        headers = {'Content-Type': 'application/json'}
+        auth = HTTPBasicAuth(access_token, '')
+
+        try:
+            response = requests.get(api_url, headers=headers, auth=auth, cert=(cert_file_path, key_file_path))
+            response.raise_for_status()
+            data = response.json()
+            
+            logger.info("Response from Teller: %s", data)
+            return [TellerTransaction(**transaction) for transaction in response.json()]
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")

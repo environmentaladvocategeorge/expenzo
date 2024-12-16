@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, Typography, IconButton, Collapse, Skeleton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Collapse,
+  Skeleton,
+  Divider,
+  useTheme,
+} from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import Account from "../account/Account";
 import { Account as AccountType } from "@/types/api";
@@ -21,6 +29,7 @@ const AccountAccordion = ({
   formatCurrency,
 }: AccountAccordionProps) => {
   const [expanded, setExpanded] = useState(true);
+  const theme = useTheme();
 
   const handleToggle = () => {
     setExpanded((prev) => !prev);
@@ -76,13 +85,32 @@ const AccountAccordion = ({
         </IconButton>
       </Box>
 
+      <Divider
+        sx={{
+          height: "4px",
+          borderRadius: "8px",
+          backgroundColor: theme.palette.primary.main,
+          marginTop: "8px",
+          marginBottom: "8px",
+        }}
+      />
+
       <Collapse in={expanded} timeout="auto">
         {loading ? (
           <Box sx={{ marginTop: 2 }}>
             <AccountSkeleton />
           </Box>
         ) : (
-          <Box sx={{ marginTop: 2 }}>
+          <Box
+            sx={{
+              height: "192px",
+              overflowY: "auto",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
             {accounts?.map((account) => (
               <Account key={account.details.id} account={account} />
             ))}

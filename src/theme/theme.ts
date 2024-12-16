@@ -48,17 +48,17 @@ export const eczar = Eczar({
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#8fad86",
-      light: "#f5faf5",
-      dark: "#6c8b67",
+      main: "#759be6",
+      light: "#78a3fa",
+      dark: "#234da1",
     },
     secondary: {
-      main: "#18b2f2",
+      main: "#367dcf",
     },
     neutral: {
-      white: "#f4f4f4",
-      lightGray: "#f4f6f4",
-      gray: "#a6a6a6",
+      white: "#ffffff",
+      lightGray: "#fcfdff",
+      gray: "#4c4b47",
       darkGray: "#434646",
       black: "#191919",
     },
@@ -102,10 +102,10 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: "#8fad86",
+          backgroundColor: "#759be6",
         },
         arrow: {
-          color: "#8fad86",
+          color: "#759be6",
         },
       },
     },
@@ -113,13 +113,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "& fieldset": {
-            borderColor: "#8fad86",
+            borderColor: "#759be6",
           },
           "&:hover fieldset": {
-            borderColor: "#6c8b67 !important",
+            borderColor: "#78a3fa !important",
           },
           "&.Mui-focused fieldset": {
-            borderColor: "#8fad86",
+            borderColor: "#759be6",
           },
         },
       },

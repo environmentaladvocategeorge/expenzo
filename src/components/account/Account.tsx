@@ -33,11 +33,8 @@ const Account = ({ account }: { account: AccountType }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        py: theme.spacing(2),
-        px: theme.spacing(2),
-        border: `1px solid ${theme.palette.neutral.gray}`,
-        borderRadius: theme.spacing(1),
-        mb: theme.spacing(2),
+        p: theme.spacing(1.5),
+        borderBottom: `1px solid ${theme.palette.neutral.gray}`,
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center" }}>
