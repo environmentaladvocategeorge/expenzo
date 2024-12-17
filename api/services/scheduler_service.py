@@ -81,7 +81,7 @@ class SchedulerService:
                     ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists(),
                 )
                 logger.info(f"Inserted new account item with PK {account_item['PK']} and SK {account_item['SK']}")
-                self.sync_transactions_for_account(account_to_insert)
+                await self.sync_transactions_for_account(account_to_insert)
             except Exception as e:
                 logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already existws. Skipping insert.")
 
@@ -117,10 +117,11 @@ class SchedulerService:
         
         return accounts_with_balances
 
-    def sync_transactions_for_account(self, account: Account):
+    async def sync_transactions_for_account(self, account: Account):
         account_sync_to_insert = AccountSync(
             PK = account.PK,
             SK=f"Provider#{account.Provider}#Sync#{account.ProviderID}#EntityID#{account.EntityID}", 
+            Provider=account.Provider,
             EntityType='Sync',
             EntityData={},
             Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
