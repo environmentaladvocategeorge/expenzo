@@ -147,7 +147,10 @@ class AccountService:
                         ":sk_prefix": sort_key_prefix,
                     }
                 )
-                balance = Balance(**(response.get("Items", [])))
+
+                items = response.get("Items", [])
+                balance = Balance(**items[0])
+                
                 teller_balance = TellerAccountBalance(
                     ledger = float(balance.EntityData.get("ledger")),
                     account_id = balance.EntityData.get("account_id"),
