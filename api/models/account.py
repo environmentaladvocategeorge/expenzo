@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Dict
+from typing import Any, Optional, Dict
 
 class Account(BaseModel):
     PK: str
@@ -8,9 +8,9 @@ class Account(BaseModel):
     ProviderID: str
     EntityType: str
     EntityID: str
-    EntityData: Dict[str, str]
+    EntityData: Dict[str, Any]
     Timestamp: int
-    Metadata: Optional[Dict] = {}
+    Metadata: Optional[Dict[str, Any]] = {}
 
 class Balance(BaseModel):
     PK: str
@@ -19,9 +19,9 @@ class Balance(BaseModel):
     ProviderID: str
     EntityType: str
     EntityID: str
-    EntityData: Dict[str, str]
+    EntityData: Dict[str, Any]
     Timestamp: int
-    Metadata: Optional[Dict] = {}
+    Metadata: Optional[Dict[str, Any]] = {}
 
 class AccountLink(BaseModel):
     PK: str
@@ -29,6 +29,6 @@ class AccountLink(BaseModel):
     Provider: str
     ProviderID: str
     EntityType: str
-    EntityData: Dict[str, str]
+    EntityData: Dict[str, Any]
     Timestamp: int
-    Metadata: Optional[Dict] = {}
+    Metadata: Optional[Dict[str, Any]] = {}

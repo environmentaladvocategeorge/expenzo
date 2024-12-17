@@ -179,10 +179,8 @@ class AccountService:
         logger.info("Combining accounts and balances")
         accounts_with_balances = []
 
-        # Iterate through all accounts
         for account_list in all_accounts:
             for account in account_list:
-                # Find the balance that corresponds to the matching account's id
                 matching_balance = None
                 for balance_list in all_balances:
                     for balance in balance_list:
@@ -191,8 +189,7 @@ class AccountService:
                             break
                     if matching_balance:
                         break
-
-                # If a matching balance is found, append the combined result
+                    
                 if matching_balance:
                     accounts_with_balances.append({
                         "details": account,

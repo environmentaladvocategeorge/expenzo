@@ -51,7 +51,7 @@ class SchedulerService:
                 ProviderID=account_link.ProviderID,
                 EntityType="Account",
                 EntityID=account.get('details').id,
-                EntityData=account.get('details').model_dump(exclude={"institution"}),
+                EntityData=account.get('details').model_dump(),
                 Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
             )
 
