@@ -103,7 +103,7 @@ class AccountService:
         all_balances = await self.fetch_all_balances(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
-        accounts_with_balances = self.combine_accounts_and_balances(account_links, all_accounts, all_balances)
+        accounts_with_balances = self.combine_accounts_and_balances(all_accounts, all_balances)
 
         return self._categorize_accounts(accounts_with_balances)
     
