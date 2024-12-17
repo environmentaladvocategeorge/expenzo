@@ -1,4 +1,3 @@
-import asyncio
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Union
@@ -81,7 +80,7 @@ class AccountService:
 
         return account_links
     
-    def get_accounts_for_account_links(account_links: list[AccountLink]) -> list[list[Account]]:
+    def get_accounts_for_account_links(self, account_links: list[AccountLink]) -> list[list[Account]]:
         # Retrieve the DynamoDB table object
         table = db_client.get_table()
 
