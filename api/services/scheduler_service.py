@@ -117,7 +117,7 @@ class SchedulerService:
         
         return accounts_with_balances
 
-    async def sync_transactions_for_account(self, account: Account):
+    def sync_transactions_for_account(self, account: Account):
         account_sync_to_insert = AccountSync(
             PK = account.PK,
             SK=f"Provider#{account.Provider}#Sync#{account.ProviderID}#EntityID#{account.EntityID}", 
