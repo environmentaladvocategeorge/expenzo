@@ -98,7 +98,6 @@ class AccountService:
         for account_link in account_links:
             sort_key_prefix = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
 
-            # Log query parameters
             logger.info("Fetching accounts for account link with PK: %s and sort key prefix: %s", account_link.PK, sort_key_prefix)
 
             response = table.query(
@@ -112,17 +111,47 @@ class AccountService:
             items = response.get("Items", [])
             accounts = [Account(**item) for item in items]
 
-            # Log the number of accounts fetched
             logger.info("Retrieved %d accounts for account link with PK: %s", len(accounts), account_link.PK)
 
-            # Convert EntityData into TellerAccount objects
             teller_accounts = [TellerAccount(**account.EntityData) for account in accounts]
             accounts_for_links.append(teller_accounts)
 
-        # Log the total number of account links processed
         logger.info("Processed %d account links", len(account_links))
 
         return accounts_for_links
+    
+    def get_balances_for_accounts(self, account_links: list[AccountLink], accounts: list[list[TellerAccount]]):
+        """
+        Retrieve the balance for each account by matching their EntityID. Converts the EntityData into TellerBalance objects.
+        The ledger and available values are converted from strings to floats.
+
+        Args:
+            accounts (list[TellerAccount]): A list of TellerAccount objects for which balance data is to be retrieved.
+
+        Returns:
+            list[TellerBalance]: A list of TellerBalance objects for each account.
+        """
+        table = db_client.get_table()
+
+        balances_for_accounts = []
+
+        for account_link, account_list in zip(account_links, accounts):
+            for account in account_list:
+                sort_key_prefix = f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}#EntityID#{account.id}"
+                logger.info("Fetching balance for account link with PK: %s and sort key prefix: %s", account_link.PK, sort_key_prefix)
+
+                response = table.query(
+                    KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
+                    ExpressionAttributeValues={
+                        ":pk": account_link.PK,
+                        ":sk_prefix": sort_key_prefix,
+                    }
+                )
+
+                items = response.get("Items", [])
+                balances_for_accounts.append(items[0])
+        
+        logger.info("BALANCES: %s", balances_for_accounts)
 
     async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
@@ -144,6 +173,7 @@ class AccountService:
         logger.info("Fetching accounts and balances for user %s", user_id)
 
         all_accounts = self.get_accounts_for_account_links(account_links)
+        self.get_balances_for_accounts(account_links, all_accounts)
         all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
