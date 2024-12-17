@@ -1,5 +1,6 @@
+from datetime import datetime, timezone
 from services.account_service import AccountService
-from models.account import Account
+from models.account import Account, Balance
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
 from boto3.dynamodb.conditions import Attr
@@ -32,33 +33,79 @@ class SchedulerService:
 
         accounts_with_balances = self.account_service.combine_accounts_and_balances(account_links, all_accounts, all_balances)
 
-        account_links_dict = {link.details['enrollment_id']: link for link in account_links}
+        account_links_dict = {link.EntityData['enrollment_id']: link for link in account_links}
 
         for account in accounts_with_balances:
-            enrollment_id = account.details.get('enrollment_id')
+            enrollment_id = account.get('details').enrollment_id
             account_link = account_links_dict.get(enrollment_id)
 
             table = db_client.get_table()
-            account = Account(
+            account_to_insert = Account(
                 PK=account_link.PK,
-                SK=f"Provider#{account_link.Provide}#Account#{account_link.ProviderID}",
-                Provider= account_link.Provider,
-                ProviderID= account_link.ProviderID,
+                SK=f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}",
+                Provider=account_link.Provider,
+                ProviderID=account_link.ProviderID,
                 EntityType="Account",
-                EntityID=account.details.id,
-                EntityData= account.details,
-                Timestamp= int
+                EntityID=account.get('details').id,
+                EntityData=account.get('details').model_dump(exclude={"institution"}),
+                Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
+            )
+
+            balance_data = account.get('balance').model_dump()
+            balance_data['ledger'] = str(balance_data.get('ledger'))
+            balance_data['available'] = str(balance_data.get('available'))
+
+            balance_to_insert = Balance(
+                PK=account_link.PK,
+                SK=f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}",
+                Provider=account_link.Provider,
+                ProviderID=account_link.ProviderID,
+                EntityType="Balance",
+                EntityID=account.get('balance').account_id,
+                EntityData=balance_data,
+                Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
             )
             
-            item = account.model_dump()
+            account_item = account_to_insert.model_dump()
+            balance_item = balance_to_insert.model_dump()
 
             try:
                 table.put_item(
-                    Item=item,
-                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists() 
+                    Item=account_item,
+                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists()
                 )
-                logger.info(f"Inserted new account item with PK {account_link.PK} and SK {account_link.ProviderID}")
+                logger.info(f"Inserted new account item with PK {account_item['PK']} and SK {account_item['SK']}")
             except Exception as e:
-                logger.warning(f"Item with PK {account_link.PK} and SK {account_link.ProviderID} already exists. Skipping insert.")
+                logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already exists. Skipping insert.")
 
+            try:
+                table.update_item(
+                    Key={
+                        'PK': balance_to_insert.PK,
+                        'SK': balance_to_insert.SK
+                    },
+                    UpdateExpression="SET #entity_data = :entity_data, #timestamp = :timestamp, "
+                                    "#provider = :provider, #provider_id = :provider_id, "
+                                    "#entity_type = :entity_type, #entity_id = :entity_id",
+                    ExpressionAttributeNames={
+                        '#entity_data': 'EntityData',
+                        '#timestamp': 'Timestamp',
+                        '#provider': 'Provider',
+                        '#provider_id': 'ProviderID',
+                        '#entity_type': 'EntityType',
+                        '#entity_id': 'EntityID'
+                    },
+                    ExpressionAttributeValues={
+                        ':entity_data': balance_to_insert.EntityData,
+                        ':timestamp': balance_to_insert.Timestamp,
+                        ':provider': balance_to_insert.Provider,
+                        ':provider_id': balance_to_insert.ProviderID,
+                        ':entity_type': balance_to_insert.EntityType,
+                        ':entity_id': balance_to_insert.EntityID
+                    }
+                )
+                logger.info(f"Upserted balance item with PK {balance_item['PK']} and SK {balance_item['SK']}")
+            except Exception as e:
+                logger.error(f"Failed to upsert balance item with PK {balance_item['PK']} and SK {balance_item['SK']}: {str(e)}")
+        
         return accounts_with_balances
