@@ -81,12 +81,25 @@ class AccountService:
         return account_links
     
     def get_accounts_for_account_links(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
+        """
+        Retrieve accounts for a list of account links. For each account link, it fetches corresponding account data from the database 
+        and converts the `EntityData` field into `TellerAccount` objects.
+
+        Args:
+            account_links (list[AccountLink]): A list of AccountLink objects for which account data is to be retrieved.
+
+        Returns:
+            list[list[TellerAccount]]: A list of lists containing `TellerAccount` objects for each account link.
+        """
         table = db_client.get_table()
 
         accounts_for_links = []
 
         for account_link in account_links:
             sort_key_prefix = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
+
+            # Log query parameters
+            logger.info("Fetching accounts for account link with PK: %s and sort key prefix: %s", account_link.PK, sort_key_prefix)
 
             response = table.query(
                 KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
@@ -99,11 +112,18 @@ class AccountService:
             items = response.get("Items", [])
             accounts = [Account(**item) for item in items]
 
+            # Log the number of accounts fetched
+            logger.info("Retrieved %d accounts for account link with PK: %s", len(accounts), account_link.PK)
+
+            # Convert EntityData into TellerAccount objects
             teller_accounts = [TellerAccount(**account.EntityData) for account in accounts]
             accounts_for_links.append(teller_accounts)
 
+        # Log the total number of account links processed
+        logger.info("Processed %d account links", len(account_links))
+
         return accounts_for_links
-    
+
     async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
         Fetch accounts and categorize them into debit and credit groups.
