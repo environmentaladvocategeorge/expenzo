@@ -80,18 +80,14 @@ class AccountService:
 
         return account_links
     
-    def get_accounts_for_account_links(self, account_links: list[AccountLink]) -> list[list[Account]]:
-        # Retrieve the DynamoDB table object
+    def get_accounts_for_account_links(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
         table = db_client.get_table()
 
         accounts_for_links = []
 
-        # Iterate over each AccountLink to retrieve related accounts
         for account_link in account_links:
-            # Construct the prefix for the sort key
             sort_key_prefix = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
 
-            # Query the DynamoDB table for related accounts based on AccountLink's PK and SK prefix
             response = table.query(
                 KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
                 ExpressionAttributeValues={
@@ -100,12 +96,11 @@ class AccountService:
                 }
             )
 
-            # Directly map the response items to Account objects
             items = response.get("Items", [])
             accounts = [Account(**item) for item in items]
 
-            # Append the accounts for this AccountLink to the results
-            accounts_for_links.append(accounts)
+            teller_accounts = [TellerAccount(**account.EntityData) for account in accounts]
+            accounts_for_links.append(teller_accounts)
 
         return accounts_for_links
     
@@ -127,8 +122,8 @@ class AccountService:
             return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
  
         logger.info("Fetching accounts and balances for user %s", user_id)
-        logger.info(self.get_accounts_for_account_links(account_links))
-        all_accounts = await self.teller_service.fetch_all_accounts_for_links(account_links)
+
+        all_accounts = self.get_accounts_for_account_links(account_links)
         all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
