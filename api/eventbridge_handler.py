@@ -18,12 +18,20 @@ scheduler_service = SchedulerService(account_service=account_service)
 
 def handler(event, context):
     """
-    This function will be triggered by AWS EventBridge
+    This function will be triggered by AWS EventBridge.
     """
     try:
-        logger.info("EventBridge event received. Starting scheduled task.")
-        result = asyncio.run(scheduler_service.consolidate_account_balances())
-        logger.info(f"Task completed successfully: {result}")
+        logger.info(f"Event received: {event}")
+        task = event.get("task")
+        
+        if task == "consolidate_account_balances":
+            logger.info("Starting task: consolidate_account_balances")
+            result = asyncio.run(scheduler_service.consolidate_account_balances())
+            logger.info(f"Task completed successfully: {result}")
+        else:
+            error_message = f"Unknown task received: {task}"
+            logger.error(error_message)
+            raise ValueError(error_message)
     except Exception as e:
-        logger.error(f"Error processing scheduled event: {e}")
+        logger.error(f"Error processing event: {e}")
         raise e

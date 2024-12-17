@@ -106,11 +106,11 @@ Resources:
                 - dynamodb:Scan
               Resource: !Ref DynamoDBTableArn
       Events:
-        ExpenzoScheduledEvent:
+        ConsolidateBalancesEvent:
           Type: Schedule
           Properties:
             Schedule: cron(0 9-23/1 * * ? *)
-            Input: "{}"
+            Input: '{"task": "consolidate_account_balances"}'
 
   ApiGateway:
     Type: AWS::Serverless::Api
