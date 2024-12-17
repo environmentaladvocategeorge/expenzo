@@ -35,6 +35,9 @@ class TellerService:
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
+        except Exception as e:
+            logger.error(f"Unexpected error when calling Teller: {e}")
+            raise RuntimeError("An unexpected error occurred when calling Teller")
         
     async def get_account_balance(self, access_token: str, account_id: str) -> TellerAccountBalance:
         """
@@ -68,6 +71,9 @@ class TellerService:
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
+        except Exception as e:
+            logger.error(f"Unexpected error when calling Teller: {e}")
+            raise RuntimeError("An unexpected error occurred when calling Teller")
         
     async def get_account_transactions(self, access_token: str, account_id: str) -> List[TellerTransaction]:
         """
@@ -96,4 +102,7 @@ class TellerService:
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
+        except Exception as e:
+            logger.error(f"Unexpected error when calling Teller: {e}")
+            raise RuntimeError("An unexpected error occurred when calling Teller")
 
