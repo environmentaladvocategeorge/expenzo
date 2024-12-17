@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from typing import Union
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
-from models.account import AccountLink
-from models.teller import TellerAccountBalance, TellerAccount, TellerTransaction
+from models.account import AccountLink, Account
+from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest, CategorizedAccounts
 from boto3.dynamodb.conditions import Key, Attr
@@ -81,6 +81,35 @@ class AccountService:
 
         return account_links
     
+    def get_accounts_for_account_links(account_links: list[AccountLink]) -> list[list[Account]]:
+        # Retrieve the DynamoDB table object
+        table = db_client.get_table()
+
+        accounts_for_links = []
+
+        # Iterate over each AccountLink to retrieve related accounts
+        for account_link in account_links:
+            # Construct the prefix for the sort key
+            sort_key_prefix = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
+
+            # Query the DynamoDB table for related accounts based on AccountLink's PK and SK prefix
+            response = table.query(
+                KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
+                ExpressionAttributeValues={
+                    ":pk": account_link.PK,
+                    ":sk_prefix": sort_key_prefix,
+                }
+            )
+
+            # Directly map the response items to Account objects
+            items = response.get("Items", [])
+            accounts = [Account(**item) for item in items]
+
+            # Append the accounts for this AccountLink to the results
+            accounts_for_links.append(accounts)
+
+        return accounts_for_links
+    
     async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
         Fetch accounts and categorize them into debit and credit groups.
@@ -99,6 +128,7 @@ class AccountService:
             return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
  
         logger.info("Fetching accounts and balances for user %s", user_id)
+        logger.info(self.get_accounts_for_account_links(account_links))
         all_accounts = await self.teller_service.fetch_all_accounts_for_links(account_links)
         all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
 
