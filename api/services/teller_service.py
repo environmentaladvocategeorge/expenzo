@@ -1,5 +1,7 @@
+import asyncio
 import requests
 from requests.auth import HTTPBasicAuth
+from api.models.account import AccountLink
 from services.certificate_service import CertificateService
 from typing import List
 from models.teller import TellerAccount, TellerAccountBalance, TellerTransaction
@@ -105,4 +107,61 @@ class TellerService:
         except Exception as e:
             logger.error(f"Unexpected error when calling Teller: {e}")
             raise RuntimeError("An unexpected error occurred when calling Teller")
+        
+    async def fetch_all_accounts(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
+        """
+        Fetch all accounts for a list of account links.
+
+        Args:
+            account_links (list[AccountLink]): The account links for which accounts need to be fetched.
+
+        Returns:
+            list[list[Account]]: A list of lists of Account objects.
+        """
+        logger.info("Fetching all accounts for %d account links", len(account_links))
+        account_data_tasks = [
+            self.get_accounts(account_link.ProviderID) for account_link in account_links
+        ]
+        return await asyncio.gather(*account_data_tasks)
+
+    async def fetch_all_balances(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerAccountBalance]]:
+        """
+        Fetch all balances for a list of account links and their corresponding accounts.
+
+        Args:
+            account_links (list[AccountLink]): The account links for which balances need to be fetched.
+            all_accounts (list[list[Account]]): The accounts corresponding to the account links.
+
+        Returns:
+            list[list[AccountBalance]]: A list of lists of AccountBalance objects.
+        """
+        logger.info("Fetching all balances for accounts")
+        balance_tasks = [
+            [
+                self.get_account_balance(account_link.ProviderID, account.id) for account in accounts
+            ]
+            for account_link, accounts in zip(account_links, all_accounts)
+        ]
+        return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in balance_tasks])
+    
+    async def _fetch_all_transactions(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerTransaction]]:
+        """
+        Fetch all transactions for a list of account links and their corresponding accounts.
+
+        Args:
+            account_links (list[AccountLink]): The account links for which balances need to be fetched.
+            all_accounts (list[list[Account]]): The accounts corresponding to the account links.
+
+        Returns:
+            list[list[TellerTransaction]]: A list of lists of TellerTransaction objects.
+        """
+        logger.info("Fetching all transactions for accounts")
+        transaction_tasks = [
+            [
+                self.get_account_transactions(account_link.ProviderID, account.id) for account in accounts
+            ]
+            for account_link, accounts in zip(account_links, all_accounts)
+        ]
+        return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in transaction_tasks])
+    
 

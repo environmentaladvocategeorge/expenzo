@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from services.account_service import AccountService
+from services.teller_service import TellerService
 from models.account import Account, Balance
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
@@ -9,8 +10,9 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 class SchedulerService:
-    def __init__(self, account_service: AccountService):
+    def __init__(self, account_service: AccountService, teller_service: TellerService):
         self.account_service = account_service
+        self.teller_service = teller_service
 
     async def consolidate_account_balances(self):
         """
@@ -30,8 +32,8 @@ class SchedulerService:
         
         logger.info("Found %s account links in the database", len(account_links))
  
-        all_accounts = await self.account_service.fetch_all_accounts(account_links)
-        all_balances = await self.account_service.fetch_all_balances(account_links, all_accounts)
+        all_accounts = await self.teller_service.fetch_all_accounts(account_links)
+        all_balances = await self.teller_service.fetch_all_balances(account_links, all_accounts)
 
         accounts_with_balances = self.account_service.combine_accounts_and_balances(all_accounts, all_balances)
 

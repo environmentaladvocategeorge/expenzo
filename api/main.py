@@ -38,7 +38,7 @@ secrets_repository = SecretsRepository(region_name=aws_region)
 certificate_service = CertificateService(secrets_repository=secrets_repository)
 teller_service = TellerService(certificate_service=certificate_service)
 account_service = AccountService(teller_service=teller_service)
-scheduler_service = SchedulerService(account_service=account_service)
+scheduler_service = SchedulerService(account_service=account_service, teller_service=teller_service)
 
 app.include_router(create_accounts_controller(account_service))
 
