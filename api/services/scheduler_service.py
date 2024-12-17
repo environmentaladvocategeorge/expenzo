@@ -76,7 +76,7 @@ class SchedulerService:
             try:
                 table.put_item(
                     Item=account_item,
-                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists()
+                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists() & Attr('EntityID').not_exists(),
                 )
                 logger.info(f"Inserted new account item with PK {account_item['PK']} and SK {account_item['SK']}")
             except Exception as e:
