@@ -150,6 +150,7 @@ class AccountService:
 
                 items = response.get("Items", [])
                 balance = Balance(**items[0])
+                logger.info(balance)
                 teller_balance = TellerAccountBalance(
                     ledger = float(balance.EntityData.ledger),
                     account_id = balance.EntityData.account_id,
