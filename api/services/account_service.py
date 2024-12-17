@@ -167,7 +167,7 @@ class AccountService:
         self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:
         """
-        Combine accounts and their balances into a single list.
+        Combine accounts and their balances into a single list, ensuring proper matching.
 
         Args:
             account_links (list[AccountLink]): The account links.
@@ -179,11 +179,31 @@ class AccountService:
         """
         logger.info("Combining accounts and balances")
         accounts_with_balances = []
-        for _, accounts, balances in zip(account_links, all_accounts, all_balances):
-            for account, balance in zip(accounts, balances):
-                accounts_with_balances.append({"details": account, "balance": balance})
+
+        enrollment_to_account_map = {}
+        for account_list in all_accounts:
+            for account in account_list:
+                enrollment_to_account_map[account.enrollment_id] = account
+
+        for account_link in account_links:
+            enrollment_id = account_link.EntityData.get("enrollment_id")
+            teller_account = enrollment_to_account_map.get(enrollment_id)
+
+            if not teller_account:
+                logger.warning(f"Account not found for enrollment_id: {enrollment_id}")
+                continue
+
+            for balance_list in all_balances:
+                for balance in balance_list:
+                    if balance.account_id == teller_account.id:
+                        accounts_with_balances.append({
+                            "details": teller_account,
+                            "balance": balance
+                        })
+                        break
+
         return accounts_with_balances
-    
+
     def _categorize_accounts(self, accounts_with_balances: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]) -> dict[str, CategorizedAccounts]:
         """
         Categorize accounts into debit and credit categories and calculate total balances.
