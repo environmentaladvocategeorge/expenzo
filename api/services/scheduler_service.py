@@ -46,7 +46,7 @@ class SchedulerService:
             table = db_client.get_table()
             account_to_insert = Account(
                 PK=account_link.PK,
-                SK=f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}",
+                SK=f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#{account.get('details').id}",
                 Provider=account_link.Provider,
                 ProviderID=account_link.ProviderID,
                 EntityType="Account",
