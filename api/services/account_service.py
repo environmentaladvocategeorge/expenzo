@@ -164,15 +164,14 @@ class AccountService:
         return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in transaction_tasks])
     
     def combine_accounts_and_balances(
-        self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
+        self, all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:
         """
-        Combine accounts and their balances into a single list, ensuring proper matching.
+        Combine accounts and their balances into a single list by matching them directly.
 
         Args:
-            account_links (list[AccountLink]): The account links.
-            all_accounts (list[list[Account]]): The accounts.
-            all_balances (list[list[AccountBalance]]): The balances.
+            all_accounts (list[list[TellerAccount]]): The accounts.
+            all_balances (list[list[TellerAccountBalance]]): The balances.
 
         Returns:
             list[dict]: A list of dictionaries containing account details and balances.
@@ -180,27 +179,27 @@ class AccountService:
         logger.info("Combining accounts and balances")
         accounts_with_balances = []
 
-        enrollment_to_account_map = {}
+        # Iterate through all accounts
         for account_list in all_accounts:
             for account in account_list:
-                enrollment_to_account_map[account.enrollment_id] = account
-
-        for account_link in account_links:
-            enrollment_id = account_link.EntityData.get("enrollment_id")
-            teller_account = enrollment_to_account_map.get(enrollment_id)
-
-            if not teller_account:
-                logger.warning(f"Account not found for enrollment_id: {enrollment_id}")
-                continue
-
-            for balance_list in all_balances:
-                for balance in balance_list:
-                    if balance.account_id == teller_account.id:
-                        accounts_with_balances.append({
-                            "details": teller_account,
-                            "balance": balance
-                        })
+                # Find the balance that corresponds to the matching account's id
+                matching_balance = None
+                for balance_list in all_balances:
+                    for balance in balance_list:
+                        if balance.account_id == account.id:
+                            matching_balance = balance
+                            break
+                    if matching_balance:
                         break
+
+                # If a matching balance is found, append the combined result
+                if matching_balance:
+                    accounts_with_balances.append({
+                        "details": account,
+                        "balance": matching_balance
+                    })
+                else:
+                    logger.warning(f"No balance found for account_id: {account.id}")
 
         return accounts_with_balances
 
