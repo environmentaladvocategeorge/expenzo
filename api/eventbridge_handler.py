@@ -1,3 +1,4 @@
+import asyncio
 import os
 from services.account_service import AccountService
 from services.certificate_service import CertificateService
@@ -21,7 +22,7 @@ def handler(event, context):
     """
     try:
         logger.info("EventBridge event received. Starting scheduled task.")
-        result = scheduler_service.consolidate_account_balances()
+        result = asyncio.run(scheduler_service.consolidate_account_balances())
         logger.info(f"Task completed successfully: {result}")
     except Exception as e:
         logger.error(f"Error processing scheduled event: {e}")
