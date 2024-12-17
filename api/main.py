@@ -1,6 +1,4 @@
-import logging
 import os
-from typing import Any, Dict
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum

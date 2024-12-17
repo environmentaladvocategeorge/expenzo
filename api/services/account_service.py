@@ -99,8 +99,8 @@ class AccountService:
             return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
  
         logger.info("Fetching accounts and balances for user %s", user_id)
-        all_accounts = await self.teller_service.fetch_all_accounts(account_links)
-        all_balances = await self.teller_service.fetch_all_balances(account_links, all_accounts)
+        all_accounts = await self.teller_service.fetch_all_accounts_for_links(account_links)
+        all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
         accounts_with_balances = self.combine_accounts_and_balances(all_accounts, all_balances)

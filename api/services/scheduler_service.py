@@ -32,8 +32,8 @@ class SchedulerService:
         
         logger.info("Found %s account links in the database", len(account_links))
  
-        all_accounts = await self.teller_service.fetch_all_accounts(account_links)
-        all_balances = await self.teller_service.fetch_all_balances(account_links, all_accounts)
+        all_accounts = await self.teller_service.fetch_all_accounts_for_links(account_links)
+        all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
 
         accounts_with_balances = self.account_service.combine_accounts_and_balances(all_accounts, all_balances)
 
