@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Union
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
-from models.account import AccountLink, Account
+from models.account import AccountLink, Account, Balance
 from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest, CategorizedAccounts
@@ -149,10 +149,16 @@ class AccountService:
                 )
 
                 items = response.get("Items", [])
-                balances_for_accounts.append(items[0])
+                balance = Balance(**items[0])
+                teller_balance = TellerAccountBalance(
+                    ledger = float(balance.EntityData.ledger),
+                    account_id = balance.EntityData.account_id,
+                    available=float(balance.EntityData.available)
+                )
+                balances_for_accounts.append([teller_balance])
         
-        logger.info("BALANCES: %s", balances_for_accounts)
-
+        return balances_for_accounts
+    
     async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
         Fetch accounts and categorize them into debit and credit groups.
