@@ -179,8 +179,7 @@ class AccountService:
         logger.info("Fetching accounts and balances for user %s", user_id)
 
         all_accounts = self.get_accounts_for_account_links(account_links)
-        self.get_balances_for_accounts(account_links, all_accounts)
-        all_balances = await self.teller_service.fetch_balances_for_accounts(account_links, all_accounts)
+        all_balances = self.get_balances_for_accounts(account_links, all_accounts)
 
         logger.info("Combining accounts and balances for user %s", user_id)
         accounts_with_balances = self.combine_accounts_and_balances(all_accounts, all_balances)
