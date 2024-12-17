@@ -61,7 +61,7 @@ class SchedulerService:
 
             balance_to_insert = Balance(
                 PK=account_link.PK,
-                SK=f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}",
+                SK=f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}#EntityID#{account.get('balance').account_id}",
                 Provider=account_link.Provider,
                 ProviderID=account_link.ProviderID,
                 EntityType="Balance",
@@ -76,11 +76,11 @@ class SchedulerService:
             try:
                 table.put_item(
                     Item=account_item,
-                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists() & Attr('EntityID').not_exists(),
+                    ConditionExpression=Attr('PK').not_exists() & Attr('SK').not_exists(),
                 )
                 logger.info(f"Inserted new account item with PK {account_item['PK']} and SK {account_item['SK']}")
             except Exception as e:
-                logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already exists. Skipping insert.")
+                logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already existws. Skipping insert.")
 
             try:
                 table.update_item(
