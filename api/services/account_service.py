@@ -246,7 +246,6 @@ class AccountService:
 
             logger.info("Fetching accounts and balances for account link with PK: %s", account_link.PK)
 
-            # Query for accounts and balances in one pass (two queries for each link)
             response_accounts = table.query(
                 KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix_accounts)",
                 ExpressionAttributeValues={
@@ -265,6 +264,9 @@ class AccountService:
 
             items_accounts = response_accounts.get("Items", [])
             items_balances = response_balances.get("Items", [])
+
+            logger.info(items_accounts)
+            logger.info(items_balances)
 
             accounts = [Account(**item) for item in items_accounts]
             balances = [Balance(**item) for item in items_balances]
