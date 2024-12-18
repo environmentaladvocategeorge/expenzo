@@ -271,18 +271,25 @@ class AccountService:
 
             logger.info("Retrieved %d accounts and %d balances for account link with PK: %s", len(accounts), len(balances), account_link.PK)
 
-            # Combine the accounts with their corresponding balances into a dictionary of 'details' and 'balance'
             accounts_and_balances = []
-            for account, balance in zip(accounts, balances):
-                account_balance_dict = {
-                    "details": TellerAccount(**account.EntityData),  # Account details
-                    "balance": TellerAccountBalance(
-                        ledger=float(balance.EntityData.get("ledger")),
-                        account_id=balance.EntityData.get("account_id"),
-                        available=float(balance.EntityData.get("available"))
-                    )  # Corresponding balance
-                }
-                accounts_and_balances.append(account_balance_dict)
+            for account in accounts:
+                matching_balance = None
+                for balance in balances:
+                    if balance.EntityData.get("account_id") == account.id:
+                        matching_balance = TellerAccountBalance(
+                            ledger=float(balance.EntityData.get("ledger")),
+                            account_id=balance.EntityData.get("account_id"),
+                            available=float(balance.EntityData.get("available"))
+                        )
+                        break
+                
+                if matching_balance:
+                    accounts_and_balances.append({
+                        "details": TellerAccount(**account.EntityData),
+                        "balance": matching_balance
+                    })
+                else:
+                    logger.warning(f"No balance found for account_id: {account.id}")
 
             accounts_and_balances_for_links.append(accounts_and_balances)
 
