@@ -80,113 +80,6 @@ class AccountService:
 
         return account_links
     
-    def get_accounts_for_account_links(self, account_links: list[AccountLink]) -> list[list[TellerAccount]]:
-        """
-        Retrieve accounts for a list of account links. For each account link, it fetches corresponding account data from the database 
-        and converts the `EntityData` field into `TellerAccount` objects.
-
-        Args:
-            account_links (list[AccountLink]): A list of AccountLink objects for which account data is to be retrieved.
-
-        Returns:
-            list[list[TellerAccount]]: A list of lists containing `TellerAccount` objects for each account link.
-        """
-        table = db_client.get_table()
-
-        accounts_for_links = []
-
-        for account_link in account_links:
-            sort_key_prefix = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
-
-            logger.info("Fetching accounts for account link with PK: %s and sort key prefix: %s", account_link.PK, sort_key_prefix)
-
-            response = table.query(
-                KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
-                ExpressionAttributeValues={
-                    ":pk": account_link.PK,
-                    ":sk_prefix": sort_key_prefix,
-                }
-            )
-
-            items = response.get("Items", [])
-            accounts = [Account(**item) for item in items]
-
-            logger.info("Retrieved %d accounts for account link with PK: %s", len(accounts), account_link.PK)
-
-            teller_accounts = [TellerAccount(**account.EntityData) for account in accounts]
-            accounts_for_links.append(teller_accounts)
-
-        logger.info("Processed %d account links", len(account_links))
-
-        return accounts_for_links
-    
-    def get_balances_for_accounts(self, account_links: list[AccountLink], accounts: list[list[TellerAccount]]):
-        """
-        Retrieve the balance for each account by matching their EntityID. Converts the EntityData into TellerBalance objects.
-        The ledger and available values are converted from strings to floats.
-
-        Args:
-            accounts (list[TellerAccount]): A list of TellerAccount objects for which balance data is to be retrieved.
-
-        Returns:
-            list[TellerBalance]: A list of TellerBalance objects for each account.
-        """
-        table = db_client.get_table()
-
-        balances_for_accounts = []
-
-        for account_link, account_list in zip(account_links, accounts):
-            for account in account_list:
-                sort_key_prefix = f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}#EntityID#{account.id}"
-                logger.info("Fetching balance for account link with PK: %s and sort key prefix: %s", account_link.PK, sort_key_prefix)
-
-                response = table.query(
-                    KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
-                    ExpressionAttributeValues={
-                        ":pk": account_link.PK,
-                        ":sk_prefix": sort_key_prefix,
-                    }
-                )
-
-                items = response.get("Items", [])
-                balance = Balance(**items[0])
-                
-                teller_balance = TellerAccountBalance(
-                    ledger = float(balance.EntityData.get("ledger")),
-                    account_id = balance.EntityData.get("account_id"),
-                    available=float(balance.EntityData.get("available"))
-                )
-                balances_for_accounts.append([teller_balance])
-        
-        return balances_for_accounts
-    
-    async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
-        """
-        Fetch accounts and categorize them into debit and credit groups.
-
-        Args:
-            user_id (str): The user ID whose accounts need to be fetched and categorized.
-
-        Returns:
-            dict[str, CategorizedAccounts]: Categorized accounts with 'debit' and 'credit' keys.
-        """
-        logger.info("Fetching account links for user %s", user_id)
-        account_links = self.get_account_links(user_id)
-
-        # if not account_links:
-        #     logger.info("No account links found for %s, returning empty response.", user_id)
-        #     return {"debit": CategorizedAccounts(), "credit": CategorizedAccounts()}
- 
-        # logger.info("Fetching accounts and balances for user %s", user_id)
-
-        # all_accounts = self.get_accounts_for_account_links(account_links)
-        # all_balances = self.get_balances_for_accounts(account_links, all_accounts)
-
-        # logger.info("Combining accounts and balances for user %s", user_id)
-        # accounts_with_balances = self.combine_accounts_and_balances(all_accounts, all_balances)
-
-        return self._categorize_accounts(self.get_accounts_and_balances_for_account_links(account_links))
-    
     def combine_accounts_and_balances(
         self, all_accounts: list[list[TellerAccount]], all_balances: list[list[TellerAccountBalance]]
     ) -> list[dict]:
@@ -224,7 +117,22 @@ class AccountService:
 
         return accounts_with_balances
     
-    def get_accounts_and_balances_for_account_links(self, account_links: list[AccountLink]) -> list[list[dict]]:
+    async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
+        """
+        Fetch accounts and categorize them into debit and credit groups.
+
+        Args:
+            user_id (str): The user ID whose accounts need to be fetched and categorized.
+
+        Returns:
+            dict[str, CategorizedAccounts]: Categorized accounts with 'debit' and 'credit' keys.
+        """
+        logger.info("Fetching account links for user %s", user_id)
+        account_links = self.get_account_links(user_id)
+
+        return self._categorize_accounts(self.get_accounts_and_balances_for_account_links(account_links))
+    
+    def get_accounts_and_balances_for_account_links(self, account_links: list[AccountLink]) -> list[dict]:
         """
         Retrieve accounts and their corresponding balances for a list of account links in one pass.
         For each account link, it fetches both account and balance data from the database and combines 
@@ -234,7 +142,7 @@ class AccountService:
             account_links (list[AccountLink]): A list of AccountLink objects for which account and balance data are to be retrieved.
 
         Returns:
-            list[list[dict]]: A list of lists containing dictionaries with `details` (TellerAccount) and 
+            list[dict]]: A list containing dictionaries with `details` (TellerAccount) and 
                             `balance` (matching TellerAccountBalance) for each account link.
         """
         table = db_client.get_table()
@@ -265,19 +173,16 @@ class AccountService:
             items_accounts = response_accounts.get("Items", [])
             items_balances = response_balances.get("Items", [])
 
-            logger.info(items_accounts)
-            logger.info(items_balances)
-
             accounts = [Account(**item) for item in items_accounts]
             balances = [Balance(**item) for item in items_balances]
 
-            logger.info("Retrieved %d accounts and %d balances for account link with PK: %s", len(accounts), len(balances), account_link.PK)
+            logger.info("Retrieved %d accounts and %d balances for account link with PK: %s", len(accounts), len(balances), account_link.SK)
 
             accounts_and_balances = []
             for account in accounts:
                 matching_balance = None
                 for balance in balances:
-                    if balance.EntityData.get("account_id") == account.id:
+                    if balance.EntityData.get("account_id") == account.EntityData.get('id'):
                         matching_balance = TellerAccountBalance(
                             ledger=float(balance.EntityData.get("ledger")),
                             account_id=balance.EntityData.get("account_id"),
@@ -295,9 +200,7 @@ class AccountService:
 
             accounts_and_balances_for_links.append(accounts_and_balances)
 
-        logger.info("Processed %d account links", len(account_links))
-
-        return accounts_and_balances_for_links
+        return [item for sublist in accounts_and_balances_for_links for item in sublist]
 
     def _categorize_accounts(self, accounts_with_balances: list[dict[str, Union[TellerAccount, TellerAccountBalance]]]) -> dict[str, CategorizedAccounts]:
         """
@@ -309,7 +212,7 @@ class AccountService:
         Returns:
             dict[CategorizedAccounts]: Categorized accounts with total balances and account details.
         """
-        logger.info("Categorizing accounts")
+        logger.info("Categorizing %s accounts", len(accounts_with_balances))
         
         categorized_accounts = defaultdict(lambda: CategorizedAccounts(accounts=[], total_ledger=0, total_available=0))
         
