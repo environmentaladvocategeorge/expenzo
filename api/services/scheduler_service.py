@@ -129,7 +129,7 @@ class SchedulerService:
             None
         """
         try:
-            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions()
+            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions(account.ProviderID, account.EntityID)
 
             for transaction in transactions:
                 transaction_data = transaction.model_dump()
