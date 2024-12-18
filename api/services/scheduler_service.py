@@ -146,7 +146,7 @@ class SchedulerService:
                     Provider=account.Provider,
                     ProviderID=account.ProviderID,
                     EntityType="Transaction",
-                    EntityId=transaction_data['id'],
+                    EntityId=transaction_data.get('id'),
                     EntityData=transaction_data,
                     Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
                 )
