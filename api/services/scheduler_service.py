@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from services.account_service import AccountService
 from services.teller_service import TellerService
-from models.account import Account, Balance, AccountSync
+from models.account import Account, AccountSync, Balance, Transaction
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
 from boto3.dynamodb.conditions import Attr
@@ -82,6 +82,7 @@ class SchedulerService:
                 )
                 logger.info(f"Inserted new account item with PK {account_item['PK']} and SK {account_item['SK']}")
                 await self.sync_transactions_for_account(account_to_insert)
+                logger.info(f"Finished syncing transactions for {account_item['EntityId']}")
             except Exception as e:
                 logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already existws. Skipping insert.")
 
@@ -118,13 +119,54 @@ class SchedulerService:
         return accounts_with_balances
 
     async def sync_transactions_for_account(self, account: Account):
-        account_sync_to_insert = AccountSync(
-            PK = account.PK,
-            SK=f"Provider#{account.Provider}#Sync#{account.ProviderID}#EntityID#{account.EntityID}", 
-            Provider=account.Provider,
-            EntityType='Sync',
-            EntityData={},
-            Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
-        ) 
-        self.table.put_item(Item=account_sync_to_insert.model_dump())
-        logger.info(f"Inserted new account sync object with PK {account_sync_to_insert.PK} and SK {account_sync_to_insert.SK}")
+        """
+        Sync transactions for a given account and update the database.
+
+        Args:
+            account (Account): The account object containing details needed for transaction synchronization.
+
+        Returns:
+            None
+        """
+        try:
+            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions()
+
+            for transaction in transactions:
+                transaction_data = transaction.model_dump()
+                transaction_data['running_balance'] = (
+                    str(transaction_data['running_balance']) 
+                    if transaction_data.get('running_balance') is not None 
+                    else None
+                )
+                transaction_data['amount'] = str(transaction_data.get('amount'))
+
+                transaction_to_insert = Transaction(
+                    PK=account.PK,
+                    SK=f"Provider#{account.Provider}#Transaction#{account.ProviderID}#EntityID#{transaction_data['id']}",
+                    Provider=account.Provider,
+                    ProviderID=account.ProviderID,
+                    EntityType="Transaction",
+                    EntityData=transaction_data,
+                    EntityId=transaction_data['id'],
+                    Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
+                )
+
+                self.table.put_item(Item=transaction_to_insert.model_dump())
+
+                logger.info(f"Inserted new transaction object with PK {transaction_to_insert.PK} and SK {transaction_to_insert.SK}")
+
+            account_sync_to_insert = AccountSync(
+                PK=account.PK,
+                SK=f"Provider#{account.Provider}#Sync#{account.ProviderID}#EntityID#{account.EntityID}",
+                Provider=account.Provider,
+                EntityType='Sync',
+                EntityData={
+                    "last_transaction": transactions[0].id
+                },
+                Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
+            )
+
+            self.table.put_item(Item=account_sync_to_insert.model_dump())
+
+        except Exception as e:
+            logger.error(f"An error occurred while syncing transactions for account {account.PK}: {e}")

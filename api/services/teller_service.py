@@ -143,25 +143,4 @@ class TellerService:
             for account_link, accounts in zip(account_links, all_accounts)
         ]
         return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in balance_tasks])
-    
-    async def fetch_transactions_for_accounts(self, account_links: list[AccountLink], all_accounts: list[list[TellerAccount]]) -> list[list[TellerTransaction]]:
-        """
-        Fetch all transactions for a list of account links and their corresponding accounts.
-
-        Args:
-            account_links (list[AccountLink]): The account links for which balances need to be fetched.
-            all_accounts (list[list[Account]]): The accounts corresponding to the account links.
-
-        Returns:
-            list[list[TellerTransaction]]: A list of lists of TellerTransaction objects.
-        """
-        logger.info("Fetching all transactions for accounts")
-        transaction_tasks = [
-            [
-                self.fetch_account_transactions(account_link.ProviderID, account.id) for account in accounts
-            ]
-            for account_link, accounts in zip(account_links, all_accounts)
-        ]
-        return await asyncio.gather(*[asyncio.gather(*tasks) for tasks in transaction_tasks])
-    
 
