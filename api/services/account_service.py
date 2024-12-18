@@ -160,68 +160,6 @@ class AccountService:
         
         return balances_for_accounts
     
-    def get_accounts_and_balances_for_account_links(self, account_links: list[AccountLink]) -> list[list[TellerAccountBalance]]:
-        """
-        Retrieve accounts and their corresponding balances for a list of account links in one pass.
-        For each account link, it fetches both account and balance data from the database and converts 
-        the `EntityData` field into `TellerAccountBalance` objects.
-
-        Args:
-            account_links (list[AccountLink]): A list of AccountLink objects for which account and balance data are to be retrieved.
-
-        Returns:
-            list[list[TellerAccountBalance]]: A list of lists containing `TellerAccountBalance` objects for each account link.
-        """
-        table = db_client.get_table()
-        accounts_and_balances_for_links = []
-
-        for account_link in account_links:
-            sort_key_prefix_accounts = f"Provider#{account_link.Provider}#Account#{account_link.ProviderID}#EntityID#"
-            sort_key_prefix_balances = f"Provider#{account_link.Provider}#Balance#{account_link.ProviderID}#EntityID#"
-
-            logger.info("Fetching accounts and balances for account link with PK: %s", account_link.PK)
-
-            # Query for accounts and balances in one pass (two queries for each link)
-            response_accounts = table.query(
-                KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix_accounts)",
-                ExpressionAttributeValues={
-                    ":pk": account_link.PK,
-                    ":sk_prefix_accounts": sort_key_prefix_accounts,
-                }
-            )
-
-            response_balances = table.query(
-                KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix_balances)",
-                ExpressionAttributeValues={
-                    ":pk": account_link.PK,
-                    ":sk_prefix_balances": sort_key_prefix_balances,
-                }
-            )
-
-            items_accounts = response_accounts.get("Items", [])
-            items_balances = response_balances.get("Items", [])
-
-            accounts = [Account(**item) for item in items_accounts]
-            balances = [Balance(**item) for item in items_balances]
-
-            logger.info("Retrieved %d accounts and %d balances for account link with PK: %s", len(accounts), len(balances), account_link.PK)
-
-            # Combine the accounts with their corresponding balances into TellerAccountBalance objects
-            accounts_and_balances = []
-            for account, balance in zip(accounts, balances):
-                teller_balance = TellerAccountBalance(
-                    ledger=float(balance.EntityData.get("ledger")),
-                    account_id=balance.EntityData.get("account_id"),
-                    available=float(balance.EntityData.get("available"))
-                )
-                accounts_and_balances.append(teller_balance)
-
-            accounts_and_balances_for_links.append(accounts_and_balances)
-
-        logger.info("Processed %d account links", len(account_links))
-
-        return accounts_and_balances_for_links
-    
     async def get_categorized_accounts(self, user_id: str) -> dict[str, CategorizedAccounts]:
         """
         Fetch accounts and categorize them into debit and credit groups.
