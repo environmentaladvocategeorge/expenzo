@@ -49,11 +49,11 @@ const theme = createTheme({
   palette: {
     primary: {
       main: "#8b7ce3",
-      light: "#78a3fa",
-      dark: "#234da1",
+      light: "#c2baf5",
+      dark: "#4838a8",
     },
     secondary: {
-      main: "#367dcf",
+      main: "#5845d1",
     },
     neutral: {
       white: "#ffffff",
@@ -116,7 +116,7 @@ const theme = createTheme({
             borderColor: "#8b7ce3",
           },
           "&:hover fieldset": {
-            borderColor: "#78a3fa !important",
+            borderColor: "#4838a8 !important",
           },
           "&.Mui-focused fieldset": {
             borderColor: "#8b7ce3",

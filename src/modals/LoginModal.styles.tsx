@@ -37,6 +37,11 @@ export const SubmitButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
+export const ForgotPasswordButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  color: theme.palette.primary.main,
+}));
+
 export const LoadingIndicator = styled(CircularProgress)(() => ({
   color: "white",
 }));

@@ -21,6 +21,7 @@ interface AuthContextType {
   showLoginModal: boolean;
   setShowLoginModal: (value: boolean) => void;
   isLoggingIn: boolean;
+  getUserName: () => string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,6 +85,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setShowLoginModal(true);
   };
 
+  const getUserName = (): string | null => {
+    return user?.getIdToken().payload?.name || null;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -95,6 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         showLoginModal,
         setShowLoginModal,
         isLoggingIn,
+        getUserName,
       }}
     >
       {children}

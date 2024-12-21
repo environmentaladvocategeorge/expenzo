@@ -51,17 +51,12 @@ const Account = ({ account }: { account: AccountType }) => {
         </Box>
         <Box sx={{ marginLeft: theme.spacing(2) }}>
           <Typography
-            variant="body1"
+            variant="body2"
             sx={{ color: theme.palette.text.secondary }}
           >
             {account.details.institution.name}
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: theme.palette.text.secondary }}
-          >
-            {account.details.name}
-          </Typography>
+          <Typography variant="body2">{account.details.name}</Typography>
         </Box>
       </Box>
       <Box>
@@ -71,7 +66,10 @@ const Account = ({ account }: { account: AccountType }) => {
         >
           {formatCurrency(account.balance.ledger)}
         </Typography>
-        <Typography variant="body2" sx={{ color: theme.palette.neutral.gray }}>
+        <Typography
+          variant="body2"
+          sx={{ color: theme.palette.neutral.gray, fontWeight: 500 }}
+        >
           {`Available: ${formatCurrency(account.balance.available)}`}
         </Typography>
       </Box>

@@ -102,3 +102,39 @@ export const reAuthenticateUser = (
     callback(new Error("No current user found"), null);
   }
 };
+
+export const resetPassword = (
+  username: string,
+  callback: (error: Error | null, result: string | null) => void
+) => {
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new CognitoUser(userData);
+
+  cognitoUser.forgotPassword({
+    onSuccess: () => {
+      const verificationCode = prompt(
+        "Please enter the verification code sent to your email/phone"
+      );
+      const newPassword = prompt("Please enter a new password");
+
+      if (verificationCode && newPassword) {
+        cognitoUser.confirmPassword(verificationCode, newPassword, {
+          onSuccess: () => {
+            callback(null, "Password reset successful!");
+          },
+          onFailure: (err: Error) => {
+            callback(err, null);
+          },
+        });
+      } else {
+        callback(new Error("Missing verification code or new password"), null);
+      }
+    },
+    onFailure: (err: Error) => {
+      callback(err, null);
+    },
+  });
+};

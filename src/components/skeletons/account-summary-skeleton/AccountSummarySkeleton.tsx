@@ -19,7 +19,7 @@ const AccountSummarySkeleton = () => {
     <Box
       sx={(theme) => ({
         borderRadius: 2,
-        padding: 4,
+        padding: 3,
         my: 2,
         backgroundColor: theme.palette.neutral.lightGray,
       })}
