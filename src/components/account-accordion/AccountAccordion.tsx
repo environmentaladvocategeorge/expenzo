@@ -11,7 +11,7 @@ import {
 import { ExpandMore } from "@mui/icons-material";
 import Account from "../account/Account";
 import { Account as AccountType } from "@/types/api";
-import AccountSkeleton from "../account-skeleton/AccountSkeleton";
+import AccountSkeleton from "../skeletons/account-skeleton/AccountSkeleton";
 
 interface AccountAccordionProps {
   title: string;
@@ -41,9 +41,7 @@ const AccountAccordion = ({
         borderRadius: 2,
         padding: 4,
         my: 2,
-        backgroundColor: "neutral.white",
-        boxShadow:
-          "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
+        backgroundColor: theme.palette.neutral.lightGray,
       }}
     >
       <Box
@@ -60,7 +58,7 @@ const AccountAccordion = ({
               color: "neutral.gray",
             }}
           >
-            {title}
+            {`${title} ${accounts.length > 0 ? `(${accounts.length})` : ""}`}
           </Typography>
           {loading ? (
             <Skeleton
@@ -97,7 +95,9 @@ const AccountAccordion = ({
 
       <Collapse in={expanded} timeout="auto">
         {loading ? (
-          <Box sx={{ marginTop: 2 }}>
+          <Box sx={{ marginTop: 1 }}>
+            <AccountSkeleton />
+            <AccountSkeleton />
             <AccountSkeleton />
           </Box>
         ) : (

@@ -33,11 +33,13 @@ export const Link = styled("span", {
 export const PageContainer = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   margin: "0 auto",
-  backgroundColor: theme.palette.neutral.lightGray,
+  backgroundColor: theme.palette.neutral.white,
   display: "flex",
   flexDirection: "column",
   boxSizing: "border-box",
   transition: "margin-left 0.3s ease-in-out",
+  borderTopLeftRadius: theme.spacing(4),
+  borderBottomLeftRadius: theme.spacing(4),
 }));
 
 export const GridPageContainer = styled(Box)({

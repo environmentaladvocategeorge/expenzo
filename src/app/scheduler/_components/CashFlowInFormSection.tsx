@@ -1,6 +1,6 @@
 import { eczar } from "@/theme/theme";
 import { Divider, Typography, useTheme } from "@mui/material";
-import RadioSelectGroup from "@/components/radio-select-group/RadioSelectGroup";
+import { RadioSelectGroup } from "@/components";
 import { useFormContext } from "react-hook-form";
 
 const CashFlowInFormSection = () => {

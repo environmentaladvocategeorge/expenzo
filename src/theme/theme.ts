@@ -1,5 +1,5 @@
 import { createTheme } from "@mui/material/styles";
-import { Poppins, Eczar } from "next/font/google";
+import { Eczar, Inter } from "next/font/google";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -35,7 +35,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-export const poppins = Poppins({
+export const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
 });
@@ -48,7 +48,7 @@ export const eczar = Eczar({
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#759be6",
+      main: "#8b7ce3",
       light: "#78a3fa",
       dark: "#234da1",
     },
@@ -57,14 +57,14 @@ const theme = createTheme({
     },
     neutral: {
       white: "#ffffff",
-      lightGray: "#fcfdff",
+      lightGray: "#f8f6ff",
       gray: "#4c4b47",
       darkGray: "#434646",
       black: "#191919",
     },
   },
   typography: {
-    fontFamily: poppins.style.fontFamily,
+    fontFamily: inter.style.fontFamily,
     allVariants: {
       fontWeight: 700,
     },
@@ -102,10 +102,10 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: "#759be6",
+          backgroundColor: "#8b7ce3",
         },
         arrow: {
-          color: "#759be6",
+          color: "#8b7ce3",
         },
       },
     },
@@ -113,13 +113,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "& fieldset": {
-            borderColor: "#759be6",
+            borderColor: "#8b7ce3",
           },
           "&:hover fieldset": {
             borderColor: "#78a3fa !important",
           },
           "&.Mui-focused fieldset": {
-            borderColor: "#759be6",
+            borderColor: "#8b7ce3",
           },
         },
       },

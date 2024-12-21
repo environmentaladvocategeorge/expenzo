@@ -5,7 +5,7 @@ import {
   CalendarMonthOutlined as CalendarIcon,
   MenuOutlined as MenuOutlinedIcon,
 } from "@mui/icons-material";
-import { AppHeaderText, WhiteDivider } from "@/global.styles";
+import { AppHeaderText } from "@/global.styles";
 import { usePathname } from "next/navigation";
 import { useNavigationMenu } from "@/contexts/NavigationMenuContext";
 import { useAuth } from "@/contexts/AuthenticationContext";
@@ -60,7 +60,6 @@ const NavigationMenu = () => {
           </Tooltip>
         )}
       </Styled.Header>
-      <WhiteDivider />
       <Box
         sx={{
           padding: 2,

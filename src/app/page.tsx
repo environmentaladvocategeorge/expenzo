@@ -15,8 +15,11 @@ import { GetAccountsResponse } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchAccounts } from "@/services/accountService";
 import { formatCurrency } from "@/utils/string_utils";
-import AccountAccordion from "@/components/account-accordion/AccountAccordion";
-import AccountSummary from "@/components/account-summary/AccountSummary";
+import {
+  AccountAccordion,
+  AccountSummary,
+  AccountSummarySkeleton,
+} from "@/components";
 
 const Home = () => {
   const theme = useTheme();
@@ -65,10 +68,8 @@ const Home = () => {
             sx={{
               borderRadius: theme.spacing(2),
               padding: theme.spacing(4),
-              backgroundColor: theme.palette.neutral.white,
+              backgroundColor: theme.palette.neutral.lightGray,
               my: theme.spacing(2),
-              boxShadow:
-                "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -103,6 +104,7 @@ const Home = () => {
                 ml: "auto",
                 my: 2,
               }}
+              disabled={loading}
               endIcon={<Add />}
             >
               Connect Account
@@ -130,10 +132,14 @@ const Home = () => {
             </Grid2>
 
             <Grid2 size={4}>
-              <AccountSummary
-                accounts={accounts}
-                formatCurrency={formatCurrency}
-              />
+              {loading ? (
+                <AccountSummarySkeleton />
+              ) : (
+                <AccountSummary
+                  accounts={accounts}
+                  formatCurrency={formatCurrency}
+                />
+              )}
             </Grid2>
           </Grid2>
         </Box>

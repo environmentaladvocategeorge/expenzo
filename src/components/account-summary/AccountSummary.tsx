@@ -166,14 +166,12 @@ const AccountSummary = ({ accounts, formatCurrency }: AccountSummaryProps) => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         borderRadius: 2,
         padding: 4,
         my: 2,
-        backgroundColor: "neutral.white",
-        boxShadow:
-          "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05)",
-      }}
+        backgroundColor: theme.palette.neutral.lightGray,
+      })}
     >
       <Typography
         variant="body1"

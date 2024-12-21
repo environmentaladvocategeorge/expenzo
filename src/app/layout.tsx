@@ -39,6 +39,7 @@ const LayoutContent = ({ children }: { children: ReactNode }) => {
             display: "flex",
             height: "100vh",
             transition: "all 0.3s ease-in-out",
+            backgroundColor: theme.palette.neutral.lightGray,
           }}
         >
           <LoginModal
