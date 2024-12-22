@@ -87,7 +87,7 @@ const Home = () => {
                 variant="body1"
                 sx={{ color: theme.palette.neutral.gray, fontWeight: 700 }}
               >
-                NET WORTH
+                Net Worth
               </Typography>
               {loading || !accounts ? (
                 <Skeleton
@@ -122,14 +122,14 @@ const Home = () => {
             <Grid2 size={8}>
               <Box>
                 <AccountAccordion
-                  title="DEBIT ACCOUNTS"
+                  title="Debit Accounts"
                   balance={accounts?.debit.total_ledger || 0}
                   accounts={accounts?.debit.accounts || []}
                   loading={loading}
                   formatCurrency={formatCurrency}
                 />
                 <AccountAccordion
-                  title="CREDIT CARDS"
+                  title="Credit Cards"
                   balance={accounts?.credit.total_ledger || 0}
                   accounts={accounts?.credit.accounts || []}
                   loading={loading}
