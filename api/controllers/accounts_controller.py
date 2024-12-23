@@ -1,7 +1,4 @@
-import asyncio
-from typing import Union
 from fastapi import APIRouter, Depends, HTTPException, Body
-from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES, TellerAccount, TellerAccountBalance
 from services.authentication_service import AuthenticationService
 from schema.account_schema import AccountCreateRequest, AccountCreateResponse, AccountGetResponse
 from services.account_service import AccountService
