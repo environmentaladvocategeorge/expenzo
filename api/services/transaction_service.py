@@ -32,6 +32,8 @@ class TransactionService:
         transactions = []
         for item in items_transactions:
             transaction = Transaction(**item)
+
+            logger.info(transaction)
             
             entity_data = transaction.EntityData
             details_data = entity_data.get("details")
@@ -55,5 +57,5 @@ class TransactionService:
         
         transactions.sort(key=lambda x: x.date, reverse=True)
         
-        logger.info("Retrieved %d transactions for user: %s", len(transactions), user_id)
+        logger.info("Retrieved and sorted %d transactions for user: %s", len(transactions), user_id)
         return transactions
