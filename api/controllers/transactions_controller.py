@@ -21,3 +21,5 @@ def create_transcations_controller(transaction_service: TransactionService) -> A
         except Exception as e:
             logger.error(f"Error retrieving accounts for user {user_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to retrieve accounts")
+        
+    return router
