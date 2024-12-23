@@ -56,19 +56,27 @@ Resources:
                 - dynamodb:Scan
               Resource: !Ref DynamoDBTableArn
       Events:
-        ExpenzoApiGet:
+        ExpenzoApiGetAccounts:
           Type: Api
           Properties:
             Path: /accounts
             Method: GET
             RestApiId: !Ref ApiGateway
             Auth:
-              Authorizer: CognitoAuthorizer
-        ExpenzoApiPost:
+              Authorizer: CognitoAuthorize
+        ExpenzoApiPostAccounts:
           Type: Api
           Properties:
             Path: /accounts
             Method: POST
+            RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
+        ExpenzoApiGetTransactions:
+          Type: Api
+          Properties:
+            Path: /transactions
+            Method: GET
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer

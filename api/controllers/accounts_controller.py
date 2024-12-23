@@ -13,7 +13,7 @@ auth_service = AuthenticationService()
 
 def create_accounts_controller(account_service: AccountService) -> APIRouter:
     @router.get("/accounts")
-    async def fetch_accounts(user_id: str = Depends(auth_service.extract_user_id)) -> AccountGetResponse:
+    async def get_accounts(user_id: str = Depends(auth_service.extract_user_id)) -> AccountGetResponse:
         try:
             if not user_id:
                 logger.error("User ID is required but not provided.")
