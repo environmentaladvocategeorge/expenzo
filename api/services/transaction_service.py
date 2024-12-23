@@ -27,32 +27,22 @@ class TransactionService:
             KeyConditionExpression=Key("PK").eq(user_id),
             FilterExpression=Attr("EntityType").eq("Transaction")
         )
-        items_transactions = response_transactions.get("Items", [])
-        
+
         transactions = []
-        for item in items_transactions:
+        
+        for item in response_transactions.get("Items", []):
             transaction = Transaction(**item)
-
-            logger.info(transaction)
-            
             entity_data = transaction.EntityData
-            details_data = entity_data.get("details")
-
-            details = TellerTransactionDetails(
-                processing_status=details_data.get("processing_status") if details_data else None,
-                category=details_data.get("category") if details_data else None
-            )
-
             transactions.append(TellerTransaction(
-                details=details,
-                running_balance=entity_data.get("running_balance"),
-                description=entity_data.get("description"),
-                id=entity_data.get("id"),
-                date=entity_data.get("date"),
-                account_id=entity_data.get("account_id"),
-                amount=float(entity_data.get("amount")),
-                type=entity_data.get("type"),
-                status=entity_data.get("status")
+                details=TellerTransactionDetails(**entity_data["details"]),
+                running_balance=entity_data["running_balance"],
+                description=entity_data["description"],
+                id=entity_data["id"],
+                date=entity_data["date"],
+                account_id=entity_data["account_id"],
+                amount=float(entity_data["amount"]),
+                type=entity_data["type"],
+                status=entity_data["status"]
             ))
         
         transactions.sort(key=lambda x: x.date, reverse=True)
