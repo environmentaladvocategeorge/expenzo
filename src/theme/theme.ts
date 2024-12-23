@@ -58,7 +58,7 @@ const theme = createTheme({
     neutral: {
       white: "#ffffff",
       lightGray: "#f8f6ff",
-      gray: "#4c4b47",
+      gray: "#75746d",
       darkGray: "#434646",
       black: "#191919",
     },

@@ -20,6 +20,7 @@ import {
   AccountSummary,
   AccountSummarySkeleton,
 } from "@/components";
+import { HomeOutlined } from "@mui/icons-material";
 
 const Home = () => {
   const theme = useTheme();
@@ -65,12 +66,48 @@ const Home = () => {
             overflowY: "scroll",
           }}
         >
-          <Box p={2}>
-            <Typography variant="h4">Overview</Typography>
-            <Typography sx={{ color: theme.palette.neutral.gray }}>
-              {`Welcome home, ${getUserName()}`}
-            </Typography>
+          <Box p={2} sx={{ marginBottom: theme.spacing(2) }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: theme.spacing(3),
+              }}
+            >
+              <Box
+                sx={{
+                  backgroundColor: theme.palette.neutral.lightGray,
+                  color: theme.palette.neutral.gray,
+                  width: theme.spacing(6),
+                  height: theme.spacing(6),
+                  display: "flex",
+                  borderRadius: theme.spacing(1),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <HomeOutlined
+                  sx={{
+                    width: theme.spacing(4),
+                    height: theme.spacing(4),
+                    color: theme.palette.neutral.gray,
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="h5">Dashboard</Typography>
+                <Typography sx={{ color: theme.palette.neutral.gray }}>
+                  {`Welcome, ${getUserName()}`}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
+
           <Box
             sx={{
               borderRadius: theme.spacing(2),
