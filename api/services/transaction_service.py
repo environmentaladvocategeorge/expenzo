@@ -46,13 +46,13 @@ class TransactionService:
             transactions.append(TellerTransaction(
                 details=details,
                 running_balance=entity_data.get("running_balance"),
-                description=item.get("description"),
-                id=item.get("id"),
-                date=item.get("date"),
-                account_id=item.get("account_id"),
+                description=entity_data.get("description"),
+                id=entity_data.get("id"),
+                date=entity_data.get("date"),
+                account_id=entity_data.get("account_id"),
                 amount=float(entity_data.get("amount")),
-                type=item.get("type"),
-                status=item.get("status")
+                type=entity_data.get("type"),
+                status=entity_data.get("status")
             ))
         
         transactions.sort(key=lambda x: x.date, reverse=True)
