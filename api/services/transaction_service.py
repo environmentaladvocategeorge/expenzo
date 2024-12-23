@@ -34,10 +34,11 @@ class TransactionService:
             transaction = Transaction(**item)
             
             entity_data = transaction.EntityData
+            details_data = entity_data.get("details")
 
             details = TellerTransactionDetails(
-                processing_status=entity_data.get("processing_status"),
-                category=entity_data.get("category")
+                processing_status=details_data.get("processing_status") if details_data else None,
+                category=details_data.get("category") if details_data else None
             )
 
             transactions.append(TellerTransaction(
