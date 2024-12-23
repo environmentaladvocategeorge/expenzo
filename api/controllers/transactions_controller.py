@@ -15,7 +15,7 @@ def create_transcations_controller(transaction_service: TransactionService) -> A
                 logger.error("User ID is required but not provided.")
                 raise HTTPException(status_code=400, detail="User ID is required")
             
-            transactions = await transaction_service.get_transactions()
+            transactions = await transaction_service.get_transactions(user_id)
             logger.info(f"Transactions retrieved for {user_id}: {transactions}")
             return transaction_service
         except Exception as e:

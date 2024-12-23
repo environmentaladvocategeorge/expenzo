@@ -12,5 +12,10 @@ class TransactionService:
     def __init__(self, teller_service: TellerService):
         self.teller_service = teller_service
 
-    def get_transactions():
-        return []
+    def get_transactions(self, user_id):
+        table = db_client.get_table()
+        response = table.query(
+            KeyConditionExpression=Key("PK").eq(user_id),
+            FilterExpression=Attr("EntityType").eq("Transaction")
+        )
+        return response.items

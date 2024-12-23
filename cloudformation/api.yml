@@ -63,20 +63,20 @@ Resources:
             Method: GET
             RestApiId: !Ref ApiGateway
             Auth:
-              Authorizer: CognitoAuthorize
-        ExpenzoApiPostAccounts:
-          Type: Api
-          Properties:
-            Path: /accounts
-            Method: POST
-            RestApiId: !Ref ApiGateway
-            Auth:
               Authorizer: CognitoAuthorizer
         ExpenzoApiGetTransactions:
           Type: Api
           Properties:
             Path: /transactions
             Method: GET
+            RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
+        ExpenzoApiPostAccounts:
+          Type: Api
+          Properties:
+            Path: /accounts
+            Method: POST
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer
