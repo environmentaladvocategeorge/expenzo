@@ -14,6 +14,7 @@ import useTellerConnect from "../hooks/useTellerConnect";
 import { GetAccountsResponse } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchAccounts } from "@/services/accountService";
+import { fetchTransactions } from "@/services/transactionService";
 import { formatCurrency } from "@/utils/string_utils";
 import {
   AccountAccordion,
@@ -43,6 +44,7 @@ const Home = () => {
       try {
         setLoading(true);
         const accountsData = await fetchAccounts(getToken);
+        console.log(await fetchTransactions(getToken));
         setAccounts(accountsData);
       } catch (error) {
         console.error("Error fetching accounts:", error);

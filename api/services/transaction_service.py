@@ -1,5 +1,5 @@
 from services.teller_service import TellerService
-from models.account import AccountLink, Account, Balance
+from models.account import Transaction
 from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest, CategorizedAccounts
@@ -14,8 +14,13 @@ class TransactionService:
 
     def get_transactions(self, user_id):
         table = db_client.get_table()
-        response = table.query(
+        response_transactions = table.query(
             KeyConditionExpression=Key("PK").eq(user_id),
             FilterExpression=Attr("EntityType").eq("Transaction")
         )
-        return response.get("Items", [])
+        items_transactions = response_transactions.get("Items", [])
+        transactions = [Transaction(**item) for item in items_transactions]
+
+        logger.info("Retrieved %d transaactions for user: %s", len(transactions), user_id)
+
+        return transactions
