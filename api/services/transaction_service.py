@@ -1,8 +1,6 @@
 from services.teller_service import TellerService
 from models.account import Transaction
-from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
-from schema.account_schema import AccountCreateRequest, CategorizedAccounts
 from boto3.dynamodb.conditions import Key, Attr
 from utils.logger import get_logger
 
@@ -12,7 +10,19 @@ class TransactionService:
     def __init__(self, teller_service: TellerService):
         self.teller_service = teller_service
 
-    def get_transactions(self, user_id):
+    def get_transactions(self, user_id: str) -> list[Transaction]:
+        """
+        Retrieve all transactions for a given user from the database.
+
+        This method queries the database table to fetch all items associated with the specified `user_id`
+        that have an `EntityType` of "Transaction". The items are then converted into `Transaction` objects.
+
+        Args:
+            user_id (str): The ID of the user for whom transactions are to be retrieved.
+
+        Returns:
+            list[Transaction]: A list of `Transaction` objects representing the user's transactions.
+        """
         table = db_client.get_table()
         response_transactions = table.query(
             KeyConditionExpression=Key("PK").eq(user_id),
