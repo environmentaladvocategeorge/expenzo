@@ -1,5 +1,5 @@
 import apiClient from "@/lib/apiClient";
-import { GetAccountsResponse } from "../types/api";
+import { GetTransactionsResponse } from "../types/api";
 
 const client = apiClient();
 
@@ -14,14 +14,17 @@ const retryOnce = async <T,>(fn: () => Promise<T>): Promise<T> => {
 
 export const fetchTransactions = async (
   getToken: () => string | null
-): Promise<GetAccountsResponse> => {
+): Promise<GetTransactionsResponse> => {
   const token = getToken();
   const makeRequest = async () => {
-    const response = await client.get<GetAccountsResponse>(`/transactions`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
-      },
-    });
+    const response = await client.get<GetTransactionsResponse>(
+      `/transactions`,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      }
+    );
     return response.data;
   };
 

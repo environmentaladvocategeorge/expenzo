@@ -14,10 +14,12 @@ import {
   HomeOutlined,
   WalletOutlined,
   AttachMoneyOutlined,
+  ReceiptOutlined,
 } from "@mui/icons-material";
 
 const routes = [
   { label: "Dashboard", path: "/", icon: HomeOutlined },
+  { label: "Transactions", path: "/transactions", icon: ReceiptOutlined },
   { label: "Accounts", path: "/accounts", icon: WalletOutlined },
   { label: "Budgets", path: "/budgets", icon: AttachMoneyOutlined },
   {

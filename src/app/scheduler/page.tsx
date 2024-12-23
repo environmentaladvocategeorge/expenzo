@@ -2,7 +2,7 @@
 
 import * as Styled from "./page.styles";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Step from "@mui/material/Step";
@@ -11,11 +11,13 @@ import PaymentScheduleSummary from "./_components/PaymentScheduleSummary";
 import { PaymentSchedulerFormType } from "@/types/payment-scheduler-form";
 import { GridPageContainer } from "@/global.styles";
 import PaymentSchedulerForm from "./_components/PaymentSchedulerForm";
+import { useAuth } from "@/contexts/AuthenticationContext";
 
 const steps = ["Cash Flow In", "Payments", "Cash Flow Out", "Review"];
 
 const Scheduler = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const { isAuthenticated, setShowLoginModal } = useAuth();
   const methods = useForm<PaymentSchedulerFormType>({
     defaultValues: {
       cashFlowIn: {
@@ -39,6 +41,16 @@ const Scheduler = () => {
   const handleSubmit = methods.handleSubmit((data) => {
     console.log("Form submitted:", data);
   });
+
+  useEffect(() => {
+    const handleAuthentication = async () => {
+      if (!isAuthenticated) {
+        setShowLoginModal(true);
+        return;
+      }
+    };
+    handleAuthentication();
+  }, [isAuthenticated]);
 
   return (
     <FormProvider {...methods}>

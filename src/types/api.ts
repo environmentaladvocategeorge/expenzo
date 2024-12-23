@@ -53,3 +53,24 @@ export interface AccountCreateRequest {
   entity_data: Record<string, string>;
   metadata?: Record<string, any>;
 }
+
+interface TransactionDetails {
+  processing_status: string;
+  category?: string;
+}
+
+interface Transaction {
+  details: TransactionDetails;
+  running_balance?: number;
+  description: string;
+  id: string;
+  date: string;
+  account_id: string;
+  amount: number;
+  type: string;
+  status: string;
+}
+
+export interface GetTransactionsResponse {
+  transactions: Transaction[];
+}
