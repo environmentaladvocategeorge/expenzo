@@ -1,5 +1,5 @@
 from services.teller_service import TellerService
-from models.account import Transaction
+from models.transaction import Transaction
 from db.dynamodb_client import db_client
 from boto3.dynamodb.conditions import Key, Attr
 from utils.logger import get_logger

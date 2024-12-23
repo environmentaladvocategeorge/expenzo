@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 from services.account_service import AccountService
 from services.teller_service import TellerService
-from models.account import Account, AccountSync, Balance, Transaction
+from models.account import Account, AccountSync, Balance
+from models.transaction import Transaction
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
 from boto3.dynamodb.conditions import Attr

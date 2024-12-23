@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from models.account import Transaction
+from models.transaction import Transaction
 
 class TransactionGetResponse(BaseModel):
     transactions: list[Transaction]

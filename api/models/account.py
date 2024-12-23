@@ -23,17 +23,6 @@ class Balance(BaseModel):
     Timestamp: int
     Metadata: Optional[Dict[str, Any]] = {}
 
-class Transaction(BaseModel):
-    PK: str
-    SK: str
-    Provider: str
-    ProviderID: str
-    EntityType: str
-    EntityID: str
-    EntityData: Dict[str, Any]
-    Timestamp: int
-    Metadata: Optional[Dict[str, Any]] = {}
-
 class AccountLink(BaseModel):
     PK: str
     SK: str
