@@ -1,3 +1,4 @@
+from models.transaction import Transaction
 from services.teller_service import TellerService
 from models.teller import TellerTransaction, TellerTransactionDetails
 from db.dynamodb_client import db_client
@@ -30,25 +31,26 @@ class TransactionService:
         
         transactions = []
         for item in items_transactions:
-            entity_data = item.get("EntityData", {})
+            transaction = Transaction(**item)
             
+            entity_data = transaction.EntityData
+
             details = TellerTransactionDetails(
-                processing_status=entity_data.get("processing_status", ""),
+                processing_status=entity_data.get("processing_status"),
                 category=entity_data.get("category")
             )
-            
-            transaction = TellerTransaction(
+
+            transactions.append(TellerTransaction(
                 details=details,
                 running_balance=entity_data.get("running_balance"),
-                description=item.get("description", ""),
-                id=item.get("id", ""),
-                date=item.get("date", ""),
-                account_id=item.get("account_id", ""),
-                amount=float(entity_data.get("amount", 0)),
-                type=item.get("type", ""),
-                status=item.get("status", "")
-            )
-            transactions.append(transaction)
+                description=item.get("description"),
+                id=item.get("id"),
+                date=item.get("date"),
+                account_id=item.get("account_id"),
+                amount=float(entity_data.get("amount")),
+                type=item.get("type"),
+                status=item.get("status")
+            ))
         
         transactions.sort(key=lambda x: x.date, reverse=True)
         
