@@ -19,7 +19,7 @@ def create_transcations_controller(transaction_service: TransactionService) -> A
             logger.info(f"Transactions retrieved for {user_id}: {transactions}")
             return transaction_service
         except Exception as e:
-            logger.error(f"Error retrieving accounts for user {user_id}: {e}")
-            raise HTTPException(status_code=500, detail="Failed to retrieve accounts")
+            logger.error(f"Error retrieving transactions for user {user_id}: {e}")
+            raise HTTPException(status_code=500, detail="Failed to retrieve transactions")
         
     return router

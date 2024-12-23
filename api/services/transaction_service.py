@@ -18,4 +18,4 @@ class TransactionService:
             KeyConditionExpression=Key("PK").eq(user_id),
             FilterExpression=Attr("EntityType").eq("Transaction")
         )
-        return response.items
+        return response.get("Items", [])
