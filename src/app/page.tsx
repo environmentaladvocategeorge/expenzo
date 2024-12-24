@@ -1,59 +1,32 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   useTheme,
   Button,
   Typography,
   Skeleton,
-  Grid2,
+  Grid2 as Grid,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
-import useTellerConnect from "../hooks/useTellerConnect";
-import { GetAccountsResponse } from "@/types/api";
+import { Add, HomeOutlined } from "@mui/icons-material";
 import { useAuth } from "@/contexts/AuthenticationContext";
-import { fetchAccounts } from "@/services/accountService";
 import { formatCurrency } from "@/utils/string_utils";
 import {
   AccountAccordion,
   AccountSummary,
   AccountSummarySkeleton,
 } from "@/components";
-import { HomeOutlined } from "@mui/icons-material";
+import useTellerConnect from "../hooks/useTellerConnect";
+import { useAccounts } from "@/contexts/AccountsContext";
 
-const Home = () => {
+const Home: React.FC = () => {
   const theme = useTheme();
-  const { isAuthenticated, setShowLoginModal, getToken, getUserName } =
-    useAuth();
+  const { isAuthenticated, getUserName } = useAuth();
+  const { accounts, accountsLoading } = useAccounts();
   const openTellerConnect = useTellerConnect(
     process.env.NEXT_PUBLIC_APP_ID || ""
   );
-
-  const [accounts, setAccounts] = useState<GetAccountsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const handleAuthentication = async () => {
-      if (!isAuthenticated) {
-        setShowLoginModal(true);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const accountsData = await fetchAccounts(getToken);
-        setAccounts(accountsData);
-      } catch (error) {
-        console.error("Error fetching accounts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    handleAuthentication();
-  }, [isAuthenticated]);
 
   return (
     <>
@@ -94,12 +67,7 @@ const Home = () => {
                   }}
                 />
               </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography variant="h5">Dashboard</Typography>
                 <Typography sx={{ color: theme.palette.neutral.gray }}>
                   {`Welcome, ${getUserName()}`}
@@ -126,13 +94,8 @@ const Home = () => {
               >
                 Net Worth
               </Typography>
-              {loading || !accounts ? (
-                <Skeleton
-                  sx={{
-                    height: "32px",
-                    width: "120px",
-                  }}
-                />
+              {accountsLoading || !accounts ? (
+                <Skeleton sx={{ height: "32px", width: "120px" }} />
               ) : (
                 <Typography variant="h5">
                   {formatCurrency(
@@ -144,39 +107,36 @@ const Home = () => {
             <Button
               variant="contained"
               onClick={openTellerConnect}
-              sx={{
-                ml: "auto",
-                my: 2,
-              }}
-              disabled={loading}
+              sx={{ ml: "auto", my: 2 }}
+              disabled={accountsLoading}
               endIcon={<Add />}
             >
               Connect Account
             </Button>
           </Box>
 
-          <Grid2 container spacing={2}>
-            <Grid2 size={8}>
+          <Grid container spacing={2}>
+            <Grid size={8}>
               <Box>
                 <AccountAccordion
                   title="Debit Accounts"
                   balance={accounts?.debit.total_ledger || 0}
                   accounts={accounts?.debit.accounts || []}
-                  loading={loading}
+                  loading={accountsLoading}
                   formatCurrency={formatCurrency}
                 />
                 <AccountAccordion
                   title="Credit Cards"
                   balance={accounts?.credit.total_ledger || 0}
                   accounts={accounts?.credit.accounts || []}
-                  loading={loading}
+                  loading={accountsLoading}
                   formatCurrency={formatCurrency}
                 />
               </Box>
-            </Grid2>
+            </Grid>
 
-            <Grid2 size={4}>
-              {loading ? (
+            <Grid size={4}>
+              {accountsLoading ? (
                 <AccountSummarySkeleton />
               ) : (
                 <AccountSummary
@@ -184,8 +144,8 @@ const Home = () => {
                   formatCurrency={formatCurrency}
                 />
               )}
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </Box>
       )}
     </>

@@ -40,6 +40,7 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   transition: "margin-left 0.3s ease-in-out",
   borderTopLeftRadius: theme.spacing(4),
   borderBottomLeftRadius: theme.spacing(4),
+  width: "calc(100% - 248px)",
 }));
 
 export const GridPageContainer = styled(Box)({

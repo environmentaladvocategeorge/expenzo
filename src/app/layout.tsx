@@ -8,16 +8,22 @@ import { NavigationMenu } from "@/components";
 import { PageContainer } from "@/global.styles";
 import { AuthProvider, useAuth } from "@/contexts/AuthenticationContext";
 import LoginModal from "@/modals/LoginModal";
+import { AccountsProvider } from "@/contexts/AccountsContext";
+import { TransactionsProvider } from "@/contexts/TransactionsContext";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <AuthProvider>
-      <NavigationMenuProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <LayoutContent>{children}</LayoutContent>
-        </ThemeProvider>
-      </NavigationMenuProvider>
+      <AccountsProvider>
+        <TransactionsProvider>
+          <NavigationMenuProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <LayoutContent>{children}</LayoutContent>
+            </ThemeProvider>
+          </NavigationMenuProvider>
+        </TransactionsProvider>
+      </AccountsProvider>
     </AuthProvider>
   );
 };
