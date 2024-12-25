@@ -66,7 +66,8 @@ class TransactionService:
         table = db_client.get_table()
 
         response = table.query(
-            KeyConditionExpression=Key("PK").eq(user_id) & Key("EntityID").eq(transaction_id)
+            KeyConditionExpression=Key("PK").eq(user_id),
+            FilterExpression=Attr("EntityType").eq("Transaction") & Attr("EntityID").eq(transaction_id),
         )
 
         items = response.get("Items", [])
