@@ -20,7 +20,7 @@ const TransactionModal = ({
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const { getToken } = useAuth();
 
-  const { getTransactionById } = useTransactions();
+  const { getTransactionById, refreshTransactions } = useTransactions();
 
   const {
     register,
@@ -41,8 +41,8 @@ const TransactionModal = ({
 
   const onSubmit: SubmitHandler<Transaction> = async (data) => {
     console.log(data);
-    const response = await updateTransaction(getToken, transactionId || "");
-    console.log(response);
+    await updateTransaction(getToken, transactionId || "");
+    await refreshTransactions();
   };
 
   return (

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { GetTransactionsResponse, Transaction } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchTransactions } from "@/services/transactionService";
+import { isEqual } from "lodash";
 
 interface TransactionsContextType {
   transactions: GetTransactionsResponse | null;
@@ -14,6 +15,7 @@ interface TransactionsContextType {
   totalPages: number;
   paginatedTransactions: GetTransactionsResponse["transactions"];
   getTransactionById: (id: string) => Transaction | null;
+  refreshTransactions: () => Promise<void>;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(
@@ -38,6 +40,20 @@ export const TransactionsProvider = ({
     ? Math.ceil(transactions.transactions.length / itemsPerPage)
     : 1;
 
+  const refreshTransactions = async () => {
+    try {
+      setTransactionsLoading(true);
+      const transactionsData = await fetchTransactions(getToken);
+      if (!isEqual(transactions, transactionsData)) {
+        setTransactions(transactionsData);
+      }
+    } catch (error) {
+      console.error("Error refreshing transactions:", error);
+    } finally {
+      setTransactionsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const handleAuthentication = async () => {
       if (!isAuthenticated) {
@@ -49,7 +65,9 @@ export const TransactionsProvider = ({
       try {
         setTransactionsLoading(true);
         const transactionsData = await fetchTransactions(getToken);
-        setTransactions(transactionsData);
+        if (!isEqual(transactions, transactionsData)) {
+          setTransactions(transactionsData);
+        }
       } catch (error) {
         console.error("Error fetching transactions:", error);
       } finally {
@@ -85,6 +103,7 @@ export const TransactionsProvider = ({
         totalPages,
         paginatedTransactions,
         getTransactionById,
+        refreshTransactions,
       }}
     >
       {children}

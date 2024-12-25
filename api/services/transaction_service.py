@@ -74,17 +74,20 @@ class TransactionService:
         if not items:
             logger.warning("Transaction with ID %s not found for user: %s", transaction_id, user_id)
             return False
-    
+
         item = items[0]
         transaction = Transaction(**item)
         entity_data = transaction.EntityData
 
         for key, value in updated_fields.items():
             if key in entity_data:
-                entity_data[key] = value
+                if value is not None:
+                    entity_data[key] = value
+                else:
+                    logger.warning("Field %s is being passed as None, skipping update.", key)
             else:
                 logger.warning("Field %s does not exist in the transaction", key)
-
+                
         try:
             logger.info("Attempting to update transaction with PK %s and SK %s using EntityData %s", transaction.PK, transaction.SK, entity_data)
             table.update_item(
