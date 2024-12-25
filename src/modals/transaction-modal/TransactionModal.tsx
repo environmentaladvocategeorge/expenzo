@@ -4,6 +4,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useTransactions } from "@/contexts/TransactionsContext";
 import * as Styled from "./TransactionModal.styles";
 import { Transaction } from "@/types/api";
+import { updateTransaction } from "@/services/transactionService";
+import { useAuth } from "@/contexts/AuthenticationContext";
 
 const TransactionModal = ({
   open,
@@ -16,6 +18,7 @@ const TransactionModal = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const { getToken } = useAuth();
 
   const { getTransactionById } = useTransactions();
 
@@ -38,6 +41,8 @@ const TransactionModal = ({
 
   const onSubmit: SubmitHandler<Transaction> = async (data) => {
     console.log(data);
+    const response = await updateTransaction(getToken, transactionId || "");
+    console.log(response);
   };
 
   return (

@@ -30,3 +30,26 @@ export const fetchTransactions = async (
 
   return await retryOnce(makeRequest);
 };
+
+export const updateTransaction = async (
+  getToken: () => string | null,
+  transactionId: string
+): Promise<GetTransactionsResponse> => {
+  const token = getToken();
+  const makeRequest = async () => {
+    const response = await client.put<any>(
+      `/transactions/${transactionId}`,
+      {
+        category: "transfer",
+      },
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  return await retryOnce(makeRequest);
+};

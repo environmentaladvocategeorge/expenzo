@@ -1,14 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel
-from models.teller import TellerTransaction
-
-class TransactionGetResponse(BaseModel):
-    transactions: list[TellerTransaction]
 
 class TellerTransactionDetails(BaseModel):
-    transaction_type: Optional[str] = None
-    other_detail_field: Optional[str] = None
-
+    processing_status: Optional[str]
+    category: Optional[str]
+    
 class TransactionEditRequest(BaseModel):
     details: Optional[TellerTransactionDetails] = None
     running_balance: Optional[float] = None
