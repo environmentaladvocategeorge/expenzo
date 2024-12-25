@@ -3,32 +3,16 @@ import { GetTransactionsResponse } from "../types/api";
 
 const client = apiClient();
 
-const retryOnce = async <T,>(fn: () => Promise<T>): Promise<T> => {
-  try {
-    return await fn();
-  } catch (error) {
-    console.warn("Initial API call failed, retrying...", error);
-    return await fn();
-  }
-};
-
 export const fetchTransactions = async (
   getToken: () => string | null
 ): Promise<GetTransactionsResponse> => {
   const token = getToken();
-  const makeRequest = async () => {
-    const response = await client.get<GetTransactionsResponse>(
-      `/transactions`,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      }
-    );
-    return response.data;
-  };
-
-  return await retryOnce(makeRequest);
+  const response = await client.get<GetTransactionsResponse>(`/transactions`, {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : undefined,
+    },
+  });
+  return response.data;
 };
 
 export const updateTransaction = async (
@@ -36,20 +20,16 @@ export const updateTransaction = async (
   transactionId: string
 ): Promise<GetTransactionsResponse> => {
   const token = getToken();
-  const makeRequest = async () => {
-    const response = await client.put<any>(
-      `/transactions/${transactionId}`,
-      {
-        category: "transfer",
+  const response = await client.put<any>(
+    `/transactions/${transactionId}`,
+    {
+      details: { category: "transfer" },
+    },
+    {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined,
       },
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      }
-    );
-    return response.data;
-  };
-
-  return await retryOnce(makeRequest);
+    }
+  );
+  return response.data;
 };

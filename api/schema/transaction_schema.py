@@ -1,5 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel
+from models.teller import TellerTransaction
+
+class TransactionGetResponse(BaseModel):
+    transactions: list[TellerTransaction]
 
 class TellerTransactionDetails(BaseModel):
     processing_status: Optional[str]
