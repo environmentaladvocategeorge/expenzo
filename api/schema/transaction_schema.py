@@ -5,12 +5,12 @@ from models.teller import TellerTransaction
 class TransactionGetResponse(BaseModel):
     transactions: list[TellerTransaction]
 
-class TellerTransactionDetails(BaseModel):
-    processing_status: Optional[str]
-    category: Optional[str]
-    
-class TransactionEditRequest(BaseModel):
-    details: Optional[TellerTransactionDetails] = None
+class PartialTellerTransactionDetails(BaseModel):
+    processing_status: Optional[str] = None
+    category: Optional[str] = None
+
+class PartialTellerTransaction(BaseModel):
+    details: Optional[PartialTellerTransactionDetails] = None
     running_balance: Optional[float] = None
     description: Optional[str] = None
     id: Optional[str] = None
@@ -19,3 +19,6 @@ class TransactionEditRequest(BaseModel):
     amount: Optional[float] = None
     type: Optional[str] = None
     status: Optional[str] = None
+
+class TransactionEditRequest(PartialTellerTransaction):
+    pass
