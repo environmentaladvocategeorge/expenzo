@@ -86,10 +86,11 @@ class TransactionService:
                 logger.warning("Field %s does not exist in the transaction", key)
 
         try:
+            logger.info("Attempting to update transaction with PK %s and SK %s using EntityData %s", transaction.PK, transaction.SK, entity_data)
             table.update_item(
                 Key={
-                    "PK": user_id,
-                    "SK": transaction_id
+                    "PK": transaction.PK,
+                    "SK": transaction.SK
                 },
                 UpdateExpression="SET EntityData = :entity_data",
                 ExpressionAttributeValues={
