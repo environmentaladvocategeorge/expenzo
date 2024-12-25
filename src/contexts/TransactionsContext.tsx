@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { GetTransactionsResponse } from "@/types/api";
+import { GetTransactionsResponse, Transaction } from "@/types/api";
 import { useAuth } from "@/contexts/AuthenticationContext";
 import { fetchTransactions } from "@/services/transactionService";
 
@@ -13,6 +13,7 @@ interface TransactionsContextType {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   totalPages: number;
   paginatedTransactions: GetTransactionsResponse["transactions"];
+  getTransactionById: (id: string) => Transaction | null;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(
@@ -65,6 +66,14 @@ export const TransactionsProvider = ({
       currentPage * itemsPerPage
     ) || [];
 
+  const getTransactionById = (id: string) => {
+    if (!transactions) return null;
+    return (
+      transactions.transactions.find((transaction) => transaction.id === id) ||
+      null
+    );
+  };
+
   return (
     <TransactionsContext.Provider
       value={{
@@ -75,6 +84,7 @@ export const TransactionsProvider = ({
         setCurrentPage,
         totalPages,
         paginatedTransactions,
+        getTransactionById,
       }}
     >
       {children}

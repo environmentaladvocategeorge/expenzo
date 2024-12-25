@@ -6,6 +6,7 @@ import AccountSummarySkeleton from "./skeletons/account-summary-skeleton/Account
 import NavigationMenu from "./navigation-menu/NavigationMenu";
 import RadioSelect from "./radio-select/RadioSelect";
 import RadioSelectGroup from "./radio-select-group/RadioSelectGroup";
+import TransactionsTable from "./transaction-table/TransactionTable";
 
 export {
   Account,
@@ -16,4 +17,5 @@ export {
   NavigationMenu,
   RadioSelect,
   RadioSelectGroup,
+  TransactionsTable,
 };

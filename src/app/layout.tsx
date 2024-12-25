@@ -7,7 +7,7 @@ import theme from "@/theme/theme";
 import { NavigationMenu } from "@/components";
 import { PageContainer } from "@/global.styles";
 import { AuthProvider, useAuth } from "@/contexts/AuthenticationContext";
-import LoginModal from "@/modals/LoginModal";
+import LoginModal from "@/modals/login-modal/LoginModal";
 import { AccountsProvider } from "@/contexts/AccountsContext";
 import { TransactionsProvider } from "@/contexts/TransactionsContext";
 

@@ -54,12 +54,12 @@ export interface AccountCreateRequest {
   metadata?: Record<string, any>;
 }
 
-interface TransactionDetails {
+export interface TransactionDetails {
   processing_status: string;
   category?: string;
 }
 
-interface Transaction {
+export interface Transaction {
   details: TransactionDetails;
   running_balance?: number;
   description: string;

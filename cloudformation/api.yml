@@ -72,6 +72,14 @@ Resources:
             RestApiId: !Ref ApiGateway
             Auth:
               Authorizer: CognitoAuthorizer
+        ExpenzoApiPutTransactions:
+          Type: Api
+          Properties:
+            Path: /transactions/{transaction_id}
+            Method: PUT
+            RestApiId: !Ref ApiGateway
+            Auth:
+              Authorizer: CognitoAuthorizer
         ExpenzoApiPostAccounts:
           Type: Api
           Properties:
