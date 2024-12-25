@@ -81,13 +81,17 @@ class TransactionService:
 
         for key, value in updated_fields.items():
             if key in entity_data:
-                if value is not None:
-                    entity_data[key] = value
+                if isinstance(entity_data[key], dict): 
+                    for nested_key, nested_value in value.items():
+                        if nested_key in entity_data[key]:
+                            if nested_value is not None:
+                                entity_data[key][nested_key] = nested_value
+                                logger.info("Updated nested field %s in %s to %s", nested_key, key, nested_value)
                 else:
-                    logger.warning("Field %s is being passed as None, skipping update.", key)
-            else:
-                logger.warning("Field %s does not exist in the transaction", key)
-                
+                    if value is not None:
+                        entity_data[key] = value
+                        logger.info("Updated field %s to %s", key, value)
+                        
         try:
             logger.info("Attempting to update transaction with PK %s and SK %s using EntityData %s", transaction.PK, transaction.SK, entity_data)
             table.update_item(
