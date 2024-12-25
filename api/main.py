@@ -5,7 +5,7 @@ from mangum import Mangum
 from services.transaction_service import TransactionService
 from services.account_service import AccountService
 from controllers.accounts_controller import create_accounts_controller
-from controllers.transactions_controller import create_transcations_controller
+from controllers.transactions_controller import create_transactions_controller
 from services.certificate_service import CertificateService
 from services.teller_service import TellerService
 from services.scheduler_service import SchedulerService
@@ -42,6 +42,6 @@ transaction_service = TransactionService(teller_service=teller_service)
 scheduler_service = SchedulerService(account_service=account_service, teller_service=teller_service)
 
 app.include_router(create_accounts_controller(account_service))
-app.include_router(create_transcations_controller(transaction_service))
+app.include_router(create_transactions_controller(transaction_service))
 
 handler = Mangum(app)
