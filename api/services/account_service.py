@@ -235,7 +235,7 @@ class AccountService:
 
         return dict(categorized_accounts)
     
-    def get_account_sync_for_account(self, account: Account) -> AccountSync | None:
+    def get_account_sync_for_account(self, account: Account) -> Union[AccountSync, None]:
         """
         Retrieve the synchronization object for a specific account.
 
@@ -247,7 +247,7 @@ class AccountService:
             account (Account): The account for which to retrieve the synchronization object.
 
         Returns:
-            AccountSync | None: The synchronization object if found, otherwise None.
+            Union[AccountSync, None]: The synchronization object if found, otherwise None.
         """
         table = db_client.get_table()
 
