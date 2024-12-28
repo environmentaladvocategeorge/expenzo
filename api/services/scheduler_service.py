@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from services.account_service import AccountService
 from services.teller_service import TellerService
 from models.account import Account, Balance
+from models.teller import TellerTransaction
 from models.transaction import Transaction
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
@@ -130,7 +131,7 @@ class SchedulerService:
             None
         """
         try:
-            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions(account.ProviderID, account.EntityID)
+            transactions: list[TellerTransaction] = await self.teller_service.fetch_account_transactions(account.ProviderID, account.EntityID)
 
             for transaction in transactions:
                 transaction_data = transaction.model_dump()
@@ -159,19 +160,41 @@ class SchedulerService:
 
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
-                    if existing_entity_data != transaction_data:
+                    
+                    fields_to_compare = {
+                        "amount": existing_entity_data.get("amount"),
+                        "details.processing_status": existing_entity_data.get("details", {}).get("processing_status"),
+                        "status": existing_entity_data.get("status"),
+                    }
+                    new_values = {
+                        "amount": transaction_data.get("amount"),
+                        "details.processing_status": transaction_data.get("details", {}).get("processing_status"),
+                        "status": transaction_data.get("status"),
+                    }
+                
+                    updates = {
+                        field: new_value
+                        for field, new_value in new_values.items()
+                        if fields_to_compare.get(field) != new_value
+                    }
+                    
+                    if updates:
+                        update_expression = "SET " + ", ".join(
+                            f"EntityData.{field} = :{field.replace('.', '_')}" for field in updates.keys()
+                        ) + ", #ts = :timestamp"
+                        
+                        expression_attribute_values = {
+                            f":{field.replace('.', '_')}": value for field, value in updates.items()
+                        }
+                        expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
+                        
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
-                            UpdateExpression="SET EntityData = :new_data, #ts = :timestamp",
-                            ExpressionAttributeNames={
-                                "#ts": "Timestamp" 
-                            },
-                            ExpressionAttributeValues={
-                                ":new_data": transaction_data,
-                                ":timestamp": int(datetime.now(tz=timezone.utc).timestamp()),
-                            },
+                            UpdateExpression=update_expression,
+                            ExpressionAttributeNames={"#ts": "Timestamp"},
+                            ExpressionAttributeValues=expression_attribute_values,
                         )
-                        logger.info(f"Updated transaction object with PK {account.PK} and SK {sk}")
+                        logger.info(f"Updated transaction object with PK {account.PK} and SK {sk} for fields: {list(updates.keys())}")
                     else:
                         logger.info(f"No changes detected for transaction with PK {account.PK} and SK {sk}")
                 else:
