@@ -164,9 +164,7 @@ class SchedulerService:
                     existing_entity_data = existing_transaction.get("EntityData", {})
                     update_expressions = []
                     expression_attribute_names = {"#ts": "Timestamp"}
-                    expression_attribute_values = {
-                        ":timestamp": int(datetime.now(tz=timezone.utc).timestamp())
-                    }
+                    expression_attribute_values = {}
 
                     if existing_entity_data.get("amount") != transaction_data["amount"]:
                         update_expressions.append("EntityData.amount = :amount")
@@ -188,6 +186,9 @@ class SchedulerService:
                         expression_attribute_values[":date"] = transaction_data["date"]
 
                     if update_expressions:
+                        update_expressions.append("EntityData.#ts = :timestamp")
+                        expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
+
                         update_expression = f"SET {', '.join(update_expressions)}"
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
