@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Union
 from models.teller import CREDIT_SUBTYPES, DEPOSITORY_SUBTYPES
 from services.teller_service import TellerService
-from models.account import AccountLink, Account, Balance
+from models.account import AccountLink, Account, Balance, AccountSync
 from models.teller import TellerAccountBalance, TellerAccount
 from db.dynamodb_client import db_client
 from schema.account_schema import AccountCreateRequest, CategorizedAccounts
@@ -234,3 +234,30 @@ class AccountService:
                 categorized_accounts["credit"].total_available += available_balance
 
         return dict(categorized_accounts)
+    
+    def get_account_sync_for_account(self, account: Account) -> AccountSync | None:
+        """
+        Retrieve the synchronization object for a specific account.
+
+        This function queries the database to find a synchronization object 
+        (AccountSync) associated with the given account. If no such object 
+        exists, it returns None.
+
+        Args:
+            account (Account): The account for which to retrieve the synchronization object.
+
+        Returns:
+            AccountSync | None: The synchronization object if found, otherwise None.
+        """
+        table = db_client.get_table()
+
+        response = table.query(
+            KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
+            ExpressionAttributeValues={
+                ":pk": account.PK,
+                ":sk_prefix": account.SK.replace("Account#", "Sync#"),
+            }
+        )
+
+        items = response.get("Items")
+        return AccountSync(**items[0]) if items else None
