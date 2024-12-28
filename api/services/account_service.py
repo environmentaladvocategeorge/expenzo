@@ -251,6 +251,8 @@ class AccountService:
         """
         table = db_client.get_table()
 
+        logger.info("Fetching account sync object with PK %s and SK %s", account.PK, account.SK.replace("Account#", "Sync#"))
+        
         response = table.query(
             KeyConditionExpression="PK = :pk and begins_with(SK, :sk_prefix)",
             ExpressionAttributeValues={
