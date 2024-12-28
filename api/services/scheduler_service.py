@@ -160,7 +160,7 @@ class SchedulerService:
 
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
-                
+        
                     fields_to_compare = {
                         "amount": existing_entity_data.get("amount"),
                         "details.processing_status": existing_entity_data.get("details", {}).get("processing_status"),
@@ -173,7 +173,7 @@ class SchedulerService:
                         "status": transaction_data.get("status"),
                         "date": transaction_data.get("date"),
                     }
-                    
+                
                     updates = {
                         field: new_value
                         for field, new_value in new_values.items()
@@ -181,8 +181,14 @@ class SchedulerService:
                     }
                     
                     if updates:
+                        expression_attribute_names = {
+                            f"#attr_{field.replace('.', '_')}": field.split('.')[-1] for field in updates.keys()
+                        }
+                        expression_attribute_names["#ts"] = "Timestamp"
+
                         update_expression = "SET " + ", ".join(
-                            f"EntityData.{field} = :{field.replace('.', '_')}" for field in updates.keys()
+                            f"EntityData.{'.'.join(['#attr_' + part for part in field.split('.')])} = :{field.replace('.', '_')}"
+                            for field in updates.keys()
                         ) + ", #ts = :timestamp"
                         
                         expression_attribute_values = {
@@ -190,14 +196,14 @@ class SchedulerService:
                         }
                         expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
                         
-                        logger.info(f"Updating transaction object with PK {account.PK} and SK {sk} for fields: {list(updates.keys())}")
                         logger.info(f"Update Expression: {update_expression}")
+                        logger.info(f"Expression Attribute Names: {expression_attribute_names}")
                         logger.info(f"Expression Attribute Values: {expression_attribute_values}")
                         
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
                             UpdateExpression=update_expression,
-                            ExpressionAttributeNames={"#ts": "Timestamp"},
+                            ExpressionAttributeNames=expression_attribute_names,
                             ExpressionAttributeValues=expression_attribute_values,
                         )
                         logger.info(f"Updated transaction object with PK {account.PK} and SK {sk} for fields: {list(updates.keys())}")
