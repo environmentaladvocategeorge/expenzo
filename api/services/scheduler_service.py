@@ -159,7 +159,11 @@ class SchedulerService:
 
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
-                    if existing_entity_data != transaction_data:
+                    
+                    existing_entity_data_without_category = {k: v for k, v in existing_entity_data.items() if k != "category"}
+                    transaction_data_without_category = {k: v for k, v in transaction_data.items() if k != "category"}
+
+                    if existing_entity_data_without_category != transaction_data_without_category:
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
                             UpdateExpression="SET EntityData = :new_data, #ts = :timestamp",
