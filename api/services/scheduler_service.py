@@ -175,4 +175,10 @@ class SchedulerService:
 
     async def consolidate_transactions(self, account: Account):
         account_sync = self.account_service.get_account_sync_for_account(account)
-        logger.info(account_sync)
+        if (account_sync):
+            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions(
+                account.ProviderID, 
+                account.EntityID, 
+                account_sync.EntityData.get("last_transaction")
+            )
+            logger.info(transactions)
