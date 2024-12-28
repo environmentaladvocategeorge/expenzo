@@ -86,7 +86,6 @@ class SchedulerService:
                 logger.info(f"Finished syncing transactions for {account_item['EntityId']}")
             except Exception as e:
                 logger.warning(f"Account item with PK {account_item['PK']} and SK {account_item['SK']} already exists. Skipping insert.")
-                await self.consolidate_transactions(account_to_insert)
 
             try:
                 self.table.update_item(
