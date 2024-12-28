@@ -168,26 +168,24 @@ class SchedulerService:
                         ":timestamp": int(datetime.now(tz=timezone.utc).timestamp())
                     }
 
-                    attributes_to_check = {
-                        "amount": "EntityData.amount", 
-                        "details.processing_status": "EntityData.#attr_details.#attr_processing_status",
-                        "status": "EntityData.status",
-                        "date": "EntityData.#attr_date"
-                    }
+                    if existing_entity_data.get("amount") != transaction_data["amount"]:
+                        update_expressions.append("EntityData.amount = :amount")
+                        expression_attribute_values[":amount"] = transaction_data["amount"]
 
-                    for key, db_attr in attributes_to_check.items():
-                        keys = key.split(".") 
-                        value = transaction_data
-                        for k in keys:
-                            value = value.get(k, {} if k == "details" else None) 
-                        
-                        if existing_entity_data.get(key.split(".")[0]) != value:
-                            update_expressions.append(db_attr)
-                            expression_attribute_values[f":{key.split('.')[-1]}"] = value
-        
-                            if len(keys) > 1:
-                                expression_attribute_names[f"#attr_{keys[1]}"] = keys[1]
-                                expression_attribute_names[f"#attr_{keys[2]}"] = keys[2] if len(keys) > 2 else keys[1]
+                    if existing_entity_data.get("details", {}).get("processing_status") != transaction_data["details"]["processing_status"]:
+                        update_expressions.append("EntityData.#attr_details.#attr_processing_status = :details_processing_status")
+                        expression_attribute_names["#attr_details"] = "details"
+                        expression_attribute_names["#attr_processing_status"] = "processing_status"
+                        expression_attribute_values[":details_processing_status"] = transaction_data["details"]["processing_status"]
+
+                    if existing_entity_data.get("status") != transaction_data["status"]:
+                        update_expressions.append("EntityData.status = :status")
+                        expression_attribute_values[":status"] = transaction_data["status"]
+
+                    if existing_entity_data.get("date") != transaction_data["date"]:
+                        update_expressions.append("EntityData.#attr_date = :date")
+                        expression_attribute_names["#attr_date"] = "date"
+                        expression_attribute_values[":date"] = transaction_data["date"]
 
                     if update_expressions:
                         update_expression = f"SET {', '.join(update_expressions)}"
