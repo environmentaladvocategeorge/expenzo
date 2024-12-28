@@ -162,7 +162,10 @@ class SchedulerService:
                     if existing_entity_data != transaction_data:
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
-                            UpdateExpression="SET EntityData = :new_data, Timestamp = :timestamp",
+                            UpdateExpression="SET EntityData = :new_data, #ts = :timestamp",
+                            ExpressionAttributeNames={
+                                "#ts": "Timestamp" 
+                            },
                             ExpressionAttributeValues={
                                 ":new_data": transaction_data,
                                 ":timestamp": int(datetime.now(tz=timezone.utc).timestamp()),
