@@ -3,7 +3,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from models.account import AccountLink
 from services.certificate_service import CertificateService
-from typing import List
+from typing import List, Optional
 from models.teller import TellerAccount, TellerAccountBalance, TellerTransaction
 from utils.logger import get_logger
 
@@ -77,13 +77,16 @@ class TellerService:
             logger.error(f"Unexpected error when calling Teller: {e}")
             raise RuntimeError("An unexpected error occurred when calling Teller")
         
-    async def fetch_account_transactions(self, access_token: str, account_id: str) -> List[TellerTransaction]:
+    async def fetch_account_transactions(
+        self, access_token: str, account_id: str, from_transaction_id: Optional[str] = None
+    ) -> List[TellerTransaction]:
         """
         Fetches the transactions for an account from Teller for a given account ID using the provided access token.
 
         Args:
             access_token (str): The access token associated with the linked account.
             account_id (str): The unique identifier for the account whose transactions is to be fetched.
+            from_transaction_id (Optional[str]): The ID of the transaction to start fetching from (optional).
 
         Returns:
             List[TellerTransaction]: A list of TellerTransaction objects.
@@ -91,6 +94,9 @@ class TellerService:
         cert_file_path, key_file_path = self.certificate_service.load_certificates()
 
         api_url = f"https://api.teller.io/accounts/{account_id}/transactions"
+        if from_transaction_id:
+            api_url += f"?from_id={from_transaction_id}"
+
         headers = {'Content-Type': 'application/json'}
         auth = HTTPBasicAuth(access_token, '')
 
@@ -100,7 +106,7 @@ class TellerService:
             data = response.json()
             
             logger.info("Response from Teller: %s", data)
-            return [TellerTransaction(**transaction) for transaction in response.json()]
+            return [TellerTransaction(**transaction) for transaction in data]
         except requests.exceptions.RequestException as e:
             logger.error(f"Teller API request error: {e}")
             raise RuntimeError("Failed to call Teller API")
