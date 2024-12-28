@@ -119,7 +119,7 @@ class SchedulerService:
                 logger.error(f"Failed to upsert balance item with PK {balance_item['PK']} and SK {balance_item['SK']}: {str(e)}")
         
         return accounts_with_balances
-    
+
     async def sync_transactions_for_account(self, account: Account):
         """
         Sync transactions for a given account and update the database.
@@ -131,7 +131,9 @@ class SchedulerService:
             None
         """
         try:
-            transactions: list[TellerTransaction] = await self.teller_service.fetch_account_transactions(account.ProviderID, account.EntityID)
+            transactions: list[TellerTransaction] = await self.teller_service.fetch_account_transactions(
+                account.ProviderID, account.EntityID
+            )
 
             for transaction in transactions:
                 transaction_data = transaction.model_dump()
@@ -160,53 +162,40 @@ class SchedulerService:
 
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
-        
-                    fields_to_compare = {
-                        "amount": existing_entity_data.get("amount"),
-                        "details.processing_status": existing_entity_data.get("details", {}).get("processing_status"),
-                        "status": existing_entity_data.get("status"),
-                        "date": existing_entity_data.get("date"),
+                    update_expressions = []
+                    expression_attribute_names = {"#ts": "Timestamp"}
+                    expression_attribute_values = {
+                        ":timestamp": int(datetime.now(tz=timezone.utc).timestamp())
                     }
-                    new_values = {
-                        "amount": transaction_data.get("amount"),
-                        "details.processing_status": transaction_data.get("details", {}).get("processing_status"),
-                        "status": transaction_data.get("status"),
-                        "date": transaction_data.get("date"),
-                    }
-                
-                    updates = {
-                        field: new_value
-                        for field, new_value in new_values.items()
-                        if fields_to_compare.get(field) != new_value
-                    }
-                    
-                    if updates:
-                        expression_attribute_names = {
-                            f"#attr_{field.replace('.', '_')}": field.split('.')[-1] for field in updates.keys()
-                        }
-                        expression_attribute_names["#ts"] = "Timestamp"
 
-                        update_expression = "SET " + ", ".join(
-                            f"EntityData.{'.'.join(['#attr_' + part for part in field.split('.')])} = :{field.replace('.', '_')}"
-                            for field in updates.keys()
-                        ) + ", #ts = :timestamp"
-                        
-                        expression_attribute_values = {
-                            f":{field.replace('.', '_')}": value for field, value in updates.items()
-                        }
-                        expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
-                        
-                        logger.info(f"Update Expression: {update_expression}")
-                        logger.info(f"Expression Attribute Names: {expression_attribute_names}")
-                        logger.info(f"Expression Attribute Values: {expression_attribute_values}")
-                        
+                    if existing_entity_data.get("amount") != transaction_data["amount"]:
+                        update_expressions.append("EntityData.amount = :amount")
+                        expression_attribute_values[":amount"] = transaction_data["amount"]
+
+                    if existing_entity_data.get("details", {}).get("processing_status") != transaction_data["details"]["processing_status"]:
+                        update_expressions.append("EntityData.#attr_details.#attr_processing_status = :details_processing_status")
+                        expression_attribute_names["#attr_details"] = "details"
+                        expression_attribute_names["#attr_processing_status"] = "processing_status"
+                        expression_attribute_values[":details_processing_status"] = transaction_data["details"]["processing_status"]
+
+                    if existing_entity_data.get("status") != transaction_data["status"]:
+                        update_expressions.append("EntityData.status = :status")
+                        expression_attribute_values[":status"] = transaction_data["status"]
+
+                    if existing_entity_data.get("date") != transaction_data["date"]:
+                        update_expressions.append("EntityData.#attr_date = :date")
+                        expression_attribute_names["#attr_date"] = "date"
+                        expression_attribute_values[":date"] = transaction_data["date"]
+
+                    if update_expressions:
+                        update_expression = f"SET {', '.join(update_expressions)}"
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
                             UpdateExpression=update_expression,
                             ExpressionAttributeNames=expression_attribute_names,
                             ExpressionAttributeValues=expression_attribute_values,
                         )
-                        logger.info(f"Updated transaction object with PK {account.PK} and SK {sk} for fields: {list(updates.keys())}")
+                        logger.info(f"Updated transaction object with PK {account.PK} and SK {sk}")
                     else:
                         logger.info(f"No changes detected for transaction with PK {account.PK} and SK {sk}")
                 else:

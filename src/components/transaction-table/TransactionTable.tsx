@@ -217,11 +217,16 @@ const TransactionsTable = ({
                     }}
                   >
                     <TableCell sx={{ width: "11.75%", fontWeight: 500 }}>
-                      {new Date(transaction.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {transaction.status === "pending"
+                        ? "---"
+                        : new Date(transaction.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
                     </TableCell>
                     <TableCell
                       sx={{
