@@ -163,7 +163,10 @@ class SchedulerService:
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
                     update_expressions = []
-                    expression_attribute_names = {"#ts": "Timestamp"}
+                    expression_attribute_names = {
+                        "#ts": "Timestamp",
+                        "#attr_status": "status"
+                    }
                     expression_attribute_values = {}
 
                     if existing_entity_data.get("amount") != transaction_data["amount"]:
@@ -177,7 +180,7 @@ class SchedulerService:
                         expression_attribute_values[":details_processing_status"] = transaction_data["details"]["processing_status"]
 
                     if existing_entity_data.get("status") != transaction_data["status"]:
-                        update_expressions.append("EntityData.status = :status")
+                        update_expressions.append("EntityData.#attr_status = :status")
                         expression_attribute_values[":status"] = transaction_data["status"]
 
                     if existing_entity_data.get("date") != transaction_data["date"]:
