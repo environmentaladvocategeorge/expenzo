@@ -81,7 +81,7 @@ class TransactionService:
 
         for key, value in updated_fields.items():
             if key in entity_data:
-                if isinstance(entity_data[key], dict): 
+                if isinstance(entity_data[key], dict) and isinstance(value, dict): 
                     for nested_key, nested_value in value.items():
                         if nested_key in entity_data[key]:
                             if nested_value is not None:
@@ -91,7 +91,6 @@ class TransactionService:
                     if value is not None:
                         entity_data[key] = value
                         logger.info("Updated field %s to %s", key, value)
-                        
         try:
             logger.info("Attempting to update transaction with PK %s and SK %s using EntityData %s", transaction.PK, transaction.SK, entity_data)
             table.update_item(

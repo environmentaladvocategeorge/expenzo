@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -30,6 +30,12 @@ const AccountAccordion = ({
 }: AccountAccordionProps) => {
   const [expanded, setExpanded] = useState(true);
   const theme = useTheme();
+
+  useEffect(() => {
+    if (!loading && accounts.length === 0) {
+      setExpanded(false);
+    }
+  }, [loading, accounts]);
 
   const handleToggle = () => {
     setExpanded((prev) => !prev);

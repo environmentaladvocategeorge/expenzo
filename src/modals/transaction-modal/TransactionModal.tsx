@@ -17,33 +17,80 @@ const TransactionModal = ({
   transactionId?: string;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [initialTransaction, setInitialTransaction] =
+    useState<Transaction | null>(null);
   const { getToken } = useAuth();
-
   const { getTransactionById, refreshTransactions } = useTransactions();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
+    watch,
   } = useForm<Transaction>();
+
+  const watchedFields = watch();
 
   useEffect(() => {
     if (transactionId) {
       const fetchedTransaction = getTransactionById(transactionId);
       if (fetchedTransaction) {
-        setTransaction(fetchedTransaction);
+        setErrorMessage(null);
+        setInitialTransaction(fetchedTransaction);
+        reset(fetchedTransaction);
       } else {
         setErrorMessage("Transaction not found");
       }
+    } else {
+      reset();
+      setInitialTransaction(null);
     }
-  }, [transactionId, getTransactionById]);
+  }, [transactionId, getTransactionById, reset]);
+
+  const deepDiff = (obj1: any, obj2: any): any => {
+    const diff: any = {};
+
+    for (const key in obj1) {
+      if (obj1.hasOwnProperty(key)) {
+        if (
+          typeof obj1[key] === "object" &&
+          obj1[key] !== null &&
+          !Array.isArray(obj1[key])
+        ) {
+          const nestedDiff = deepDiff(obj1[key], obj2[key]);
+          if (Object.keys(nestedDiff).length > 0) {
+            diff[key] = nestedDiff;
+          }
+        } else if (obj1[key] !== obj2[key]) {
+          diff[key] = obj1[key];
+        }
+      }
+    }
+
+    return diff;
+  };
 
   const onSubmit: SubmitHandler<Transaction> = async (data) => {
-    console.log(data);
-    await updateTransaction(getToken, transactionId || "");
-    await refreshTransactions();
+    try {
+      const updatedAttributes = deepDiff(data, initialTransaction);
+
+      if (Object.keys(updatedAttributes).length > 0) {
+        await updateTransaction(
+          getToken,
+          transactionId || "",
+          updatedAttributes
+        );
+        await refreshTransactions();
+      }
+      onClose();
+    } catch {
+      setErrorMessage("Failed to update transaction");
+    }
   };
+
+  const isSaveDisabled =
+    JSON.stringify(watchedFields) === JSON.stringify(initialTransaction);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -51,14 +98,14 @@ const TransactionModal = ({
         {errorMessage && (
           <Styled.Alert severity="error">{errorMessage}</Styled.Alert>
         )}
-        <Styled.ModalTitle variant="h6">Transaction</Styled.ModalTitle>
+        <Styled.ModalTitle variant="h6">Edit Transaction</Styled.ModalTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Styled.TextField
             label="ID"
             fullWidth
             variant="outlined"
             value={transactionId || ""}
-            slotProps={{ input: { readOnly: true } }}
+            InputProps={{ readOnly: true }}
           />
           <Styled.TextField
             label="Date"
@@ -68,7 +115,6 @@ const TransactionModal = ({
             {...register("date", { required: "Date is required" })}
             error={!!errors.date}
             helperText={errors.date?.message}
-            defaultValue={transaction?.date}
           />
           <Styled.TextField
             label="Description"
@@ -79,7 +125,6 @@ const TransactionModal = ({
             })}
             error={!!errors.description}
             helperText={errors.description?.message}
-            defaultValue={transaction?.description}
             multiline
           />
           <Styled.TextField
@@ -87,26 +132,27 @@ const TransactionModal = ({
             fullWidth
             variant="outlined"
             type="number"
+            inputProps={{ step: "any" }}
             {...register("amount", { required: "Amount is required" })}
             error={!!errors.amount}
             helperText={errors.amount?.message}
-            defaultValue={transaction?.amount}
           />
           <Styled.TextField
             label="Category"
             fullWidth
             variant="outlined"
+            {...register("details.category")}
             error={!!errors.details?.category}
             helperText={errors.details?.category?.message}
-            defaultValue={transaction?.details?.category}
           />
           <Styled.SubmitButton
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
+            disabled={isSaveDisabled}
           >
-            EDIT
+            Save
           </Styled.SubmitButton>
           <Styled.CloseButton
             variant="outlined"
@@ -114,7 +160,7 @@ const TransactionModal = ({
             fullWidth
             onClick={onClose}
           >
-            CLOSE
+            Close
           </Styled.CloseButton>
         </form>
       </Styled.ModalContainer>

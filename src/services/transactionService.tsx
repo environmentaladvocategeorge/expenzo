@@ -1,5 +1,5 @@
 import apiClient from "@/lib/apiClient";
-import { GetTransactionsResponse } from "../types/api";
+import { GetTransactionsResponse, Transaction } from "../types/api";
 
 const client = apiClient();
 
@@ -17,13 +17,14 @@ export const fetchTransactions = async (
 
 export const updateTransaction = async (
   getToken: () => string | null,
-  transactionId: string
+  transactionId: string,
+  transaction: Partial<Transaction>
 ): Promise<GetTransactionsResponse> => {
   const token = getToken();
   const response = await client.put<any>(
     `/transactions/${transactionId}`,
     {
-      details: { category: "transfer" },
+      ...transaction,
     },
     {
       headers: {
