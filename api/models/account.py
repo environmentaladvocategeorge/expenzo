@@ -32,11 +32,3 @@ class AccountLink(BaseModel):
     EntityData: Dict[str, Any]
     Timestamp: int
     Metadata: Optional[Dict[str, Any]] = {}
-
-class AccountSync(BaseModel):
-    PK: str
-    SK: str
-    Provider: str
-    EntityType: str
-    EntityData: Dict[str, Any]
-    Timestamp: int

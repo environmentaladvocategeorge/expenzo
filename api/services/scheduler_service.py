@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from services.account_service import AccountService
 from services.teller_service import TellerService
-from models.account import Account, AccountSync, Balance
+from models.account import Account, Balance
 from models.transaction import Transaction
 from db.dynamodb_client import db_client
 from schema.account_schema import CategorizedAccounts
@@ -142,9 +142,10 @@ class SchedulerService:
                 )
                 transaction_data['amount'] = str(transaction_data.get('amount'))
 
+                sk = f"Provider#{account.Provider}#Transaction#{account.ProviderID}#EntityID#{transaction_data['id']}"
                 transaction_to_insert = Transaction(
                     PK=account.PK,
-                    SK=f"Provider#{account.Provider}#Transaction#{account.ProviderID}#EntityID#{transaction_data['id']}",
+                    SK=sk,
                     Provider=account.Provider,
                     ProviderID=account.ProviderID,
                     EntityType="Transaction",
@@ -153,32 +154,27 @@ class SchedulerService:
                     Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
                 )
 
-                self.table.put_item(Item=transaction_to_insert.model_dump())
+                existing_transaction = self.table.get_item(
+                    Key={"PK": account.PK, "SK": sk}
+                ).get("Item")
 
-                logger.info(f"Inserted new transaction object with PK {transaction_to_insert.PK} and SK {transaction_to_insert.SK}")
-
-            account_sync_to_insert = AccountSync(
-                PK=account.PK,
-                SK=f"Provider#{account.Provider}#Sync#{account.ProviderID}#EntityID#{account.EntityID}",
-                Provider=account.Provider,
-                EntityType='Sync',
-                EntityData={
-                    "last_transaction": transactions[0].id
-                },
-                Timestamp=int(datetime.now(tz=timezone.utc).timestamp()),
-            )
-
-            self.table.put_item(Item=account_sync_to_insert.model_dump())
+                if existing_transaction:
+                    existing_entity_data = existing_transaction.get("EntityData", {})
+                    if existing_entity_data != transaction_data:
+                        self.table.update_item(
+                            Key={"PK": account.PK, "SK": sk},
+                            UpdateExpression="SET EntityData = :new_data, Timestamp = :timestamp",
+                            ExpressionAttributeValues={
+                                ":new_data": transaction_data,
+                                ":timestamp": int(datetime.now(tz=timezone.utc).timestamp()),
+                            },
+                        )
+                        logger.info(f"Updated transaction object with PK {account.PK} and SK {sk}")
+                    else:
+                        logger.info(f"No changes detected for transaction with PK {account.PK} and SK {sk}")
+                else:
+                    self.table.put_item(Item=transaction_to_insert.model_dump())
+                    logger.info(f"Inserted new transaction object with PK {transaction_to_insert.PK} and SK {transaction_to_insert.SK}")
 
         except Exception as e:
             logger.error(f"An error occurred while syncing transactions for account {account.PK}: {e}")
-
-    async def consolidate_transactions(self, account: Account):
-        account_sync = self.account_service.get_account_sync_for_account(account)
-        if (account_sync):
-            transactions: list[Transaction] = await self.teller_service.fetch_account_transactions(
-                account.ProviderID, 
-                account.EntityID, 
-                account_sync.EntityData.get("last_transaction")
-            )
-            logger.info(transactions)
