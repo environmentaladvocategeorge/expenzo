@@ -213,8 +213,11 @@ class AccountService:
             dict[CategorizedAccounts]: Categorized accounts with total balances and account details.
         """
         logger.info("Categorizing %s accounts", len(accounts_with_balances))
-        
-        categorized_accounts = defaultdict(lambda: CategorizedAccounts(accounts=[], total_ledger=0, total_available=0))
+    
+        categorized_accounts = {
+            "debit": CategorizedAccounts(accounts=[], total_ledger=0, total_available=0),
+            "credit": CategorizedAccounts(accounts=[], total_ledger=0, total_available=0),
+        }
         
         for account_data in accounts_with_balances:
             subtype = account_data["details"].subtype
@@ -233,4 +236,4 @@ class AccountService:
                 categorized_accounts["credit"].total_ledger += -ledger_balance
                 categorized_accounts["credit"].total_available += available_balance
 
-        return dict(categorized_accounts)
+        return categorized_accounts
