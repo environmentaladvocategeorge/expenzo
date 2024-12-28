@@ -105,7 +105,7 @@ const TransactionModal = ({
             fullWidth
             variant="outlined"
             value={transactionId || ""}
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
           />
           <Styled.TextField
             label="Date"
@@ -115,6 +115,7 @@ const TransactionModal = ({
             {...register("date", { required: "Date is required" })}
             error={!!errors.date}
             helperText={errors.date?.message}
+            slotProps={{ input: { readOnly: true } }}
           />
           <Styled.TextField
             label="Description"
@@ -132,10 +133,13 @@ const TransactionModal = ({
             fullWidth
             variant="outlined"
             type="number"
-            inputProps={{ step: "any" }}
             {...register("amount", { required: "Amount is required" })}
             error={!!errors.amount}
             helperText={errors.amount?.message}
+            slotProps={{
+              input: { readOnly: true },
+              htmlInput: { step: "any" },
+            }}
           />
           <Styled.TextField
             label="Category"

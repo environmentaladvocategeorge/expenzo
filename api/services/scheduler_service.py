@@ -119,7 +119,7 @@ class SchedulerService:
                 logger.error(f"Failed to upsert balance item with PK {balance_item['PK']} and SK {balance_item['SK']}: {str(e)}")
         
         return accounts_with_balances
-
+    
     async def sync_transactions_for_account(self, account: Account):
         """
         Sync transactions for a given account and update the database.
@@ -160,18 +160,20 @@ class SchedulerService:
 
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
-                    
+                
                     fields_to_compare = {
                         "amount": existing_entity_data.get("amount"),
                         "details.processing_status": existing_entity_data.get("details", {}).get("processing_status"),
                         "status": existing_entity_data.get("status"),
+                        "date": existing_entity_data.get("date"),
                     }
                     new_values = {
                         "amount": transaction_data.get("amount"),
                         "details.processing_status": transaction_data.get("details", {}).get("processing_status"),
                         "status": transaction_data.get("status"),
+                        "date": transaction_data.get("date"),
                     }
-                
+                    
                     updates = {
                         field: new_value
                         for field, new_value in new_values.items()
@@ -187,6 +189,10 @@ class SchedulerService:
                             f":{field.replace('.', '_')}": value for field, value in updates.items()
                         }
                         expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
+                        
+                        logger.info(f"Updating transaction object with PK {account.PK} and SK {sk} for fields: {list(updates.keys())}")
+                        logger.info(f"Update Expression: {update_expression}")
+                        logger.info(f"Expression Attribute Values: {expression_attribute_values}")
                         
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
