@@ -119,6 +119,27 @@ class SchedulerService:
                 logger.error(f"Failed to upsert balance item with PK {balance_item['PK']} and SK {balance_item['SK']}: {str(e)}")
         
         return accounts_with_balances
+    
+    async def consolidate_transactions(self):
+        """
+        Fetch all accounts from the database and synchronize transactions for each account.
+
+        This method scans the table for items where `EntityType` is 'Account', and for each
+        account found, it calls `sync_transactions_for_account` to process the transactions.
+
+        Returns:
+            None
+        """
+        response = self.table.scan(
+            FilterExpression=Attr('EntityType').eq('Account')
+        )
+
+        items = response.get('Items', [])
+
+        accounts = [Account(**item) for item in items]
+
+        for account in accounts:
+            self.sync_transactions_for_account(account)
 
     async def sync_transactions_for_account(self, account: Account):
         """

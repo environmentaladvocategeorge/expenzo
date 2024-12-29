@@ -125,8 +125,13 @@ Resources:
         ConsolidateBalancesEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(0 9-23/1 * * ? *)
+            Schedule: cron(0 12 * * ? *)
             Input: '{"task": "consolidate_account_balances"}'
+        ConsolidateTransactionsEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 12-24/1 * * ? *)
+            Input: '{"task": "consolidate_transactions"}'
 
   ApiGateway:
     Type: AWS::Serverless::Api

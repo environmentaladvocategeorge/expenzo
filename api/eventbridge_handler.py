@@ -28,6 +28,10 @@ def handler(event, context):
             logger.info("Starting task: consolidate_account_balances")
             result = asyncio.run(scheduler_service.consolidate_account_balances())
             logger.info(f"Task completed successfully: {result}")
+        if task == "consolidate_transactions":
+            logger.info("Starting task: consolidate_transactions")
+            result = asyncio.run(scheduler_service.consolidate_transactions())
+            logger.info(f"Task completed successfully: {result}")
         else:
             error_message = f"Unknown task received: {task}"
             logger.error(error_message)
