@@ -139,7 +139,7 @@ class SchedulerService:
         accounts = [Account(**item) for item in items]
 
         for account in accounts:
-            self.sync_transactions_for_account(account)
+            await self.sync_transactions_for_account(account)
 
     async def sync_transactions_for_account(self, account: Account):
         """
