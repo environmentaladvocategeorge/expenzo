@@ -16,6 +16,7 @@ interface TransactionsContextType {
   paginatedTransactions: GetTransactionsResponse["transactions"];
   getTransactionById: (id: string) => Transaction | null;
   refreshTransactions: () => Promise<void>;
+  getCategorizedTransactions: () => Record<string, Transaction[]>;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(
@@ -92,6 +93,19 @@ export const TransactionsProvider = ({
     );
   };
 
+  const getCategorizedTransactions = (): Record<string, Transaction[]> => {
+    return transactions
+      ? transactions.transactions.reduce((acc, transaction) => {
+          const category = transaction.details.category || "Uncategorized";
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push(transaction);
+          return acc;
+        }, {} as Record<string, Transaction[]>)
+      : {};
+  };
+
   return (
     <TransactionsContext.Provider
       value={{
@@ -104,6 +118,7 @@ export const TransactionsProvider = ({
         paginatedTransactions,
         getTransactionById,
         refreshTransactions,
+        getCategorizedTransactions,
       }}
     >
       {children}
