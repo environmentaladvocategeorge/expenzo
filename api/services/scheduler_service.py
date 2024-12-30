@@ -184,10 +184,7 @@ class SchedulerService:
                 if existing_transaction:
                     existing_entity_data = existing_transaction.get("EntityData", {})
                     update_expressions = []
-                    expression_attribute_names = {
-                        "#ts": "Timestamp",
-                        "#attr_status": "status"
-                    }
+                    expression_attribute_names = {}
                     expression_attribute_values = {}
 
                     if existing_entity_data.get("amount") != transaction_data["amount"]:
@@ -202,6 +199,7 @@ class SchedulerService:
 
                     if existing_entity_data.get("status") != transaction_data["status"]:
                         update_expressions.append("EntityData.#attr_status = :status")
+                        expression_attribute_names["#attr_status"] = "status"
                         expression_attribute_values[":status"] = transaction_data["status"]
 
                     if existing_entity_data.get("date") != transaction_data["date"]:
@@ -211,14 +209,15 @@ class SchedulerService:
 
                     if update_expressions:
                         update_expressions.append("EntityData.#ts = :timestamp")
+                        expression_attribute_names["#ts"] = "Timestamp"
                         expression_attribute_values[":timestamp"] = int(datetime.now(tz=timezone.utc).timestamp())
 
                         update_expression = f"SET {', '.join(update_expressions)}"
                         self.table.update_item(
                             Key={"PK": account.PK, "SK": sk},
                             UpdateExpression=update_expression,
-                            ExpressionAttributeNames=expression_attribute_names,
-                            ExpressionAttributeValues=expression_attribute_values,
+                            ExpressionAttributeNames=expression_attribute_names or None,
+                            ExpressionAttributeValues=expression_attribute_values or None,
                         )
                         logger.info(f"Updated transaction object with PK {account.PK} and SK {sk}")
                     else:
